@@ -7,6 +7,10 @@ import {
   Typography,
   Stack,
 } from "@mui/material";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
 
 type InvoiceForm = {
   buyerName: string;
@@ -24,7 +28,7 @@ export default function InvoiceFormPage() {
       buyerName: "",
       address: "",
       invoiceNumber: "",
-      date: "",
+      date: dayjs().format("YYYY-MM-DD"),
       description: "",
       qty: 1,
       rate: 0,
@@ -37,13 +41,14 @@ export default function InvoiceFormPage() {
   };
 
   return (
-    <Paper sx={{ maxWidth: 420, mx: "auto", mt: 4, p: 3 }}>
-      <Typography variant="h5" gutterBottom>
-        Create Invoice
-      </Typography>
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <Paper sx={{ width: 420, mt: 4, p: 3 }}>
+        <Typography variant="h5" gutterBottom>
+          Create Invoice
+        </Typography>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Stack spacing={2}>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Stack spacing={2}>
           <Controller
             name="buyerName"
             control={control}
@@ -78,12 +83,17 @@ export default function InvoiceFormPage() {
             name="date"
             control={control}
             render={({ field }) => (
-              <TextField
-                type="date"
+              <MobileDatePicker
                 label="Date"
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-                {...field}
+                value={dayjs(field.value)}
+                onChange={(newValue) => {
+                  field.onChange(newValue ? dayjs(newValue).format("YYYY-MM-DD") : "");
+                }}
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                  },
+                }}
               />
             )}
           />
@@ -118,5 +128,6 @@ export default function InvoiceFormPage() {
         </Stack>
       </form>
     </Paper>
+    </LocalizationProvider>
   );
 }
