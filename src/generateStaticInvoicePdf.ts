@@ -17,7 +17,6 @@ export function generateStaticInvoicePdf() {
   // --------------------
   doc.setDrawColor(borderColor);
   doc.setLineWidth(2);
-
   doc.rect(
     padding,
     padding,
@@ -26,10 +25,10 @@ export function generateStaticInvoicePdf() {
   );
 
   // --------------------
-  // Centered "Tax Invoice" Text on Border
+  // "Tax Invoice" centered on top border
   // --------------------
   const text = "Tax Invoice";
-  const borderTopY = padding; // top border y-position
+  const borderTopY = padding;
 
   doc.setFont("helvetica", "bold");
   doc.setFontSize(14);
@@ -37,22 +36,60 @@ export function generateStaticInvoicePdf() {
 
   const textWidth = doc.getTextWidth(text);
   const textX = pageWidth / 2 - textWidth / 2;
-  const textY = borderTopY + 5; // center text vertically on the 2px border line
+  const textY = borderTopY + 5;
 
-  // White background box behind text (padding inside)
   const bgPaddingX = 4;
   const bgPaddingY = 2;
   const bgWidth = textWidth + bgPaddingX * 2;
   const bgHeight = 14 + bgPaddingY * 2;
-
   const bgX = textX - bgPaddingX;
-  const bgY = textY - 12; // 12 is approx text height
+  const bgY = textY - 12;
 
   doc.setFillColor(255, 255, 255);
   doc.rect(bgX, bgY, bgWidth, bgHeight, "F");
 
-  // Draw the text after the background fill
   doc.text(text, textX, textY);
+
+  // --------------------
+  // "Khaldun Plastic Industries" Title
+  // --------------------
+  const title = "Khaldun Plastic Industries";
+  const titleX = padding + 10;
+  const titleY = padding + 30;
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(18);
+  doc.setTextColor(borderColor);
+
+  doc.text(title, titleX, titleY);
+
+  // --- title underline ---
+  const titleWidth = doc.getTextWidth(title);
+  const underlineY = titleY + 6;
+
+  doc.setDrawColor(borderColor);
+  doc.setLineWidth(2);
+  doc.line(titleX, underlineY, titleX + titleWidth, underlineY);
+
+  // --------------------
+  // Address line under underline
+  // --------------------
+  const addressText = "28A-SIDCO INDL. COMPLEX SHALLATENG SRINAGAR (J&K)";
+  const addressY = underlineY + 16;
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.setTextColor(borderColor);
+
+  doc.text(addressText, titleX, addressY);
+
+  // --- NEW: underline under address ---
+  const addressWidth = doc.getTextWidth(addressText);
+  const addressUnderlineY = addressY + 4; // slight spacing
+
+  doc.setDrawColor(borderColor);
+  doc.setLineWidth(1.5);
+  doc.line(titleX, addressUnderlineY, titleX + addressWidth, addressUnderlineY);
 
   return doc;
 }
