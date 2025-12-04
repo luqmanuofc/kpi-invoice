@@ -37,32 +37,34 @@
 .company-title {
   font-size: 22pt;
   margin: 0;
-  border-bottom: 2pt solid #31395e;
+  border-bottom: 1pt solid #31395e;
   text-align: left;
 }
 
 .address {
   font-size: 11pt;
-  border-bottom: 1.5pt solid #31395e;
+  border-bottom: 1pt solid #31395e;
   width: fit-content;
 }
 
 .right div {
-  font-size: 11pt;
+  font-size: 10pt;
   text-align: right;
 }
 
 .divider {
   border: none;
-  border-top: 1.5pt solid #31395e;
+  border-top: 1pt solid #31395e;
   margin-left: -10pt;
   margin-right: -10pt;
+  margin-top: 2pt;
+  margin-bottom: 2pt;
 }
 
 .invoice-meta {
   display: flex;
   justify-content: space-between;
-  font-size: 11pt;
+  font-size: 10pt;
   font-weight: bold;
 }
 
