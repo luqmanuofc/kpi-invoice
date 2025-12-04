@@ -1,130 +1,144 @@
 import jsPDF from "jspdf";
 
 export function generateStaticInvoicePdf() {
-  const doc = new jsPDF({
-    unit: "pt",
-    format: "a4",
-  });
+  const doc = new jsPDF({ unit: "pt", format: "a4" });
+
+  // -------------------------------------------------
+  // Layout & Style Constants
+  // -------------------------------------------------
+  const BORDER_COLOR = "#31395e";
+  const PAGE_PADDING = 15;
+  const INNER_LEFT_X = PAGE_PADDING + 10;
+  const RIGHT_COLUMN_PADDING = 10;
+
+  const TITLE_FONT_SIZE = 22;
+  const NORMAL_FONT_SIZE = 11;
+  const TAX_LABEL_FONT_SIZE = 14;
+
+  const TAX_LABEL_VERTICAL_OFFSET = 5;
+  const TAX_LABEL_BG_HORIZONTAL_PADDING = 4;
+  const TAX_LABEL_BG_VERTICAL_PADDING = 2;
+
+  const TITLE_VERTICAL_OFFSET = 30;
+  const TITLE_UNDERLINE_OFFSET = 6;
+
+  const ADDRESS_VERTICAL_OFFSET = 16;
+  const ADDRESS_UNDERLINE_OFFSET = 4;
+
+  const RIGHT_COLUMN_LINE_HEIGHT = 14;
+  const RIGHT_COLUMN_VERTICAL_OFFSET = -10; // relative to title baseline
+
+  const HEADER_DIVIDER_OFFSET = 10;
+
+  const BORDER_THICKNESS = 2;
+  const UNDERLINE_THICKNESS = 1.5;
+  const DIVIDER_THICKNESS = 1.2;
 
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
 
-  const padding = 15;
-  const borderColor = "#31395e";
+  const INNER_RIGHT_X = pageWidth - PAGE_PADDING - RIGHT_COLUMN_PADDING;
 
-  // --------------------
-  // Border
-  // --------------------
-  doc.setDrawColor(borderColor);
-  doc.setLineWidth(2);
+  // -------------------------------------------------
+  // Utility: Right-align any text block
+  // -------------------------------------------------
+  const rightAlignText = (text: string, y: number) => {
+    const width = doc.getTextWidth(text);
+    doc.text(text, INNER_RIGHT_X - width, y);
+  };
+
+  // -------------------------------------------------
+  // Base Styles
+  // -------------------------------------------------
+  doc.setTextColor(BORDER_COLOR);
+  doc.setDrawColor(BORDER_COLOR);
+
+  // -------------------------------------------------
+  // Outer Border
+  // -------------------------------------------------
+  doc.setLineWidth(BORDER_THICKNESS);
   doc.rect(
-    padding,
-    padding,
-    pageWidth - padding * 2,
-    pageHeight - padding * 2
+    PAGE_PADDING,
+    PAGE_PADDING,
+    pageWidth - PAGE_PADDING * 2,
+    pageHeight - PAGE_PADDING * 2
   );
 
-  // --------------------
+  // -------------------------------------------------
   // "Tax Invoice" centered on top border
-  // --------------------
-  const text = "Tax Invoice";
-  const borderTopY = padding;
+  // -------------------------------------------------
+  const TAX_LABEL = "Tax Invoice";
 
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(14);
-  doc.setTextColor(borderColor);
+  doc.setFontSize(TAX_LABEL_FONT_SIZE);
 
-  const textWidth = doc.getTextWidth(text);
-  const textX = pageWidth / 2 - textWidth / 2;
-  const textY = borderTopY + 5;
+  const taxLabelWidth = doc.getTextWidth(TAX_LABEL);
+  const taxLabelX = pageWidth / 2 - taxLabelWidth / 2;
+  const taxLabelY = PAGE_PADDING + TAX_LABEL_VERTICAL_OFFSET;
 
-  const bgPaddingX = 4;
-  const bgPaddingY = 2;
-  const bgWidth = textWidth + bgPaddingX * 2;
-  const bgHeight = 14 + bgPaddingY * 2;
-  const bgX = textX - bgPaddingX;
-  const bgY = textY - 12;
-
+  // Background box behind text
   doc.setFillColor(255, 255, 255);
-  doc.rect(bgX, bgY, bgWidth, bgHeight, "F");
-
-  doc.text(text, textX, textY);
-
-  // --------------------
-  // "Khaldun Plastic Industries" Title
-  // --------------------
-  const title = "Khaldun Plastic Industries";
-  const titleX = padding + 10;
-  const titleY = padding + 30; // vertical anchor for both sides
-
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(22);
-  doc.setTextColor(borderColor);
-
-  doc.text(title, titleX, titleY);
-
-  // --- title underline ---
-  const titleWidth = doc.getTextWidth(title);
-  const underlineY = titleY + 6;
-
-  doc.setDrawColor(borderColor);
-  doc.setLineWidth(2);
-  doc.line(titleX, underlineY, titleX + titleWidth, underlineY);
-
-  // --------------------
-  // Address line
-  // --------------------
-  const addressText = "28A-SIDCO INDL. COMPLEX SHALLATENG SRINAGAR (J&K)";
-  const addressY = underlineY + 16;
-
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(11);
-  doc.setTextColor(borderColor);
-
-  doc.text(addressText, titleX, addressY);
-
-  // --- underline under address ---
-  const addressWidth = doc.getTextWidth(addressText);
-  const addressUnderlineY = addressY + 4;
-
-  doc.setDrawColor(borderColor);
-  doc.setLineWidth(1.5);
-  doc.line(titleX, addressUnderlineY, titleX + addressWidth, addressUnderlineY);
-
-  // --------------------
-  // NEW: Right-side Email & Mobile (right-aligned)
-  // --------------------
-
-  // Right margin inside the border:
-  const rightMarginX = pageWidth - padding - 10;
-
-  const emailText = "Email: kpikashmir@gmail.com";
-  const mobileText = "Mobile: 9419009217";
-
-  const emailWidth = doc.getTextWidth(emailText);
-  const mobileWidth = doc.getTextWidth(mobileText);
-
-  // Top alignment matches the title's vertical position (titleY)
-  const rightBlockY = titleY;
-
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(11);
-  doc.setTextColor(borderColor);
-
-  // Right-aligned text: x = rightMarginX - textWidth
-  doc.text(emailText, rightMarginX - emailWidth, rightBlockY);
-  doc.text(mobileText, rightMarginX - mobileWidth, rightBlockY + 16);
-
-  const dividerY = addressUnderlineY + 5; // adjust spacing as needed
-  doc.setDrawColor(borderColor);
-  doc.setLineWidth(1.2);
-  doc.line(
-    padding,                 
-    dividerY,                   
-    pageWidth - padding, 
-    dividerY
+  doc.rect(
+    taxLabelX - TAX_LABEL_BG_HORIZONTAL_PADDING,
+    taxLabelY - (TAX_LABEL_FONT_SIZE + TAX_LABEL_BG_VERTICAL_PADDING - 4),
+    taxLabelWidth + TAX_LABEL_BG_HORIZONTAL_PADDING * 2,
+    TAX_LABEL_FONT_SIZE + TAX_LABEL_BG_VERTICAL_PADDING * 2,
+    "F"
   );
 
+  doc.text(TAX_LABEL, taxLabelX, taxLabelY);
+
+  // -------------------------------------------------
+  // Company Title
+  // -------------------------------------------------
+  const COMPANY_TITLE = "Khaldun Plastic Industries";
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(TITLE_FONT_SIZE);
+
+  const titleY = PAGE_PADDING + TITLE_VERTICAL_OFFSET;
+  doc.text(COMPANY_TITLE, INNER_LEFT_X, titleY);
+
+  // Underline under title
+  const titleWidth = doc.getTextWidth(COMPANY_TITLE);
+  const titleUnderlineY = titleY + TITLE_UNDERLINE_OFFSET;
+
+  doc.setLineWidth(BORDER_THICKNESS);
+  doc.line(INNER_LEFT_X, titleUnderlineY, INNER_LEFT_X + titleWidth, titleUnderlineY);
+
+  // -------------------------------------------------
+  // Address Line + Underline
+  // -------------------------------------------------
+  const ADDRESS_LINE = "28A-SIDCO INDL. COMPLEX SHALLATENG SRINAGAR (J&K)";
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(NORMAL_FONT_SIZE);
+
+  const addressY = titleUnderlineY + ADDRESS_VERTICAL_OFFSET;
+  doc.text(ADDRESS_LINE, INNER_LEFT_X, addressY);
+
+  const addressWidth = doc.getTextWidth(ADDRESS_LINE);
+  const addressUnderlineY = addressY + ADDRESS_UNDERLINE_OFFSET;
+
+  doc.setLineWidth(UNDERLINE_THICKNESS);
+  doc.line(INNER_LEFT_X, addressUnderlineY, INNER_LEFT_X + addressWidth, addressUnderlineY);
+
+  // -------------------------------------------------
+  // Right-side Contact & GSTIN (Even Spacing)
+  // -------------------------------------------------
+  const rightColumnBaseY = titleY + RIGHT_COLUMN_VERTICAL_OFFSET;
+
+  rightAlignText("Email: kpikashmir@gmail.com", rightColumnBaseY);
+  rightAlignText("Mobile: 9419009217", rightColumnBaseY + RIGHT_COLUMN_LINE_HEIGHT);
+  rightAlignText("GSTIN: 01BSGPB0427H1ZJ", rightColumnBaseY + RIGHT_COLUMN_LINE_HEIGHT * 2);
+
+  // -------------------------------------------------
+  // Divider Line Under Header
+  // -------------------------------------------------
+  const dividerY = addressUnderlineY + HEADER_DIVIDER_OFFSET;
+
+  doc.setLineWidth(DIVIDER_THICKNESS);
+  doc.line(PAGE_PADDING, dividerY, pageWidth - PAGE_PADDING, dividerY);
 
   return doc;
 }
