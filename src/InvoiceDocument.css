@@ -55,6 +55,8 @@
 .divider {
   border: none;
   border-top: 1.5pt solid #31395e;
+  margin-left: -10pt;
+  margin-right: -10pt;
 }
 
 .invoice-meta {
