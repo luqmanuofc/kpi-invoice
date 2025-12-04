@@ -115,5 +115,16 @@ export function generateStaticInvoicePdf() {
   doc.text(emailText, rightMarginX - emailWidth, rightBlockY);
   doc.text(mobileText, rightMarginX - mobileWidth, rightBlockY + 16);
 
+  const dividerY = addressUnderlineY + 5; // adjust spacing as needed
+  doc.setDrawColor(borderColor);
+  doc.setLineWidth(1.2);
+  doc.line(
+    padding,                 
+    dividerY,                   
+    pageWidth - padding, 
+    dividerY
+  );
+
+
   return doc;
 }
