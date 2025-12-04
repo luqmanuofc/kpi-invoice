@@ -55,10 +55,10 @@ export function generateStaticInvoicePdf() {
   // --------------------
   const title = "Khaldun Plastic Industries";
   const titleX = padding + 10;
-  const titleY = padding + 30;
+  const titleY = padding + 30; // vertical anchor for both sides
 
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(18);
+  doc.setFontSize(22);
   doc.setTextColor(borderColor);
 
   doc.text(title, titleX, titleY);
@@ -72,24 +72,48 @@ export function generateStaticInvoicePdf() {
   doc.line(titleX, underlineY, titleX + titleWidth, underlineY);
 
   // --------------------
-  // Address line under underline
+  // Address line
   // --------------------
   const addressText = "28A-SIDCO INDL. COMPLEX SHALLATENG SRINAGAR (J&K)";
   const addressY = underlineY + 16;
 
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
+  doc.setFontSize(11);
   doc.setTextColor(borderColor);
 
   doc.text(addressText, titleX, addressY);
 
-  // --- NEW: underline under address ---
+  // --- underline under address ---
   const addressWidth = doc.getTextWidth(addressText);
-  const addressUnderlineY = addressY + 4; // slight spacing
+  const addressUnderlineY = addressY + 4;
 
   doc.setDrawColor(borderColor);
   doc.setLineWidth(1.5);
   doc.line(titleX, addressUnderlineY, titleX + addressWidth, addressUnderlineY);
+
+  // --------------------
+  // NEW: Right-side Email & Mobile (right-aligned)
+  // --------------------
+
+  // Right margin inside the border:
+  const rightMarginX = pageWidth - padding - 10;
+
+  const emailText = "Email: kpikashmir@gmail.com";
+  const mobileText = "Mobile: 9419009217";
+
+  const emailWidth = doc.getTextWidth(emailText);
+  const mobileWidth = doc.getTextWidth(mobileText);
+
+  // Top alignment matches the title's vertical position (titleY)
+  const rightBlockY = titleY;
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(11);
+  doc.setTextColor(borderColor);
+
+  // Right-aligned text: x = rightMarginX - textWidth
+  doc.text(emailText, rightMarginX - emailWidth, rightBlockY);
+  doc.text(mobileText, rightMarginX - mobileWidth, rightBlockY + 16);
 
   return doc;
 }
