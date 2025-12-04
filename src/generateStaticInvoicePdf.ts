@@ -7,48 +7,73 @@ export function generateStaticInvoicePdf() {
   // Layout & Style Constants
   // -------------------------------------------------
   const BORDER_COLOR = "#31395e";
+
+  // Page spacing
   const PAGE_PADDING = 15;
-  const INNER_LEFT_X = PAGE_PADDING + 10;
-  const RIGHT_COLUMN_PADDING = 10;
+  const CONTENT_LEFT_X = PAGE_PADDING + 10;
+  const CONTENT_RIGHT_PADDING = 10;
 
-  const TITLE_FONT_SIZE = 22;
-  const NORMAL_FONT_SIZE = 11;
-  const TAX_LABEL_FONT_SIZE = 14;
+  // Font sizes
+  const FONT_SIZE_TITLE = 22;
+  const FONT_SIZE_NORMAL = 11;
+  const FONT_SIZE_TAX_LABEL = 14;
 
-  const TAX_LABEL_VERTICAL_OFFSET = 5;
-  const TAX_LABEL_BG_HORIZONTAL_PADDING = 4;
-  const TAX_LABEL_BG_VERTICAL_PADDING = 2;
+  // Tax label layout
+  const TAX_LABEL_Y_OFFSET = 5;
+  const TAX_BG_PAD_X = 4;
+  const TAX_BG_PAD_Y = 2;
 
-  const TITLE_VERTICAL_OFFSET = 30;
-  const TITLE_UNDERLINE_OFFSET = 6;
+  // Company title layout
+  const COMPANY_TITLE_Y_OFFSET = 30;
+  const COMPANY_TITLE_UNDERLINE_OFFSET = 6;
 
-  const ADDRESS_VERTICAL_OFFSET = 16;
+  // Address layout
+  const ADDRESS_Y_OFFSET = 16;
   const ADDRESS_UNDERLINE_OFFSET = 4;
 
+  // Right-side contact layout
   const RIGHT_COLUMN_LINE_HEIGHT = 14;
-  const RIGHT_COLUMN_VERTICAL_OFFSET = -10; // relative to title baseline
+  const RIGHT_COLUMN_VERTICAL_OFFSET = -10; // relative to company title Y
 
-  const HEADER_DIVIDER_OFFSET = 10;
+  // Divider spacing
+  const HEADER_DIVIDER_Y_OFFSET = 10;
 
+  // Thicknesses
   const BORDER_THICKNESS = 2;
   const UNDERLINE_THICKNESS = 1.5;
   const DIVIDER_THICKNESS = 1.2;
+  const SECTION_DIVIDER_THICKNESS = 1;
+
+  // Invoice section spacing
+  const INVOICE_SECTION_Y_OFFSET = 15;
+  const INVOICE_SECTION_LINE_OFFSET = 7.5;
 
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
 
-  const INNER_RIGHT_X = pageWidth - PAGE_PADDING - RIGHT_COLUMN_PADDING;
+  const CONTENT_RIGHT_X = pageWidth - PAGE_PADDING - CONTENT_RIGHT_PADDING;
 
   // -------------------------------------------------
-  // Utility: Right-align any text block
+  // Utilities
   // -------------------------------------------------
-  const rightAlignText = (text: string, y: number) => {
-    const width = doc.getTextWidth(text);
-    doc.text(text, INNER_RIGHT_X - width, y);
+
+  const centerX = (text: string) => pageWidth / 2 - doc.getTextWidth(text) / 2;
+
+  const rightAlignX = (text: string) =>
+    CONTENT_RIGHT_X - doc.getTextWidth(text);
+
+  const drawUnderline = (
+    x: number,
+    y: number,
+    width: number,
+    thickness = UNDERLINE_THICKNESS
+  ) => {
+    doc.setLineWidth(thickness);
+    doc.line(x, y, x + width, y);
   };
 
   // -------------------------------------------------
-  // Base Styles
+  // Base Style Setup
   // -------------------------------------------------
   doc.setTextColor(BORDER_COLOR);
   doc.setDrawColor(BORDER_COLOR);
@@ -65,24 +90,23 @@ export function generateStaticInvoicePdf() {
   );
 
   // -------------------------------------------------
-  // "Tax Invoice" centered on top border
+  // "Tax Invoice" Label (Centered on Top Border)
   // -------------------------------------------------
   const TAX_LABEL = "Tax Invoice";
 
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(TAX_LABEL_FONT_SIZE);
+  doc.setFontSize(FONT_SIZE_TAX_LABEL);
 
-  const taxLabelWidth = doc.getTextWidth(TAX_LABEL);
-  const taxLabelX = pageWidth / 2 - taxLabelWidth / 2;
-  const taxLabelY = PAGE_PADDING + TAX_LABEL_VERTICAL_OFFSET;
+  const taxLabelX = centerX(TAX_LABEL);
+  const taxLabelY = PAGE_PADDING + TAX_LABEL_Y_OFFSET;
 
-  // Background box behind text
+  // White box behind text
   doc.setFillColor(255, 255, 255);
   doc.rect(
-    taxLabelX - TAX_LABEL_BG_HORIZONTAL_PADDING,
-    taxLabelY - (TAX_LABEL_FONT_SIZE + TAX_LABEL_BG_VERTICAL_PADDING - 4),
-    taxLabelWidth + TAX_LABEL_BG_HORIZONTAL_PADDING * 2,
-    TAX_LABEL_FONT_SIZE + TAX_LABEL_BG_VERTICAL_PADDING * 2,
+    taxLabelX - TAX_BG_PAD_X,
+    taxLabelY - (FONT_SIZE_TAX_LABEL - TAX_BG_PAD_Y - 4),
+    doc.getTextWidth(TAX_LABEL) + TAX_BG_PAD_X * 2,
+    FONT_SIZE_TAX_LABEL + TAX_BG_PAD_Y * 2,
     "F"
   );
 
@@ -94,51 +118,95 @@ export function generateStaticInvoicePdf() {
   const COMPANY_TITLE = "Khaldun Plastic Industries";
 
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(TITLE_FONT_SIZE);
+  doc.setFontSize(FONT_SIZE_TITLE);
 
-  const titleY = PAGE_PADDING + TITLE_VERTICAL_OFFSET;
-  doc.text(COMPANY_TITLE, INNER_LEFT_X, titleY);
+  const companyTitleY = PAGE_PADDING + COMPANY_TITLE_Y_OFFSET;
+  doc.text(COMPANY_TITLE, CONTENT_LEFT_X, companyTitleY);
 
-  // Underline under title
-  const titleWidth = doc.getTextWidth(COMPANY_TITLE);
-  const titleUnderlineY = titleY + TITLE_UNDERLINE_OFFSET;
+  // Underline
+  const companyTitleWidth = doc.getTextWidth(COMPANY_TITLE);
+  const companyTitleUnderlineY = companyTitleY + COMPANY_TITLE_UNDERLINE_OFFSET;
 
-  doc.setLineWidth(BORDER_THICKNESS);
-  doc.line(INNER_LEFT_X, titleUnderlineY, INNER_LEFT_X + titleWidth, titleUnderlineY);
+  drawUnderline(
+    CONTENT_LEFT_X,
+    companyTitleUnderlineY,
+    companyTitleWidth,
+    BORDER_THICKNESS
+  );
 
   // -------------------------------------------------
-  // Address Line + Underline
+  // Address + Underline
   // -------------------------------------------------
   const ADDRESS_LINE = "28A-SIDCO INDL. COMPLEX SHALLATENG SRINAGAR (J&K)";
 
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(NORMAL_FONT_SIZE);
+  doc.setFontSize(FONT_SIZE_NORMAL);
 
-  const addressY = titleUnderlineY + ADDRESS_VERTICAL_OFFSET;
-  doc.text(ADDRESS_LINE, INNER_LEFT_X, addressY);
+  const addressY = companyTitleUnderlineY + ADDRESS_Y_OFFSET;
 
-  const addressWidth = doc.getTextWidth(ADDRESS_LINE);
+  doc.text(ADDRESS_LINE, CONTENT_LEFT_X, addressY);
+
+  drawUnderline(
+    CONTENT_LEFT_X,
+    addressY + ADDRESS_UNDERLINE_OFFSET,
+    doc.getTextWidth(ADDRESS_LINE)
+  );
+
   const addressUnderlineY = addressY + ADDRESS_UNDERLINE_OFFSET;
 
-  doc.setLineWidth(UNDERLINE_THICKNESS);
-  doc.line(INNER_LEFT_X, addressUnderlineY, INNER_LEFT_X + addressWidth, addressUnderlineY);
+  // -------------------------------------------------
+  // Right Column Contact Info
+  // -------------------------------------------------
+  const contactStartY = companyTitleY + RIGHT_COLUMN_VERTICAL_OFFSET;
+
+  const CONTACT_LINES = [
+    "Email: kpikashmir@gmail.com",
+    "Mobile: 9419009217",
+    "GSTIN: 01BSGPB0427H1ZJ",
+  ];
+
+  CONTACT_LINES.forEach((line, i) => {
+    const y = contactStartY + RIGHT_COLUMN_LINE_HEIGHT * i;
+    doc.text(line, rightAlignX(line), y);
+  });
 
   // -------------------------------------------------
-  // Right-side Contact & GSTIN (Even Spacing)
+  // Divider under header section
   // -------------------------------------------------
-  const rightColumnBaseY = titleY + RIGHT_COLUMN_VERTICAL_OFFSET;
-
-  rightAlignText("Email: kpikashmir@gmail.com", rightColumnBaseY);
-  rightAlignText("Mobile: 9419009217", rightColumnBaseY + RIGHT_COLUMN_LINE_HEIGHT);
-  rightAlignText("GSTIN: 01BSGPB0427H1ZJ", rightColumnBaseY + RIGHT_COLUMN_LINE_HEIGHT * 2);
-
-  // -------------------------------------------------
-  // Divider Line Under Header
-  // -------------------------------------------------
-  const dividerY = addressUnderlineY + HEADER_DIVIDER_OFFSET;
+  const dividerY = addressUnderlineY + HEADER_DIVIDER_Y_OFFSET;
 
   doc.setLineWidth(DIVIDER_THICKNESS);
   doc.line(PAGE_PADDING, dividerY, pageWidth - PAGE_PADDING, dividerY);
+
+  // -------------------------------------------------
+  // INVOICE SECTION (Left, Center, Right)
+  // -------------------------------------------------
+  const invoiceSectionY = dividerY + INVOICE_SECTION_Y_OFFSET;
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(FONT_SIZE_NORMAL);
+
+  const invoiceNoText = "Invoice No: INV-001";
+  const transportText = "Transport No: TR-1234";
+  const dateText = "Date: 27/09/2025";
+
+  // Left
+  doc.text(invoiceNoText, CONTENT_LEFT_X, invoiceSectionY);
+
+  // Center (true center)
+  doc.text(transportText, centerX(transportText), invoiceSectionY);
+
+  // Right
+  doc.text(dateText, rightAlignX(dateText), invoiceSectionY);
+
+  // Section divider under invoice section
+  doc.setLineWidth(SECTION_DIVIDER_THICKNESS);
+  doc.line(
+    PAGE_PADDING,
+    invoiceSectionY + INVOICE_SECTION_LINE_OFFSET,
+    pageWidth - PAGE_PADDING,
+    invoiceSectionY + INVOICE_SECTION_LINE_OFFSET
+  );
 
   return doc;
 }
