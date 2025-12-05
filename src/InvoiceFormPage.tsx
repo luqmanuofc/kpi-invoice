@@ -1,5 +1,4 @@
 import {
-  Box,
   TextField,
   Button,
   Paper,
@@ -23,7 +22,12 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
 import dayjs from "dayjs";
 
-type InvoiceItem = {
+//
+// ===========================
+// FULL TYPES
+// ===========================
+//
+export type InvoiceItem = {
   description: string;
   hsn: string;
   qty: number;
@@ -31,7 +35,7 @@ type InvoiceItem = {
   rate: number;
 };
 
-type InvoiceForm = {
+export type InvoiceForm = {
   invoiceNumber: string;
   vehicleNumber: string;
   date: string;
@@ -46,10 +50,23 @@ type InvoiceForm = {
   cgst: number;
   sgst: number;
   igst: number;
+
+  sellerName: string;
+  sellerAddress: string;
+  sellerEmail: string;
+  sellerPhone: string;
+  sellerGstin: string;
+
+  amountInWords: string;
 };
 
+//
+// ===========================
+// COMPONENT
+// ===========================
+//
 export default function InvoiceFormPage() {
-  const { control, handleSubmit, watch } = useForm<InvoiceForm>({
+  const { control, handleSubmit } = useForm<InvoiceForm>({
     defaultValues: {
       invoiceNumber: "",
       vehicleNumber: "",
@@ -65,6 +82,16 @@ export default function InvoiceFormPage() {
       cgst: 9,
       sgst: 9,
       igst: 0,
+
+      // NEW DEFAULT SELLER INFO
+      sellerName: "Khaldun Plastic Industries",
+      sellerAddress: "28A-SIDCO INDL. COMPLEX SHALLATENG SRINAGAR (J&K)",
+      sellerEmail: "kpikashmir@gmail.com",
+      sellerPhone: "9419009217",
+      sellerGstin: "01BSGPB0427H1ZJ",
+
+      // NEW
+      amountInWords: "",
     },
   });
 
@@ -74,7 +101,7 @@ export default function InvoiceFormPage() {
   });
 
   const onSubmit = (data: InvoiceForm) => {
-    console.log(data);
+    console.log("FINAL FORM DATA:", data);
   };
 
   return (
@@ -178,6 +205,7 @@ export default function InvoiceFormPage() {
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 Items ({fields.length})
               </AccordionSummary>
+
               <AccordionDetails>
                 <Stack spacing={3}>
                   {fields.map((item, index) => (
@@ -332,6 +360,30 @@ export default function InvoiceFormPage() {
               </AccordionDetails>
             </Accordion>
 
+            {/* =============================
+                AMOUNT IN WORDS
+            ============================== */}
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                Amount in Words
+              </AccordionSummary>
+              <AccordionDetails>
+                <Controller
+                  name="amountInWords"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      label="Amount in Words"
+                      fullWidth
+                      placeholder="Auto-generated or enter manually"
+                      {...field}
+                    />
+                  )}
+                />
+              </AccordionDetails>
+            </Accordion>
+
+            {/* SUBMIT BUTTON */}
             <Button variant="contained" size="large" type="submit">
               Preview & Generate PDF
             </Button>
