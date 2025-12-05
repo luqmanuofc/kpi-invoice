@@ -138,13 +138,14 @@
   float: right;                
   width: 44.075%;                   
   border: 1pt solid #31395e; 
-  border-top: none;             
+  margin-top: 5pt;
+  /* border-top: none;              */
   text-align: right;
 }
 
-.totals-table > tbody > tr:first-child > td {
+/* .totals-table > tbody > tr:first-child > td {
   border-top: none;
-}
+} */
 
 .totals-table td {
   border: 1pt solid #31395e;
