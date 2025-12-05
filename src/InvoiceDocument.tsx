@@ -135,6 +135,49 @@ export default function InvoiceDocument() {
             </tr>
           </tbody>
         </table>
+
+        <div className="clear-float"></div>
+
+        {/* === Amount in Words Section === */}
+        <div className="amount-words-section">
+          <div className="dotted-line"></div>
+          <div className="amount-text">
+            Rs.{" "}
+            <span className="amount-words">
+              ONE LAKH EIGHTY FOUR THOUSAND SIX HUNDRED ELEVEN ONLY.
+            </span>
+          </div>
+          <div className="dotted-line"></div>
+        </div>
+
+        {/* === Footer Section (T&C + Signature) === */}
+        <div className="footer-section">
+          {/* Left: Terms & Conditions */}
+          <div className="terms">
+            <strong>Terms & Conditions:</strong>
+            <ol className="terms-list">
+              <li>E. &amp; O.E.</li>
+              <li>Subject to Srinagar Jurisdiction.</li>
+              <li>
+                Interest @ 24% per annum will be charged if the bill is not paid
+                within 30 days.
+              </li>
+              <li>Goods once sold cannot be taken back.</li>
+            </ol>
+          </div>
+
+          {/* Right: Signature Block */}
+          <div className="signature-block">
+            <div className="company-sign">For KHALDUN PLASTIC INDUSTRIES</div>
+
+            <div className="signature-spacer"></div>
+
+            <div className="signature-labels">
+              <div />
+              <span>Authorised Signatory</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
