@@ -7,7 +7,8 @@ type Props = {
 
 export default function InvoiceDocument({ data }: Props) {
   return (
-    <div className="invoice-page">
+    <div className="invoice-page-wrapper">
+      <div className="invoice-page">
       {/* Outer border */}
       <div className="invoice-border">
         {/* Tax Label */}
@@ -169,6 +170,7 @@ export default function InvoiceDocument({ data }: Props) {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );
