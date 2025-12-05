@@ -101,3 +101,64 @@
   flex: 1;
   text-align: left;
 }
+
+/* ================================
+   Items Table
+   ================================ */
+
+.items-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8pt;
+  font-size: 10pt;
+}
+
+.items-table th,
+.items-table td {
+  border: 1pt solid #31395e;
+  padding: 4pt 6pt;
+  text-align: center;
+}
+
+.items-table th {
+  font-weight: bold;
+  background: #f8f8f8;
+}
+
+.items-table td:nth-child(2) {
+  text-align: left; /* Description column left aligned */
+}
+
+/* ================================
+   Totals Table (Right-Aligned)
+   ================================ */
+.totals-table {
+  border-collapse: collapse;
+  margin-top: 5pt;
+  font-size: 10pt;
+  float: right;                 /* right alignment */
+  width: 44%;                   /* matches width of Qty + Unit + Rate + Total */
+  border: 1pt solid #31395e; 
+  text-align: right;
+}
+
+.totals-table td {
+  border: 1pt solid #31395e;
+  padding: 4pt 6pt;
+}
+
+.totals-table td.amount {
+  text-align: right;
+  font-weight: bold;
+}
+
+.totals-table tr td:first-child {
+  width: 59%;
+  font-weight: bold;
+}
+
+.totals-table .grand-total td {
+  font-size: 11pt;
+  font-weight: bold;
+  background: #f0f0f0;
+}
