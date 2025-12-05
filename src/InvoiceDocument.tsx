@@ -30,7 +30,7 @@ export default function InvoiceDocument() {
         {/* Invoice Info */}
         <div className="invoice-meta">
           <span>Invoice No: INV-001</span>
-          <span className="center">Transport No: TR-1234</span>
+          <span className="center">Vehicle No: TR-1234</span>
           <span className="right">Date: 27/09/2025</span>
         </div>
 
