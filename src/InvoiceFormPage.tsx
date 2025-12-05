@@ -21,7 +21,6 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 import { Controller, useFieldArray, type UseFormReturn } from "react-hook-form";
 import dayjs from "dayjs";
-import { ToWords } from "to-words";
 
 //
 // ===========================
@@ -235,7 +234,9 @@ export default function InvoiceFormPage({ form }: Props) {
                                 label="Qty"
                                 sx={{ width: "33%" }}
                                 {...field}
-                                onChange={(e) => field.onChange(Number(e.target.value))}
+                                onChange={(e) =>
+                                  field.onChange(Number(e.target.value))
+                                }
                               />
                             )}
                           />
@@ -268,7 +269,9 @@ export default function InvoiceFormPage({ form }: Props) {
                                 label="Rate"
                                 sx={{ width: "33%" }}
                                 {...field}
-                                onChange={(e) => field.onChange(Number(e.target.value))}
+                                onChange={(e) =>
+                                  field.onChange(Number(e.target.value))
+                                }
                               />
                             )}
                           />
