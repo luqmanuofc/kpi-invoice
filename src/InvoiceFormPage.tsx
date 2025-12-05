@@ -87,7 +87,7 @@ export default function InvoiceFormPage({ form }: Props) {
   });
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <Paper sx={{ p: 2, maxWidth: 480, m: "auto", mt: 3 }}>
+      <Paper sx={{ p: 2, maxWidth: 480, mt: 3 }}>
         <Typography variant="h5" sx={{ mb: 2 }}>
           Create Invoice
         </Typography>

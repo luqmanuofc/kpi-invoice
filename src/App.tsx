@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import dayjs from "dayjs";
 import { useMemo } from "react";
 import { ToWords } from "to-words";
+import { Button } from "@mui/material";
 
 function App() {
   const form = useForm<InvoiceForm>({
@@ -48,10 +49,7 @@ function App() {
 
   // Compute totals automatically whenever form data changes
   const computedData = useMemo(() => {
-    const subtotal = formData.items.reduce(
-      (sum, i) => sum + i.qty * i.rate,
-      0
-    );
+    const subtotal = formData.items.reduce((sum, i) => sum + i.qty * i.rate, 0);
 
     const cgstAmount = (subtotal * formData.cgst) / 100;
     const sgstAmount = (subtotal * formData.sgst) / 100;
@@ -83,7 +81,18 @@ function App() {
         flexDirection: "row",
       }}
     >
-      <InvoiceFormPage form={form} />
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "flex-start",
+          gap: "1rem",
+        }}
+      >
+        <InvoiceFormPage form={form} />
+        <Button variant="contained">Generate PDF</Button>
+      </div>
+
       <InvoiceDocument data={computedData} />
     </div>
   );
