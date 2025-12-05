@@ -21,6 +21,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 import { useForm, Controller, useFieldArray } from "react-hook-form";
 import dayjs from "dayjs";
+import { ToWords } from "to-words";
 
 //
 // ===========================
@@ -51,12 +52,21 @@ export type InvoiceForm = {
   sgst: number;
   igst: number;
 
+  // NEW TOTAL SECTIONS (computed automatically)
+  subtotal: number;
+  cgstAmount: number;
+  sgstAmount: number;
+  igstAmount: number;
+  total: number;
+
+  // Seller
   sellerName: string;
   sellerAddress: string;
   sellerEmail: string;
   sellerPhone: string;
   sellerGstin: string;
 
+  // Auto-generated
   amountInWords: string;
 };
 
@@ -83,14 +93,20 @@ export default function InvoiceFormPage() {
       sgst: 9,
       igst: 0,
 
-      // NEW DEFAULT SELLER INFO
+      // Totals – initially 0, will be overwritten
+      subtotal: 0,
+      cgstAmount: 0,
+      sgstAmount: 0,
+      igstAmount: 0,
+      total: 0,
+
+      // Seller
       sellerName: "Khaldun Plastic Industries",
       sellerAddress: "28A-SIDCO INDL. COMPLEX SHALLATENG SRINAGAR (J&K)",
       sellerEmail: "kpikashmir@gmail.com",
       sellerPhone: "9419009217",
       sellerGstin: "01BSGPB0427H1ZJ",
 
-      // NEW
       amountInWords: "",
     },
   });
@@ -100,8 +116,45 @@ export default function InvoiceFormPage() {
     name: "items",
   });
 
-  const onSubmit = (data: InvoiceForm) => {
-    console.log("FINAL FORM DATA:", data);
+  const onSubmit = async (data: InvoiceForm) => {
+    // ============================
+    // COMPUTE TOTALS
+    // ============================
+    const subtotal = data.items.reduce((sum, i) => sum + i.qty * i.rate, 0);
+
+    const cgstAmount = (subtotal * data.cgst) / 100;
+    const sgstAmount = (subtotal * data.sgst) / 100;
+    const igstAmount = (subtotal * data.igst) / 100;
+
+    const total =
+      subtotal - data.discount + cgstAmount + sgstAmount + igstAmount;
+
+    // ============================
+    // AUTO-GENERATE WORDS USING to-words
+    // ============================
+    const toWords = new ToWords({ localeCode: "en-IN" });
+
+    const amountInWords =
+      toWords.convert(Math.round(total)).toUpperCase() + " ONLY";
+
+    // ============================
+    // FINAL DATA PAYLOAD
+    // ============================
+    const finalData: InvoiceForm = {
+      ...data,
+      subtotal,
+      cgstAmount,
+      sgstAmount,
+      igstAmount,
+      total,
+      amountInWords,
+    };
+
+    console.log("FINAL INVOICE DATA:", finalData);
+
+    // Later:
+    // navigate("/preview", { state: finalData })
+    // OR pass to PDF generator
   };
 
   return (
@@ -116,7 +169,7 @@ export default function InvoiceFormPage() {
             {/* =============================
                 INVOICE INFO
             ============================== */}
-            <Accordion defaultExpanded>
+            <Accordion>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 Invoice Details
               </AccordionSummary>
@@ -357,29 +410,6 @@ export default function InvoiceFormPage() {
                     )}
                   />
                 </Stack>
-              </AccordionDetails>
-            </Accordion>
-
-            {/* =============================
-                AMOUNT IN WORDS
-            ============================== */}
-            <Accordion>
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                Amount in Words
-              </AccordionSummary>
-              <AccordionDetails>
-                <Controller
-                  name="amountInWords"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      label="Amount in Words"
-                      fullWidth
-                      placeholder="Auto-generated or enter manually"
-                      {...field}
-                    />
-                  )}
-                />
               </AccordionDetails>
             </Accordion>
 
