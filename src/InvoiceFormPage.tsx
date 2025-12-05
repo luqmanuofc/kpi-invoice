@@ -19,7 +19,7 @@ import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
-import { useForm, Controller, useFieldArray } from "react-hook-form";
+import { Controller, useFieldArray, type UseFormReturn } from "react-hook-form";
 import dayjs from "dayjs";
 import { ToWords } from "to-words";
 
@@ -75,88 +75,17 @@ export type InvoiceForm = {
 // COMPONENT
 // ===========================
 //
-export default function InvoiceFormPage() {
-  const { control, handleSubmit } = useForm<InvoiceForm>({
-    defaultValues: {
-      invoiceNumber: "",
-      vehicleNumber: "",
-      date: dayjs().format("YYYY-MM-DD"),
+type Props = {
+  form: UseFormReturn<InvoiceForm, any, InvoiceForm>;
+  onSubmit?: (data: InvoiceForm) => void;
+};
 
-      buyerName: "",
-      buyerAddress: "",
-      buyerGstin: "",
-
-      items: [{ description: "", hsn: "", qty: 1, unit: "Kg", rate: 0 }],
-
-      discount: 0,
-      cgst: 9,
-      sgst: 9,
-      igst: 0,
-
-      // Totals – initially 0, will be overwritten
-      subtotal: 0,
-      cgstAmount: 0,
-      sgstAmount: 0,
-      igstAmount: 0,
-      total: 0,
-
-      // Seller
-      sellerName: "Khaldun Plastic Industries",
-      sellerAddress: "28A-SIDCO INDL. COMPLEX SHALLATENG SRINAGAR (J&K)",
-      sellerEmail: "kpikashmir@gmail.com",
-      sellerPhone: "9419009217",
-      sellerGstin: "01BSGPB0427H1ZJ",
-
-      amountInWords: "",
-    },
-  });
-
+export default function InvoiceFormPage({ form }: Props) {
+  const { control } = form;
   const { fields, append, remove } = useFieldArray({
     control,
     name: "items",
   });
-
-  const onSubmit = async (data: InvoiceForm) => {
-    // ============================
-    // COMPUTE TOTALS
-    // ============================
-    const subtotal = data.items.reduce((sum, i) => sum + i.qty * i.rate, 0);
-
-    const cgstAmount = (subtotal * data.cgst) / 100;
-    const sgstAmount = (subtotal * data.sgst) / 100;
-    const igstAmount = (subtotal * data.igst) / 100;
-
-    const total =
-      subtotal - data.discount + cgstAmount + sgstAmount + igstAmount;
-
-    // ============================
-    // AUTO-GENERATE WORDS USING to-words
-    // ============================
-    const toWords = new ToWords({ localeCode: "en-IN" });
-
-    const amountInWords =
-      toWords.convert(Math.round(total)).toUpperCase() + " ONLY";
-
-    // ============================
-    // FINAL DATA PAYLOAD
-    // ============================
-    const finalData: InvoiceForm = {
-      ...data,
-      subtotal,
-      cgstAmount,
-      sgstAmount,
-      igstAmount,
-      total,
-      amountInWords,
-    };
-
-    console.log("FINAL INVOICE DATA:", finalData);
-
-    // Later:
-    // navigate("/preview", { state: finalData })
-    // OR pass to PDF generator
-  };
-
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Paper sx={{ p: 2, maxWidth: 480, m: "auto", mt: 3 }}>
@@ -164,7 +93,7 @@ export default function InvoiceFormPage() {
           Create Invoice
         </Typography>
 
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form>
           <Stack spacing={2}>
             {/* =============================
                 INVOICE INFO
@@ -306,6 +235,7 @@ export default function InvoiceFormPage() {
                                 label="Qty"
                                 sx={{ width: "33%" }}
                                 {...field}
+                                onChange={(e) => field.onChange(Number(e.target.value))}
                               />
                             )}
                           />
@@ -338,6 +268,7 @@ export default function InvoiceFormPage() {
                                 label="Rate"
                                 sx={{ width: "33%" }}
                                 {...field}
+                                onChange={(e) => field.onChange(Number(e.target.value))}
                               />
                             )}
                           />
@@ -382,6 +313,7 @@ export default function InvoiceFormPage() {
                         type="number"
                         label="Discount (₹)"
                         {...field}
+                        onChange={(e) => field.onChange(Number(e.target.value))}
                       />
                     )}
                   />
@@ -390,7 +322,12 @@ export default function InvoiceFormPage() {
                     name="cgst"
                     control={control}
                     render={({ field }) => (
-                      <TextField type="number" label="CGST (%)" {...field} />
+                      <TextField
+                        type="number"
+                        label="CGST (%)"
+                        {...field}
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                      />
                     )}
                   />
 
@@ -398,7 +335,12 @@ export default function InvoiceFormPage() {
                     name="sgst"
                     control={control}
                     render={({ field }) => (
-                      <TextField type="number" label="SGST (%)" {...field} />
+                      <TextField
+                        type="number"
+                        label="SGST (%)"
+                        {...field}
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                      />
                     )}
                   />
 
@@ -406,17 +348,17 @@ export default function InvoiceFormPage() {
                     name="igst"
                     control={control}
                     render={({ field }) => (
-                      <TextField type="number" label="IGST (%)" {...field} />
+                      <TextField
+                        type="number"
+                        label="IGST (%)"
+                        {...field}
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                      />
                     )}
                   />
                 </Stack>
               </AccordionDetails>
             </Accordion>
-
-            {/* SUBMIT BUTTON */}
-            <Button variant="contained" size="large" type="submit">
-              Preview & Generate PDF
-            </Button>
           </Stack>
         </form>
       </Paper>
