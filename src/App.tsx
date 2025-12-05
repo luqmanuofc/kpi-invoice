@@ -4,11 +4,15 @@ import InvoiceDocument from "./InvoiceDocument";
 import type { InvoiceForm } from "./InvoiceFormPage";
 import { useForm } from "react-hook-form";
 import dayjs from "dayjs";
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import { ToWords } from "to-words";
 import { Button } from "@mui/material";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 function App() {
+  const invoiceRef = useRef<HTMLDivElement>(null);
+
   const form = useForm<InvoiceForm>({
     defaultValues: {
       invoiceNumber: "",
@@ -73,6 +77,31 @@ function App() {
     };
   }, [formData]);
 
+  const handleGeneratePDF = async () => {
+    if (!invoiceRef.current) return;
+
+    const canvas = await html2canvas(invoiceRef.current, {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+    });
+
+    const imgData = canvas.toDataURL("image/png");
+    const pdf = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4",
+    });
+
+    const imgWidth = 210; // A4 width in mm
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+    pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+
+    const fileName = `Invoice_${computedData.invoiceNumber || "draft"}_${dayjs().format("YYYYMMDD")}.pdf`;
+    pdf.save(fileName);
+  };
+
   return (
     <div
       style={{
@@ -90,10 +119,12 @@ function App() {
         }}
       >
         <InvoiceFormPage form={form} />
-        <Button variant="contained">Generate PDF</Button>
+        <Button variant="contained" onClick={handleGeneratePDF}>
+          Generate PDF
+        </Button>
       </div>
 
-      <InvoiceDocument data={computedData} />
+      <InvoiceDocument ref={invoiceRef} data={computedData} />
     </div>
   );
 }

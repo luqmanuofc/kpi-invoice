@@ -1,14 +1,15 @@
 import "./InvoiceDocument.css";
 import type { InvoiceForm } from "./InvoiceFormPage"; // adjust path if needed
+import { forwardRef } from "react";
 
 type Props = {
   data: InvoiceForm;
 };
 
-export default function InvoiceDocument({ data }: Props) {
+const InvoiceDocument = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   return (
     <div className="invoice-page-wrapper">
-      <div className="invoice-page">
+      <div className="invoice-page" ref={ref}>
       {/* Outer border */}
       <div className="invoice-border">
         {/* Tax Label */}
@@ -174,4 +175,8 @@ export default function InvoiceDocument({ data }: Props) {
       </div>
     </div>
   );
-}
+});
+
+InvoiceDocument.displayName = "InvoiceDocument";
+
+export default InvoiceDocument;
