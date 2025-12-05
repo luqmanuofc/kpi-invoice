@@ -134,12 +134,16 @@
    ================================ */
 .totals-table {
   border-collapse: collapse;
-  margin-top: 5pt;
   font-size: 10pt;
-  float: right;                 /* right alignment */
-  width: 44%;                   /* matches width of Qty + Unit + Rate + Total */
+  float: right;                
+  width: 44.075%;                   
   border: 1pt solid #31395e; 
+  border-top: none;             
   text-align: right;
+}
+
+.totals-table > tbody > tr:first-child > td {
+  border-top: none;
 }
 
 .totals-table td {
@@ -153,7 +157,7 @@
 }
 
 .totals-table tr td:first-child {
-  width: 59%;
+  width: 59.25%;
   font-weight: bold;
 }
 
