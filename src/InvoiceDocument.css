@@ -72,3 +72,32 @@
   text-align: center;
   flex: 1;
 }
+
+/* ================================
+   Receiver (Billed To) Section
+   ================================ */
+
+.receiver-section {
+  font-size: 10pt;
+}
+
+.receiver-title {
+  font-weight: bold;
+  font-size: 11pt;
+  width: fit-content;
+}
+
+.receiver-field {
+  display: flex;
+  gap: 6pt;
+}
+
+.receiver-field label {
+  font-weight: bold;
+  text-align: left;
+}
+
+.receiver-field span {
+  flex: 1;
+  text-align: left;
+}

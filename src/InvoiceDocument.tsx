@@ -35,6 +35,28 @@ export default function InvoiceDocument() {
         </div>
 
         <hr className="divider" />
+
+        {/* === Details of Receiver (Billed To) === */}
+        <div className="receiver-section">
+          <div className="receiver-title">Details of Receiver (Billed To)</div>
+
+          <div className="receiver-field">
+            <label>Name:</label>
+            <span>John Doe Enterprises</span>
+          </div>
+
+          <div className="receiver-field">
+            <label>Address:</label>
+            <span>123 Industrial Road, Srinagar, J&amp;K</span>
+          </div>
+
+          <div className="receiver-field">
+            <label>GSTIN No:</label>
+            <span>22ABCDE1234F1Z9</span>
+          </div>
+        </div>
+
+        <hr className="divider" />
       </div>
     </div>
   );
