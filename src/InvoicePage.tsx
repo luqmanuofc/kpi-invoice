@@ -166,12 +166,15 @@ export default function InvoicePage({
           <div className="footer-section">
             <div className="terms">
               <strong>Terms & Conditions:</strong>
-              <ol className="terms-list">
-                <li>E. &amp; O.E.</li>
-                <li>Subject to Srinagar Jurisdiction.</li>
-                <li>Interest @ 24% p.a. if unpaid within 30 days.</li>
-                <li>Goods once sold cannot be taken back.</li>
-              </ol>
+              <div>
+                1. E. &amp; O.E.
+                <br />
+                2. Subject to Srinagar Jurisdiction.
+                <br />
+                3. Interest @ 24% p.a. if unpaid within 30 days.
+                <br />
+                4. Goods once sold cannot be taken back.
+              </div>
             </div>
 
             <div className="signature-block">

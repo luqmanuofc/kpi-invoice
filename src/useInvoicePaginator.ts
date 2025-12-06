@@ -281,14 +281,17 @@ function createFooterTemplate(data: InvoiceForm) {
   const wrap = document.createElement("div");
   wrap.innerHTML = `
     <div class="footer-section">
-      <div class="terms">
-        <strong>Terms & Conditions:</strong>
-        <ol class="terms-list">
-          <li>E. & O.E.</li>
-          <li>Subject to Srinagar Jurisdiction.</li>
-          <li>Interest @ 24% p.a if not paid in 30 days.</li>
-          <li>Goods once sold cannot be taken back.</li>
-        </ol>
+      <div className="terms">
+              <strong>Terms & Conditions:</strong>
+              <div>
+                1. E. &amp; O.E.
+                <br />
+                2. Subject to Srinagar Jurisdiction.
+                <br />
+                3. Interest @ 24% p.a. if unpaid within 30 days.
+                <br />
+                4. Goods once sold cannot be taken back.
+              </div>
       </div>
       <div class="signature-block">
         <div class="company-sign">For ${data.sellerName}</div>
