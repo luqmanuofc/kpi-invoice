@@ -7,8 +7,10 @@ type Props = {
   showTotals: boolean;
   showWords: boolean;
   showFooter: boolean;
-  continued: boolean;
   rowStartIndex: number;
+  isFirstPage: boolean;
+  pageNumber: number;
+  totalPages: number;
 };
 
 export default function InvoicePage({
@@ -17,14 +19,18 @@ export default function InvoicePage({
   showTotals,
   showWords,
   showFooter,
-  continued,
   rowStartIndex,
+  isFirstPage,
+  pageNumber,
+  totalPages,
 }: Props) {
   return (
     <div className="invoice-page">
       <div className="invoice-border">
+        {/* Always repeated */}
         <div className="tax-label">Tax Invoice</div>
 
+        {/* Always repeated */}
         <div className="header-section">
           <div className="left">
             <h1 className="company-title">{data.sellerName}</h1>
@@ -39,6 +45,8 @@ export default function InvoicePage({
         </div>
 
         <hr className="divider" />
+
+        {/* Always repeated */}
         <div className="invoice-meta">
           <span>Invoice No: {data.invoiceNumber}</span>
           <span className="center">Vehicle No: {data.vehicleNumber}</span>
@@ -46,55 +54,69 @@ export default function InvoicePage({
         </div>
 
         <hr className="divider" />
-        <div className="receiver-section">
-          <div className="receiver-title">Details of Receiver (Billed To)</div>
-          <div className="receiver-field">
-            <label>Name:</label>
-            <span>{data.buyerName}</span>
-          </div>
-          <div className="receiver-field">
-            <label>Address:</label>
-            <span>{data.buyerAddress}</span>
-          </div>
-          <div className="receiver-field">
-            <label>GSTIN No:</label>
-            <span>{data.buyerGstin}</span>
-          </div>
-        </div>
 
-        <hr className="divider" />
+        {/* Buyer details ONLY on page 1 */}
+        {isFirstPage && (
+          <>
+            <div className="receiver-section">
+              <div className="receiver-title">
+                Details of Receiver (Billed To)
+              </div>
 
-        <table className="items-table">
-          <thead>
-            <tr>
-              <th>S. No.</th>
-              <th>Description of Goods</th>
-              <th>HSN Code</th>
-              <th>Qty</th>
-              <th>Unit</th>
-              <th>Rate</th>
-              <th>Total Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((item, idx) => {
-              const total = item.qty * item.rate;
-              const serial = rowStartIndex + idx + 1;
+              <div className="receiver-field">
+                <label>Name:</label>
+                <span>{data.buyerName}</span>
+              </div>
 
-              return (
-                <tr key={idx}>
-                  <td>{serial}</td>
-                  <td>{item.description}</td>
-                  <td>{item.hsn}</td>
-                  <td>{item.qty}</td>
-                  <td>{item.unit}</td>
-                  <td>{item.rate.toFixed(2)}</td>
-                  <td>{total.toFixed(2)}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+              <div className="receiver-field">
+                <label>Address:</label>
+                <span>{data.buyerAddress}</span>
+              </div>
+
+              <div className="receiver-field">
+                <label>GSTIN No:</label>
+                <span>{data.buyerGstin}</span>
+              </div>
+            </div>
+
+            <hr className="divider" />
+          </>
+        )}
+
+        {(items.length > 0 || isFirstPage) && (
+          <table className="items-table">
+            <thead>
+              <tr>
+                <th>S. No.</th>
+                <th>Description of Goods</th>
+                <th>HSN Code</th>
+                <th>Qty</th>
+                <th>Unit</th>
+                <th>Rate</th>
+                <th>Total Amount</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {items.map((item, idx) => {
+                const serial = rowStartIndex + idx + 1;
+                const total = item.qty * item.rate;
+
+                return (
+                  <tr key={idx}>
+                    <td>{serial}</td>
+                    <td>{item.description}</td>
+                    <td>{item.hsn}</td>
+                    <td>{item.qty}</td>
+                    <td>{item.unit}</td>
+                    <td>{item.rate.toFixed(2)}</td>
+                    <td>{total.toFixed(2)}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
 
         {showTotals && (
           <>
@@ -147,22 +169,25 @@ export default function InvoicePage({
               <ol className="terms-list">
                 <li>E. &amp; O.E.</li>
                 <li>Subject to Srinagar Jurisdiction.</li>
-                <li>Interest @ 24% if the bill not paid within 30 days.</li>
+                <li>Interest @ 24% p.a. if unpaid within 30 days.</li>
                 <li>Goods once sold cannot be taken back.</li>
               </ol>
             </div>
+
             <div className="signature-block">
               <div className="company-sign">For {data.sellerName}</div>
               <div className="signature-spacer"></div>
               <div className="signature-labels">
-                <div></div>
-                <span>Authorised Signatory</span>
+                <div />
+                Authorised Signatory
               </div>
             </div>
           </div>
         )}
 
-        {continued && <div className="continued-label">Continued…</div>}
+        <div className="page-number-label">
+          Page {pageNumber} of {totalPages}
+        </div>
       </div>
     </div>
   );

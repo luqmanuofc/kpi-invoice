@@ -53,8 +53,10 @@ const InvoiceDocument = forwardRef<InvoiceDocumentHandle, Props>(
                 showTotals={p.showTotals}
                 showWords={p.showWords}
                 showFooter={p.showFooter}
-                continued={p.continued}
                 rowStartIndex={p.startRow}
+                isFirstPage={idx === 0}
+                pageNumber={p.pageNumber}
+                totalPages={p.totalPages}
               />
             </div>
           );

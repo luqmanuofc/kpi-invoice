@@ -8,6 +8,8 @@ export type PageConfig = {
   showWords: boolean;
   showFooter: boolean;
   continued: boolean;
+  pageNumber: number;
+  totalPages: number;
 };
 
 type Props = {
@@ -126,10 +128,18 @@ export function useInvoicePaginator({ data }: Props) {
         showWords: placeWords,
         showFooter: placeFooter,
         continued,
+        pageNumber: 0,
+        totalPages: 0,
       });
 
       rowIndex = endRow;
     }
+
+    // ADD THIS:
+    newPages.forEach((page, i) => {
+      page.pageNumber = i + 1;
+      page.totalPages = newPages.length;
+    });
 
     setPages(newPages);
   }
