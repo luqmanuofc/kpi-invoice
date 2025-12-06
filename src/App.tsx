@@ -9,7 +9,6 @@ import { ToWords } from "to-words";
 import { Button } from "@mui/material";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import { dummyInvoiceData } from "./dummyData";
 
 function App() {
   const invoiceRef = useRef<InvoiceDocumentHandle | null>(null);
