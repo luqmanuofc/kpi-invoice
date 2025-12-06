@@ -1,11 +1,25 @@
-/* Wrapper for responsive scaling */
 .invoice-page-wrapper {
   width: 100%;
   max-width: 100vw;
   overflow-x: hidden;
   display: flex;
+  flex-direction: column; /* multiple pages stacked */
+  gap: 20px;
   justify-content: flex-start;
   padding: 10px;
+}
+
+.continued-label {
+  position: absolute;
+  bottom: 10pt;
+  right: 10pt;
+  font-size: 10pt;
+  font-weight: bold;
+  color: #373b75;
+}
+
+.probe {
+  position: relative;
 }
 
 .invoice-page {

@@ -1,7 +1,7 @@
+// App.tsx
 import "./App.css";
-import InvoiceFormPage from "./InvoiceFormPage";
-import InvoiceDocument from "./InvoiceDocument";
-import type { InvoiceForm } from "./InvoiceFormPage";
+import InvoiceFormPage, { type InvoiceForm } from "./InvoiceFormPage";
+import InvoiceDocument, { type InvoiceDocumentHandle } from "./InvoiceDocument";
 import { useForm } from "react-hook-form";
 import dayjs from "dayjs";
 import { useMemo, useRef } from "react";
@@ -9,9 +9,10 @@ import { ToWords } from "to-words";
 import { Button } from "@mui/material";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { dummyInvoiceData } from "./dummyData";
 
 function App() {
-  const invoiceRef = useRef<HTMLDivElement>(null);
+  const invoiceRef = useRef<InvoiceDocumentHandle | null>(null);
 
   const form = useForm<InvoiceForm>({
     defaultValues: {
@@ -30,14 +31,12 @@ function App() {
       sgst: 9,
       igst: 0,
 
-      // Totals – initially 0, will be overwritten
       subtotal: 0,
       cgstAmount: 0,
       sgstAmount: 0,
       igstAmount: 0,
       total: 0,
 
-      // Seller
       sellerName: "Khaldun Plastic Industries",
       sellerAddress: "28A-SIDCO INDL. COMPLEX SHALLATENG SRINAGAR (J&K)",
       sellerEmail: "kpikashmir@gmail.com",
@@ -48,11 +47,9 @@ function App() {
     },
   });
 
-  // Watch form values for real-time updates
   const formData = form.watch();
 
-  // Compute totals automatically whenever form data changes
-  const computedData = useMemo(() => {
+  const computedData = useMemo<InvoiceForm>(() => {
     const subtotal = formData.items.reduce((sum, i) => sum + i.qty * i.rate, 0);
 
     const cgstAmount = (subtotal * formData.cgst) / 100;
@@ -80,25 +77,38 @@ function App() {
   const handleGeneratePDF = async () => {
     if (!invoiceRef.current) return;
 
-    const canvas = await html2canvas(invoiceRef.current, {
-      scale: 2,
-      useCORS: true,
-      logging: false,
-    });
+    const pageElements = invoiceRef.current.getPageElements();
+    if (!pageElements.length) return;
 
-    const imgData = canvas.toDataURL("image/png");
     const pdf = new jsPDF({
       orientation: "portrait",
       unit: "mm",
       format: "a4",
     });
 
-    const imgWidth = 210; // A4 width in mm
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    let isFirstPage = true;
 
-    pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+    for (const pageEl of pageElements) {
+      const canvas = await html2canvas(pageEl, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+      });
 
-    const fileName = `Invoice_${computedData.invoiceNumber || "draft"}_${dayjs().format("YYYYMMDD")}.pdf`;
+      const imgData = canvas.toDataURL("image/png");
+      const imgWidth = 210; // A4 width in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      if (!isFirstPage) {
+        pdf.addPage();
+      }
+      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+      isFirstPage = false;
+    }
+
+    const fileName = `Invoice_${
+      computedData.invoiceNumber || "draft"
+    }_${dayjs().format("YYYYMMDD")}.pdf`;
     pdf.save(fileName);
   };
 
