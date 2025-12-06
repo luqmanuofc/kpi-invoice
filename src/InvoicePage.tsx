@@ -100,16 +100,18 @@ export default function InvoicePage({
             <tbody>
               {items.map((item, idx) => {
                 const serial = rowStartIndex + idx + 1;
-                const total = item.qty * item.rate;
+                const rate = Number(item.rate) || 0;
+                const qty = Number(item.qty) || 0;
+                const total = qty * rate;
 
                 return (
                   <tr key={idx}>
                     <td>{serial}</td>
                     <td>{item.description}</td>
                     <td>{item.hsn}</td>
-                    <td>{item.qty}</td>
+                    <td>{qty}</td>
                     <td>{item.unit}</td>
-                    <td>{item.rate.toFixed(2)}</td>
+                    <td>{rate.toFixed(2)}</td>
                     <td>{total.toFixed(2)}</td>
                   </tr>
                 );

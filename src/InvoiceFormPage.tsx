@@ -235,7 +235,11 @@ export default function InvoiceFormPage({ form }: Props) {
                                 sx={{ width: "33%" }}
                                 {...field}
                                 onChange={(e) =>
-                                  field.onChange(Number(e.target.value))
+                                  field.onChange(
+                                    e.target.value === ""
+                                      ? ""
+                                      : Number(e.target.value)
+                                  )
                                 }
                               />
                             )}
@@ -274,7 +278,11 @@ export default function InvoiceFormPage({ form }: Props) {
                                 sx={{ width: "33%" }}
                                 {...field}
                                 onChange={(e) =>
-                                  field.onChange(Number(e.target.value))
+                                  field.onChange(
+                                    e.target.value === ""
+                                      ? ""
+                                      : Number(e.target.value)
+                                  )
                                 }
                               />
                             )}

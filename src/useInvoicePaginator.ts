@@ -221,14 +221,16 @@ function renderProbePageSkeleton(container: HTMLElement, data: InvoiceForm) {
 
 function renderProbeRow(item: InvoiceItem) {
   const tr = document.createElement("tr");
-  const lineTotal = item.qty * item.rate;
+  const rate = Number(item.rate) || 0;
+  const qty = Number(item.qty) || 0;
+  const lineTotal = qty * rate;
   tr.innerHTML = `
     <td>?</td>
     <td>${item.description}</td>
     <td>${item.hsn}</td>
-    <td>${item.qty}</td>
+    <td>${qty}</td>
     <td>${item.unit}</td>
-    <td>${item.rate.toFixed(2)}</td>
+    <td>${rate.toFixed(2)}</td>
     <td>${lineTotal.toFixed(2)}</td>
   `;
   return tr;
