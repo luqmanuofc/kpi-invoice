@@ -8,7 +8,7 @@ import {
   AccordionSummary,
   AccordionDetails,
   IconButton,
-  MenuItem,
+  Autocomplete,
 } from "@mui/material";
 
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -244,19 +244,23 @@ export default function InvoiceFormPage({ form }: Props) {
                           <Controller
                             name={`items.${index}.unit`}
                             control={control}
-                            render={({ field }) => (
-                              <TextField
-                                label="Unit"
-                                select
-                                sx={{ width: "33%" }}
-                                {...field}
-                              >
-                                <MenuItem value="Kg">Kg</MenuItem>
-                                <MenuItem value="Pcs">Pcs</MenuItem>
-                                <MenuItem value="Meter">Meter</MenuItem>
-                                <MenuItem value="Roll">Roll</MenuItem>
-                                <MenuItem value="Bag">Bag</MenuItem>
-                              </TextField>
+                            render={({ field: { value, onChange } }) => (
+                              <Autocomplete
+                                freeSolo
+                                options={["Kg", "Pcs", "Meter", "Roll", "Bag"]}
+                                value={value || ""}
+                                onChange={(_, newValue) => onChange(newValue)}
+                                onInputChange={(_, newInputValue) =>
+                                  onChange(newInputValue)
+                                }
+                                renderInput={(params) => (
+                                  <TextField
+                                    {...params}
+                                    label="Unit"
+                                    sx={{ width: "100%" }}
+                                  />
+                                )}
+                              />
                             )}
                           />
 
