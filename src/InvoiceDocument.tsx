@@ -24,7 +24,7 @@ const InvoiceDocument = forwardRef<InvoiceDocumentHandle, Props>(
     }));
 
     return (
-      <div className="invoice-page-wrapper">
+      <div>
         {/* Hidden probe area */}
         <div
           ref={probeRootRef}
@@ -36,7 +36,6 @@ const InvoiceDocument = forwardRef<InvoiceDocumentHandle, Props>(
             pointerEvents: "none",
           }}
         />
-
         {/* Visible paginated pages */}
         {pages.map((p, idx) => {
           const items = data.items.slice(p.startRow, p.endRow);
