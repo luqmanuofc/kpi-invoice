@@ -1,8 +1,25 @@
 [build]
-  command = "npm run build"
+  command = "npx prisma generate && npm run build"
   publish = "dist"
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+  node_version = "18"
+
+  external_node_modules = [
+    "@prisma/client",
+    "@prisma/adapter-pg",
+    "pg"
+  ]
+
+  included_files = [
+    "prisma/schema.prisma",
+    "prisma/migrations/**",
+    "netlify/generated/prisma/**"
+  ]
