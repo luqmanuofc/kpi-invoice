@@ -76,7 +76,7 @@ export type InvoiceForm = {
 const steps = ["Invoice & Buyer", "Items", "Taxes & Discounts"];
 
 export default function InvoiceFormPage() {
-  const [activeStep, setActiveStep] = useState<number>(3);
+  const [activeStep, setActiveStep] = useState<number>(0);
   const { handleGeneratePDF: onGeneratePdf } = useInvoice();
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
