@@ -16,7 +16,6 @@ export default async function handler(event) {
 
         buyerId: data.buyerId,
 
-        // Snapshot fields (must match schema)
         buyerNameSnapshot: data.buyerName,
         buyerAddressSnapshot: data.buyerAddress,
         buyerGstinSnapshot: data.buyerGstin,
