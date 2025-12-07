@@ -45,7 +45,7 @@ export function ReceiverSection({ data }: { data: InvoiceForm }) {
 
         <div className="receiver-field">
           <label>Address:</label>
-          <span>{data.buyerAddress}</span>
+          <span className="preserve-newlines">{data.buyerAddress}</span>
         </div>
 
         <div className="receiver-field">

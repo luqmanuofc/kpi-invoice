@@ -156,6 +156,10 @@
   text-align: left;
 }
 
+.receiver-field span.preserve-newlines {
+  white-space: pre-wrap;
+}
+
 /* ================================
    Items Table
    ================================ */
