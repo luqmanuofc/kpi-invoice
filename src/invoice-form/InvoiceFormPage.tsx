@@ -21,6 +21,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 import { Controller, useFieldArray, type UseFormReturn } from "react-hook-form";
 import dayjs from "dayjs";
+import { useInvoice } from "../contexts/InvoiceProvider";
 
 //
 // ===========================
@@ -69,17 +70,8 @@ export type InvoiceForm = {
   amountInWords: string;
 };
 
-//
-// ===========================
-// COMPONENT
-// ===========================
-//
-type Props = {
-  form: UseFormReturn<InvoiceForm, any, InvoiceForm>;
-  onSubmit?: (data: InvoiceForm) => void;
-};
-
-export default function InvoiceFormPage({ form }: Props) {
+export default function InvoiceFormPage() {
+  const { form } = useInvoice();
   const { control } = form;
   const { fields, append, remove } = useFieldArray({
     control,

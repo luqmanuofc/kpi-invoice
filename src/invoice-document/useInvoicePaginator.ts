@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
-import type { InvoiceForm, InvoiceItem } from "./InvoiceFormPage";
+import { useInvoice } from "../contexts/InvoiceProvider";
+import type { InvoiceForm, InvoiceItem } from "../invoice-form/InvoiceFormPage";
 
 export type PageConfig = {
   startRow: number;
@@ -12,17 +13,14 @@ export type PageConfig = {
   totalPages: number;
 };
 
-type Props = {
-  data: InvoiceForm;
-};
-
 /**
  * Hybrid probe-based pagination.
  * We render invisible pages and test whether adding
  * the next element (row/totals/words/footer) overlaps
  * the bottom of the page.
  */
-export function useInvoicePaginator({ data }: Props) {
+export function useInvoicePaginator() {
+  const { computedData: data } = useInvoice();
   const [pages, setPages] = useState<PageConfig[]>([]);
   const probeRootRef = useRef<HTMLDivElement | null>(null);
 
