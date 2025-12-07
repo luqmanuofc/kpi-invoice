@@ -7,6 +7,7 @@ import {
   IconButton,
   Autocomplete,
   StepButton,
+  Divider,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -83,7 +84,7 @@ export default function InvoiceFormPage() {
         <Typography variant="h5" sx={{ mb: 2 }}>
           Create Invoice
         </Typography>
-        <Box sx={{ width: "100%" }}>
+        <Box sx={{ width: "100%", mb: "2rem" }}>
           <Stepper activeStep={activeStep} alternativeLabel>
             {steps.map((label, index) => (
               <Step key={index}>
@@ -165,9 +166,6 @@ function InvoiceFormDetails() {
   const { control } = form;
   return (
     <>
-      <Typography align="left" variant="h6">
-        Details:
-      </Typography>
       <Stack spacing={2}>
         <Controller
           name="invoiceNumber"
@@ -202,9 +200,7 @@ function InvoiceFormDetails() {
       {/* =============================
                 BUYER DETAILS
             ============================== */}
-      <Typography align="left" variant="h6">
-        Buyer Details
-      </Typography>
+      <Divider sx={{ width: "100%", mt: "1rem", mb: "1rem" }} />
       <>
         <Stack spacing={2}>
           <Controller
@@ -251,10 +247,6 @@ function InvoiceFormItems() {
   });
   return (
     <>
-      <Typography align="left" variant="h6">
-        Items ({fields.length})
-      </Typography>
-
       <Stack spacing={3}>
         {fields.map((item, index) => (
           <Paper key={item.id} sx={{ p: 2 }} elevation={1}>
@@ -307,7 +299,7 @@ function InvoiceFormItems() {
                   render={({ field: { value, onChange } }) => (
                     <Autocomplete
                       freeSolo
-                      options={["Kg", "Pcs", "Meter", "Roll", "Bag"]}
+                      options={["Kg", "Pcs", "Bundle", "Dozen", "Bag"]}
                       value={value || ""}
                       onChange={(_, newValue) => onChange(newValue)}
                       onInputChange={(_, newInputValue) =>
@@ -372,65 +364,59 @@ function InvoiceFormTaxesAndDiscounts() {
 
   return (
     <>
-      <Typography align="left" variant="h6">
-        Taxes & Discount
-      </Typography>
+      <Stack spacing={2}>
+        <Controller
+          name="discount"
+          control={control}
+          render={({ field }) => (
+            <TextField
+              type="number"
+              label="Discount (₹)"
+              {...field}
+              onChange={(e) => field.onChange(Number(e.target.value))}
+            />
+          )}
+        />
 
-      <>
-        <Stack spacing={2}>
-          <Controller
-            name="discount"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                type="number"
-                label="Discount (₹)"
-                {...field}
-                onChange={(e) => field.onChange(Number(e.target.value))}
-              />
-            )}
-          />
+        <Controller
+          name="cgst"
+          control={control}
+          render={({ field }) => (
+            <TextField
+              type="number"
+              label="CGST (%)"
+              {...field}
+              onChange={(e) => field.onChange(Number(e.target.value))}
+            />
+          )}
+        />
 
-          <Controller
-            name="cgst"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                type="number"
-                label="CGST (%)"
-                {...field}
-                onChange={(e) => field.onChange(Number(e.target.value))}
-              />
-            )}
-          />
+        <Controller
+          name="sgst"
+          control={control}
+          render={({ field }) => (
+            <TextField
+              type="number"
+              label="SGST (%)"
+              {...field}
+              onChange={(e) => field.onChange(Number(e.target.value))}
+            />
+          )}
+        />
 
-          <Controller
-            name="sgst"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                type="number"
-                label="SGST (%)"
-                {...field}
-                onChange={(e) => field.onChange(Number(e.target.value))}
-              />
-            )}
-          />
-
-          <Controller
-            name="igst"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                type="number"
-                label="IGST (%)"
-                {...field}
-                onChange={(e) => field.onChange(Number(e.target.value))}
-              />
-            )}
-          />
-        </Stack>
-      </>
+        <Controller
+          name="igst"
+          control={control}
+          render={({ field }) => (
+            <TextField
+              type="number"
+              label="IGST (%)"
+              {...field}
+              onChange={(e) => field.onChange(Number(e.target.value))}
+            />
+          )}
+        />
+      </Stack>
     </>
   );
 }
