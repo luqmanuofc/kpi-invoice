@@ -4,6 +4,7 @@ import App from "./App.tsx";
 import "./index.css";
 import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
 import { InvoiceProvider } from "./contexts/InvoiceProvider.tsx";
+import { BrowserRouter } from "react-router-dom";
 
 const theme = createTheme({
   palette: {
@@ -13,11 +14,13 @@ const theme = createTheme({
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <InvoiceProvider>
-        <App />
-      </InvoiceProvider>
-    </ThemeProvider>
+    <BrowserRouter>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <InvoiceProvider>
+          <App />
+        </InvoiceProvider>
+      </ThemeProvider>
+    </BrowserRouter>
   </StrictMode>
 );
