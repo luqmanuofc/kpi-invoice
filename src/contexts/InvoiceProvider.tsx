@@ -8,7 +8,7 @@ import {
 import { useForm, type UseFormReturn } from "react-hook-form";
 import dayjs from "dayjs";
 import { ToWords } from "to-words";
-import type { InvoiceForm } from "../invoice-form/InvoiceFormPage";
+import type { InvoiceForm } from "../invoice-form/types";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import type { InvoiceDocumentHandle } from "../invoice-document/InvoiceDocument";

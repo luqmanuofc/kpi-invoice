@@ -1,5 +1,5 @@
 // InvoicePage.tsx
-import type { InvoiceForm } from "../invoice-form/InvoiceFormPage";
+import type { InvoiceForm } from "../invoice-form/types";
 import {
   TaxLabel,
   HeaderSection,

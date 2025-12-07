@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { useInvoice } from "../contexts/InvoiceProvider";
-import type { InvoiceForm, InvoiceItem } from "../invoice-form/InvoiceFormPage";
+import type { InvoiceForm, InvoiceItem } from "../invoice-form/types";
 import {
   TaxLabel,
   HeaderSection,

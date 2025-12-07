@@ -1,4 +1,4 @@
-import type { InvoiceForm } from "./invoice-form/InvoiceFormPage";
+import type { InvoiceForm } from "./invoice-form/types";
 import dayjs from "dayjs";
 
 export const dummyInvoiceData: InvoiceForm = {

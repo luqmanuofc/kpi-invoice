@@ -1,5 +1,5 @@
 // Shared invoice template components used in both rendering and pagination
-import type { InvoiceForm, InvoiceItem } from "../invoice-form/InvoiceFormPage";
+import type { InvoiceForm, InvoiceItem } from "../invoice-form/types";
 
 export function TaxLabel() {
   return <div className="tax-label">Tax Invoice</div>;
