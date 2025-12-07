@@ -1,7 +1,11 @@
 // App.tsx
 import "./App.css";
-import InvoiceFormPage, { type InvoiceForm } from "./InvoiceFormPage";
-import InvoiceDocument, { type InvoiceDocumentHandle } from "./InvoiceDocument";
+import InvoiceFormPage, {
+  type InvoiceForm,
+} from "./invoice-form/InvoiceFormPage";
+import InvoiceDocument, {
+  type InvoiceDocumentHandle,
+} from "./invoice-document/InvoiceDocument";
 import { useForm } from "react-hook-form";
 import dayjs from "dayjs";
 import { useMemo, useRef } from "react";
@@ -115,6 +119,7 @@ function App() {
     <div
       style={{
         display: "flex",
+        padding: "1rem",
         gap: "1rem",
         flexDirection: "row",
       }}

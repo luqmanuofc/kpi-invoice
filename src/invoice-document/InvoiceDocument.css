@@ -1,3 +1,25 @@
+.invoice-page-wrapper {
+  width: 100%;
+  overflow-y: scroll;
+}
+
+/* Scale down on smaller screens - ONLY transform scale, no dimension changes */
+@media (max-width: 800px) {
+  .invoice-page {
+    transform: scale(0.6);
+  }
+}
+
+@media (max-width: 600px) {
+  .invoice-page-wrapper {
+    padding: 5px;
+  }
+
+  .invoice-page {
+    transform: scale(0.45);
+  }
+}
+
 .invoice-page {
   width: 595pt;   /* A4 width in points - NEVER CHANGES */
   height: 842pt;  /* A4 height - NEVER CHANGES */

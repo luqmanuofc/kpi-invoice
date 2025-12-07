@@ -1,5 +1,5 @@
 // InvoicePage.tsx
-import type { InvoiceForm } from "./InvoiceFormPage";
+import type { InvoiceForm } from "../invoice-form/InvoiceFormPage";
 
 type Props = {
   data: InvoiceForm;

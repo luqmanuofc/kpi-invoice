@@ -87,7 +87,7 @@ export default function InvoiceFormPage({ form }: Props) {
   });
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <Paper sx={{ p: 2, maxWidth: 480, mt: 3 }}>
+      <Paper sx={{ p: 2, width: "100%", mt: 3 }}>
         <Typography variant="h5" sx={{ mb: 2 }}>
           Create Invoice
         </Typography>
@@ -97,45 +97,41 @@ export default function InvoiceFormPage({ form }: Props) {
             {/* =============================
                 INVOICE INFO
             ============================== */}
-            <Accordion>
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                Invoice Details
-              </AccordionSummary>
-              <AccordionDetails>
-                <Stack spacing={2}>
-                  <Controller
-                    name="invoiceNumber"
-                    control={control}
-                    render={({ field }) => (
-                      <TextField label="Invoice Number" fullWidth {...field} />
-                    )}
-                  />
+            <Typography align="left" variant="h6">
+              Details:
+            </Typography>
+            <Stack spacing={2}>
+              <Controller
+                name="invoiceNumber"
+                control={control}
+                render={({ field }) => (
+                  <TextField label="Invoice Number" fullWidth {...field} />
+                )}
+              />
 
-                  <Controller
-                    name="vehicleNumber"
-                    control={control}
-                    render={({ field }) => (
-                      <TextField label="Vehicle Number" fullWidth {...field} />
-                    )}
-                  />
+              <Controller
+                name="vehicleNumber"
+                control={control}
+                render={({ field }) => (
+                  <TextField label="Vehicle Number" fullWidth {...field} />
+                )}
+              />
 
-                  <Controller
-                    name="date"
-                    control={control}
-                    render={({ field }) => (
-                      <MobileDatePicker
-                        label="Invoice Date"
-                        value={dayjs(field.value)}
-                        onChange={(val) =>
-                          field.onChange(val?.format("YYYY-MM-DD"))
-                        }
-                        slotProps={{ textField: { fullWidth: true } }}
-                      />
-                    )}
+              <Controller
+                name="date"
+                control={control}
+                render={({ field }) => (
+                  <MobileDatePicker
+                    label="Invoice Date"
+                    value={dayjs(field.value)}
+                    onChange={(val) =>
+                      field.onChange(val?.format("YYYY-MM-DD"))
+                    }
+                    slotProps={{ textField: { fullWidth: true } }}
                   />
-                </Stack>
-              </AccordionDetails>
-            </Accordion>
+                )}
+              />
+            </Stack>
 
             {/* =============================
                 BUYER DETAILS
