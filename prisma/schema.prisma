@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Buyer {
+  id      String  @id @default(cuid())
+  name    String
+  address String
+  gstin   String?
+  phone   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  invoices Invoice[]
+}
+
+model Invoice {
+  id String @id @default(cuid())
+
+  invoiceNumber String
+  date          DateTime
+  vehicleNumber String?
+
+  // Relation (for grouping/querying)
+  buyerId String
+  buyer   Buyer  @relation(fields: [buyerId], references: [id])
+
+  // SNAPSHOT fields — stored exactly as used on the invoice
+  buyerNameSnapshot    String
+  buyerAddressSnapshot String
+  buyerGstinSnapshot   String?
+
+  sellerNameSnapshot    String
+  sellerAddressSnapshot String
+  sellerGstinSnapshot   String
+  sellerEmailSnapshot   String
+  sellerPhoneSnapshot   String
+
+  // Financial breakdown
+  subtotal      Decimal @db.Decimal(10, 2)
+  discount      Decimal @db.Decimal(10, 2)
+  cgst          Decimal @db.Decimal(5, 2)
+  sgst          Decimal @db.Decimal(5, 2)
+  igst          Decimal @db.Decimal(5, 2)
+  total         Decimal @db.Decimal(10, 2)
+  amountInWords String
+
+  items InvoiceItem[]
+
+  createdAt DateTime @default(now())
+
+  @@index([buyerId])
+  @@index([invoiceNumber])
+}
+
+model InvoiceItem {
+  id String @id @default(cuid())
+
+  invoiceId String
+  invoice   Invoice @relation(fields: [invoiceId], references: [id])
+
+  description String
+  hsn         String?
+  qty         Decimal @db.Decimal(10, 2)
+  unit        String
+  rate        Decimal @db.Decimal(10, 2)
+  lineTotal   Decimal @db.Decimal(10, 2)
+
+  @@index([invoiceId])
+}
