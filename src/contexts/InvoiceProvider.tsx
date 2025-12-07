@@ -12,6 +12,7 @@ import type { InvoiceForm } from "../invoice-form/types";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import type { InvoiceDocumentHandle } from "../invoice-document/InvoiceDocument";
+import { createInvoice } from "../api/invoices";
 
 type InvoiceContextType = {
   invoiceRef: React.RefObject<InvoiceDocumentHandle | null>;
@@ -86,6 +87,14 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
 
   const handleGeneratePDF = async () => {
     if (!invoiceRef.current) return;
+
+    try {
+      const result = await createInvoice(computedData);
+      console.log("Invoice created:", result);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to create invoice.");
+    }
 
     const pageElements = invoiceRef.current.getPageElements();
     if (!pageElements.length) return;
