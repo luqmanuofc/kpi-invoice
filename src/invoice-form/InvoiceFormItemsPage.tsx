@@ -57,7 +57,7 @@ export default function InvoiceFormItemsPage() {
                     <TextField
                       type="number"
                       label="Qty"
-                      sx={{ width: "33%" }}
+                      fullWidth
                       {...field}
                       onChange={(e) =>
                         field.onChange(
@@ -80,12 +80,9 @@ export default function InvoiceFormItemsPage() {
                       onInputChange={(_, newInputValue) =>
                         onChange(newInputValue)
                       }
+                      fullWidth
                       renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label="Unit"
-                          sx={{ width: "100%" }}
-                        />
+                        <TextField {...params} label="Unit" />
                       )}
                     />
                   )}
@@ -98,7 +95,7 @@ export default function InvoiceFormItemsPage() {
                     <TextField
                       type="number"
                       label="Rate"
-                      sx={{ width: "33%" }}
+                      sx={{ width: "100%" }}
                       {...field}
                       onChange={(e) =>
                         field.onChange(
