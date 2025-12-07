@@ -4,14 +4,11 @@ import {
   Paper,
   Typography,
   Stack,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
   IconButton,
   Autocomplete,
+  StepButton,
 } from "@mui/material";
-
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 
@@ -19,9 +16,14 @@ import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
+import Box from "@mui/material/Box";
+import Stepper from "@mui/material/Stepper";
+import Step from "@mui/material/Step";
+
 import { Controller, useFieldArray } from "react-hook-form";
 import dayjs from "dayjs";
 import { useInvoice } from "../contexts/InvoiceProvider";
+import { useState } from "react";
 
 //
 // ===========================
@@ -70,19 +72,89 @@ export type InvoiceForm = {
   amountInWords: string;
 };
 
+const steps = ["Invoice & Buyer", "Items", "Taxes & Discounts"];
+
 export default function InvoiceFormPage() {
+  const [activeStep, setActiveStep] = useState<number>(3);
+  const { handleGeneratePDF: onGeneratePdf } = useInvoice();
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <Paper sx={{ p: 2, width: "100%", mt: 3 }}>
+      <Paper sx={{ p: 2, width: "100%", minWidth: "450px", mt: 3 }}>
         <Typography variant="h5" sx={{ mb: 2 }}>
           Create Invoice
         </Typography>
+        <Box sx={{ width: "100%" }}>
+          <Stepper activeStep={activeStep} alternativeLabel>
+            {steps.map((label, index) => (
+              <Step key={index}>
+                <StepButton onClick={() => setActiveStep(index)}>
+                  {label}
+                </StepButton>
+              </Step>
+            ))}
+          </Stepper>
+        </Box>
 
-        <Stack spacing={2}>
-          <InvoiceFormDetails />
-          <InvoiceFormItems />
-          <InvoiceFormTaxesAndDiscounts />
-        </Stack>
+        {activeStep == 0 && (
+          <>
+            <InvoiceFormDetails />{" "}
+            <Button
+              style={{ marginTop: "1rem" }}
+              fullWidth
+              variant="outlined"
+              onClick={() => setActiveStep(1)}
+            >
+              Next
+            </Button>
+          </>
+        )}
+
+        {activeStep == 1 && (
+          <>
+            <InvoiceFormItems />{" "}
+            <div style={{ display: "flex", gap: "1rem" }}>
+              <Button
+                style={{ marginTop: "1rem" }}
+                fullWidth
+                variant="outlined"
+                color="secondary"
+                onClick={() => setActiveStep(0)}
+              >
+                Back
+              </Button>
+              <Button
+                style={{ marginTop: "1rem" }}
+                fullWidth
+                variant="outlined"
+                onClick={() => setActiveStep(2)}
+              >
+                Next
+              </Button>
+            </div>
+          </>
+        )}
+        {activeStep == 2 && (
+          <>
+            <InvoiceFormTaxesAndDiscounts />
+            <div style={{ display: "flex", gap: "1rem" }}>
+              <IconButton
+                style={{ marginTop: "1rem" }}
+                color="secondary"
+                onClick={() => setActiveStep(1)}
+              >
+                <ArrowBackIcon />
+              </IconButton>
+              <Button
+                style={{ marginTop: "1rem" }}
+                fullWidth
+                variant="contained"
+                onClick={onGeneratePdf}
+              >
+                Download PDF
+              </Button>
+            </div>
+          </>
+        )}
       </Paper>
     </LocalizationProvider>
   );
@@ -130,44 +202,42 @@ function InvoiceFormDetails() {
       {/* =============================
                 BUYER DETAILS
             ============================== */}
-      <Accordion>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          Buyer Details
-        </AccordionSummary>
-        <AccordionDetails>
-          <Stack spacing={2}>
-            <Controller
-              name="buyerName"
-              control={control}
-              render={({ field }) => (
-                <TextField label="Buyer Name" fullWidth {...field} />
-              )}
-            />
+      <Typography align="left" variant="h6">
+        Buyer Details
+      </Typography>
+      <>
+        <Stack spacing={2}>
+          <Controller
+            name="buyerName"
+            control={control}
+            render={({ field }) => (
+              <TextField label="Buyer Name" fullWidth {...field} />
+            )}
+          />
 
-            <Controller
-              name="buyerAddress"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  label="Buyer Address"
-                  fullWidth
-                  multiline
-                  rows={3}
-                  {...field}
-                />
-              )}
-            />
+          <Controller
+            name="buyerAddress"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                label="Buyer Address"
+                fullWidth
+                multiline
+                rows={3}
+                {...field}
+              />
+            )}
+          />
 
-            <Controller
-              name="buyerGstin"
-              control={control}
-              render={({ field }) => (
-                <TextField label="Buyer GSTIN" fullWidth {...field} />
-              )}
-            />
-          </Stack>
-        </AccordionDetails>
-      </Accordion>
+          <Controller
+            name="buyerGstin"
+            control={control}
+            render={({ field }) => (
+              <TextField label="Buyer GSTIN" fullWidth {...field} />
+            )}
+          />
+        </Stack>
+      </>
     </>
   );
 }
@@ -277,7 +347,7 @@ function InvoiceFormItems() {
         ))}
 
         <Button
-          variant="outlined"
+          variant="contained"
           startIcon={<AddIcon />}
           onClick={() =>
             append({

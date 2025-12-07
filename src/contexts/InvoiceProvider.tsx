@@ -1,17 +1,29 @@
-import { createContext, useContext, useMemo, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useMemo,
+  useRef,
+  type ReactNode,
+} from "react";
 import { useForm, type UseFormReturn } from "react-hook-form";
 import dayjs from "dayjs";
 import { ToWords } from "to-words";
 import type { InvoiceForm } from "../invoice-form/InvoiceFormPage";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import type { InvoiceDocumentHandle } from "../invoice-document/InvoiceDocument";
 
 type InvoiceContextType = {
+  invoiceRef: React.RefObject<InvoiceDocumentHandle | null>;
   form: UseFormReturn<InvoiceForm, any, InvoiceForm>;
   computedData: InvoiceForm;
+  handleGeneratePDF: () => void;
 };
 
 const InvoiceContext = createContext<InvoiceContextType | undefined>(undefined);
 
 export function InvoiceProvider({ children }: { children: ReactNode }) {
+  const invoiceRef = useRef<InvoiceDocumentHandle | null>(null);
   const form = useForm<InvoiceForm>({
     defaultValues: {
       invoiceNumber: "",
@@ -72,8 +84,48 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
     };
   }, [formData]);
 
+  const handleGeneratePDF = async () => {
+    if (!invoiceRef.current) return;
+
+    const pageElements = invoiceRef.current.getPageElements();
+    if (!pageElements.length) return;
+
+    const pdf = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4",
+    });
+
+    let isFirstPage = true;
+
+    for (const pageEl of pageElements) {
+      const canvas = await html2canvas(pageEl, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+      const imgWidth = 210; // A4 width in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      if (!isFirstPage) {
+        pdf.addPage();
+      }
+      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+      isFirstPage = false;
+    }
+
+    const fileName = `Invoice_${
+      computedData.invoiceNumber || "draft"
+    }_${dayjs().format("YYYYMMDD")}.pdf`;
+    pdf.save(fileName);
+  };
+
   return (
-    <InvoiceContext.Provider value={{ form, computedData }}>
+    <InvoiceContext.Provider
+      value={{ form, computedData, invoiceRef, handleGeneratePDF }}
+    >
       {children}
     </InvoiceContext.Provider>
   );
