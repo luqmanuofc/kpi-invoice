@@ -1,0 +1,173 @@
+// Shared invoice template components used in both rendering and pagination
+import type { InvoiceForm, InvoiceItem } from "../invoice-form/InvoiceFormPage";
+
+export function TaxLabel() {
+  return <div className="tax-label">Tax Invoice</div>;
+}
+
+export function HeaderSection({ data }: { data: InvoiceForm }) {
+  return (
+    <div className="header-section">
+      <div className="left">
+        <h1 className="company-title">{data.sellerName}</h1>
+        <div className="address">{data.sellerAddress}</div>
+      </div>
+
+      <div className="right">
+        <div>Email: {data.sellerEmail}</div>
+        <div>Mobile: {data.sellerPhone}</div>
+        <div>GSTIN: {data.sellerGstin}</div>
+      </div>
+    </div>
+  );
+}
+
+export function InvoiceMeta({ data }: { data: InvoiceForm }) {
+  return (
+    <div className="invoice-meta">
+      <span>Invoice No: {data.invoiceNumber}</span>
+      <span className="center">Vehicle No: {data.vehicleNumber}</span>
+      <span className="right">Date: {data.date}</span>
+    </div>
+  );
+}
+
+export function ReceiverSection({ data }: { data: InvoiceForm }) {
+  return (
+    <>
+      <div className="receiver-section">
+        <div className="receiver-title">Details of Receiver (Billed To)</div>
+
+        <div className="receiver-field">
+          <label>Name:</label>
+          <span>{data.buyerName}</span>
+        </div>
+
+        <div className="receiver-field">
+          <label>Address:</label>
+          <span>{data.buyerAddress}</span>
+        </div>
+
+        <div className="receiver-field">
+          <label>GSTIN No:</label>
+          <span>{data.buyerGstin}</span>
+        </div>
+      </div>
+
+      <hr className="divider" />
+    </>
+  );
+}
+
+export function ItemsTableHeader() {
+  return (
+    <thead>
+      <tr>
+        <th>S. No.</th>
+        <th>Description of Goods</th>
+        <th>HSN Code</th>
+        <th>Qty</th>
+        <th>Unit</th>
+        <th>Rate</th>
+        <th>Total Amount</th>
+      </tr>
+    </thead>
+  );
+}
+
+export function ItemsTableRow({
+  item,
+  serial,
+}: {
+  item: InvoiceItem;
+  serial?: number;
+}) {
+  const rate = Number(item.rate) || 0;
+  const qty = Number(item.qty) || 0;
+  const total = qty * rate;
+
+  return (
+    <tr>
+      <td>{serial ?? "?"}</td>
+      <td>{item.description}</td>
+      <td>{item.hsn}</td>
+      <td>{qty}</td>
+      <td>{item.unit}</td>
+      <td>{rate.toFixed(2)}</td>
+      <td>{total.toFixed(2)}</td>
+    </tr>
+  );
+}
+
+export function TotalsTable({ data }: { data: InvoiceForm }) {
+  return (
+    <table className="totals-table">
+      <tbody>
+        <tr>
+          <td>Sub Total</td>
+          <td className="amount">₹{data.subtotal.toFixed(2)}</td>
+        </tr>
+        <tr>
+          <td>Discount</td>
+          <td className="amount">₹{data.discount.toFixed(2)}</td>
+        </tr>
+        <tr>
+          <td>CGST @ {data.cgst}%</td>
+          <td className="amount">₹{data.cgstAmount.toFixed(2)}</td>
+        </tr>
+        <tr>
+          <td>SGST @ {data.sgst}%</td>
+          <td className="amount">₹{data.sgstAmount.toFixed(2)}</td>
+        </tr>
+        <tr>
+          <td>IGST @ {data.igst}%</td>
+          <td className="amount">₹{data.igstAmount.toFixed(2)}</td>
+        </tr>
+        <tr className="grand-total">
+          <td>Total Invoice Value</td>
+          <td className="amount">₹{data.total.toFixed(2)}</td>
+        </tr>
+      </tbody>
+    </table>
+  );
+}
+
+export function AmountWordsSection({ data }: { data: InvoiceForm }) {
+  return (
+    <div className="amount-words-section">
+      <div className="dotted-line" />
+      <div className="amount-text">
+        Rs. <span className="amount-words">{data.amountInWords}</span>
+      </div>
+      <div className="dotted-line" />
+    </div>
+  );
+}
+
+export function FooterSection({ data }: { data: InvoiceForm }) {
+  return (
+    <div className="footer-section">
+      <div className="terms">
+        <strong>Terms & Conditions:</strong>
+        <div>
+          1. E. &amp; O.E.
+          <br />
+          2. Subject to Srinagar Jurisdiction.
+          <br />
+          3. Interest @ 24% p.a. if unpaid within 30 days.
+          <br />
+          4. Goods once sold cannot be taken back.
+        </div>
+      </div>
+
+      <div className="signature-block">
+        <div className="company-sign">For {data.sellerName}</div>
+        <div className="signature-spacer"></div>
+        <div className="signature-labels">
+          <div />
+          Authorised Signatory
+        </div>
+      </div>
+    </div>
+  );
+}

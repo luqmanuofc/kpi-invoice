@@ -1,6 +1,18 @@
 import { useEffect, useState, useRef } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { useInvoice } from "../contexts/InvoiceProvider";
 import type { InvoiceForm, InvoiceItem } from "../invoice-form/InvoiceFormPage";
+import {
+  TaxLabel,
+  HeaderSection,
+  InvoiceMeta,
+  ReceiverSection,
+  ItemsTableHeader,
+  ItemsTableRow,
+  TotalsTable,
+  AmountWordsSection,
+  FooterSection,
+} from "./InvoiceTemplateComponents";
 
 export type PageConfig = {
   startRow: number;
@@ -151,49 +163,25 @@ export function useInvoicePaginator() {
 
 // Render empty page with header + meta + buyer + table header
 function renderProbePageSkeleton(container: HTMLElement, data: InvoiceForm) {
-  // Use actual InvoicePage component skeleton
-  container.innerHTML = `
+  // Use the same React components rendered to HTML
+  const taxLabel = renderToStaticMarkup(TaxLabel());
+  const headerSection = renderToStaticMarkup(HeaderSection({ data }));
+  const invoiceMeta = renderToStaticMarkup(InvoiceMeta({ data }));
+  const receiverSection = renderToStaticMarkup(ReceiverSection({ data }));
+  const tableHeader = renderToStaticMarkup(ItemsTableHeader());
+
+  const html = `
     <div class="invoice-page probe">
       <div class="invoice-border">
-        <div class="tax-label">Tax Invoice</div>
-        <div class="header-section">
-          <div class="left">
-            <h1 class="company-title">${data.sellerName}</h1>
-            <div class="address">${data.sellerAddress}</div>
-          </div>
-          <div class="right">
-            <div>Email: ${data.sellerEmail}</div>
-            <div>Mobile: ${data.sellerPhone}</div>
-            <div>GSTIN: ${data.sellerGstin}</div>
-          </div>
-        </div>
+        ${taxLabel}
+        ${headerSection}
         <hr class="divider" />
-        <div class="invoice-meta">
-          <span>Invoice No: ${data.invoiceNumber}</span>
-          <span class="center">Vehicle No: ${data.vehicleNumber}</span>
-          <span class="right">Date: ${data.date}</span>
-        </div>
+        ${invoiceMeta}
         <hr class="divider" />
-        <div class="receiver-section">
-          <div class="receiver-title">Details of Receiver (Billed To)</div>
-          <div class="receiver-field"><label>Name:</label><span>${data.buyerName}</span></div>
-          <div class="receiver-field"><label>Address:</label><span>${data.buyerAddress}</span></div>
-          <div class="receiver-field"><label>GSTIN No:</label><span>${data.buyerGstin}</span></div>
-        </div>
-        <hr class="divider" />
-        
+        ${receiverSection}
+
         <table class="items-table">
-          <thead>
-            <tr>
-              <th>S. No.</th>
-              <th>Description of Goods</th>
-              <th>HSN Code</th>
-              <th>Qty</th>
-              <th>Unit</th>
-              <th>Rate</th>
-              <th>Total Amount</th>
-            </tr>
-          </thead>
+          ${tableHeader}
           <tbody></tbody>
         </table>
 
@@ -201,6 +189,8 @@ function renderProbePageSkeleton(container: HTMLElement, data: InvoiceForm) {
       </div>
     </div>
   `;
+
+  container.innerHTML = html;
 
   const tbody = container.querySelector(".items-table tbody")!;
   const totalsTemplate = createTotalsTemplate(data);
@@ -219,18 +209,7 @@ function renderProbePageSkeleton(container: HTMLElement, data: InvoiceForm) {
 
 function renderProbeRow(item: InvoiceItem) {
   const tr = document.createElement("tr");
-  const rate = Number(item.rate) || 0;
-  const qty = Number(item.qty) || 0;
-  const lineTotal = qty * rate;
-  tr.innerHTML = `
-    <td>?</td>
-    <td>${item.description}</td>
-    <td>${item.hsn}</td>
-    <td>${qty}</td>
-    <td>${item.unit}</td>
-    <td>${rate.toFixed(2)}</td>
-    <td>${lineTotal.toFixed(2)}</td>
-  `;
+  tr.innerHTML = renderToStaticMarkup(ItemsTableRow({ item }));
   return tr;
 }
 
@@ -238,67 +217,18 @@ function renderProbeRow(item: InvoiceItem) {
 
 function createTotalsTemplate(data: InvoiceForm) {
   const wrap = document.createElement("div");
-  wrap.innerHTML = `
-    <table class="totals-table">
-      <tbody>
-        <tr><td>Sub Total</td><td class="amount">₹${data.subtotal.toFixed(
-          2
-        )}</td></tr>
-        <tr><td>Discount</td><td class="amount">₹${data.discount.toFixed(
-          2
-        )}</td></tr>
-        <tr><td>CGST @ ${
-          data.cgst
-        }%</td><td class="amount">₹${data.cgstAmount.toFixed(2)}</td></tr>
-        <tr><td>SGST @ ${
-          data.sgst
-        }%</td><td class="amount">₹${data.sgstAmount.toFixed(2)}</td></tr>
-        <tr><td>IGST @ ${
-          data.igst
-        }%</td><td class="amount">₹${data.igstAmount.toFixed(2)}</td></tr>
-        <tr class="grand-total"><td>Total Invoice Value</td><td class="amount">₹${data.total.toFixed(
-          2
-        )}</td></tr>
-      </tbody>
-    </table>
-  `;
+  wrap.innerHTML = renderToStaticMarkup(TotalsTable({ data }));
   return wrap.firstElementChild as HTMLElement;
 }
 
 function createWordsTemplate(data: InvoiceForm) {
   const wrap = document.createElement("div");
-  wrap.innerHTML = `
-    <div class="amount-words-section">
-      <div class="dotted-line"></div>
-      <div class="amount-text">Rs. <span class="amount-words">${data.amountInWords}</span></div>
-      <div class="dotted-line"></div>
-    </div>
-  `;
+  wrap.innerHTML = renderToStaticMarkup(AmountWordsSection({ data }));
   return wrap.firstElementChild as HTMLElement;
 }
 
 function createFooterTemplate(data: InvoiceForm) {
   const wrap = document.createElement("div");
-  wrap.innerHTML = `
-    <div class="footer-section">
-      <div className="terms">
-              <strong>Terms & Conditions:</strong>
-              <div>
-                1. E. &amp; O.E.
-                <br />
-                2. Subject to Srinagar Jurisdiction.
-                <br />
-                3. Interest @ 24% p.a. if unpaid within 30 days.
-                <br />
-                4. Goods once sold cannot be taken back.
-              </div>
-      </div>
-      <div class="signature-block">
-        <div class="company-sign">For ${data.sellerName}</div>
-        <div class="signature-spacer"></div>
-        <div class="signature-labels"><div></div><span>Authorised Signatory</span></div>
-      </div>
-    </div>
-  `;
+  wrap.innerHTML = renderToStaticMarkup(FooterSection({ data }));
   return wrap.firstElementChild as HTMLElement;
 }
