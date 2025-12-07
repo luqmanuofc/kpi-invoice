@@ -1,12 +1,12 @@
 import prisma from "../lib/prisma";
 
-export default async function handler(event) {
-  if (event.httpMethod !== "POST") {
-    return { statusCode: 405, body: "Method not allowed" };
+export default async function handler(request: Request) {
+  if (request.method !== "POST") {
+    return new Response("Method not allowed", { status: 405 });
   }
 
   try {
-    const data = JSON.parse(event.body!);
+    const data = await request.json();
 
     const invoice = await prisma.invoice.create({
       data: {
@@ -48,11 +48,13 @@ export default async function handler(event) {
       include: { items: true, buyer: true },
     });
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify(invoice),
-    };
+    return new Response(JSON.stringify(invoice), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
   } catch (err: any) {
-    return { statusCode: 500, body: err.message };
+    return new Response(err.message, { status: 500 });
   }
 }
