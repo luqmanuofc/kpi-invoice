@@ -4,6 +4,7 @@ import { Routes, Route } from "react-router-dom";
 import NavigationAppBar from "./components/AppBar";
 import InvoicePage from "./pages/Invoice.page";
 import BuyerPage from "./pages/Buyer.page";
+import BuyerCreatePage from "./pages/BuyerCreate.page";
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
       <Routes>
         <Route path="/" element={<InvoicePage />} />
         <Route path="/buyer" element={<BuyerPage />} />
+        <Route path="/buyer/create" element={<BuyerCreatePage />} />
       </Routes>
     </div>
   );
