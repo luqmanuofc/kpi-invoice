@@ -8,6 +8,9 @@ import InvoiceDocument, {
 import { getInvoiceById, type Invoice } from "../api/invoices";
 import type { InvoiceForm } from "../invoice-form/types";
 import dayjs from "dayjs";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+import { GridDownloadIcon } from "@mui/x-data-grid";
 
 export default function InvoiceViewPage() {
   const { id } = useParams<{ id: string }>();
@@ -73,6 +76,44 @@ export default function InvoiceViewPage() {
     };
   }, [invoice]);
 
+  const downloadPDF = async () => {
+    if (!invoiceRef.current) return;
+
+    const pageElements = invoiceRef.current.getPageElements();
+    if (!pageElements.length) return;
+
+    const pdf = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4",
+    });
+
+    let isFirstPage = true;
+
+    for (const pageEl of pageElements) {
+      const canvas = await html2canvas(pageEl, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+      const imgWidth = 210; // A4 width in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      if (!isFirstPage) {
+        pdf.addPage();
+      }
+      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+      isFirstPage = false;
+    }
+
+    const fileName = `Invoice_${
+      invoiceData?.invoiceNumber || "draft"
+    }_${dayjs().format("YYYYMMDD")}.pdf`;
+    pdf.save(fileName);
+  };
+
   const handleBack = () => {
     navigate("/invoices");
   };
@@ -111,7 +152,9 @@ export default function InvoiceViewPage() {
 
   return (
     <div style={{ padding: "1rem" }}>
-      <Box sx={{ mb: 2 }}>
+      <Box
+        sx={{ display: "flex", justifyContent: "space-between", mb: 2, gap: 2 }}
+      >
         <Button
           variant="outlined"
           size="small"
@@ -120,7 +163,16 @@ export default function InvoiceViewPage() {
         >
           Back to Invoices
         </Button>
+        <Button
+          variant="contained"
+          size="small"
+          startIcon={<GridDownloadIcon />}
+          onClick={downloadPDF}
+        >
+          Download
+        </Button>
       </Box>
+
       <InvoiceDocument data={invoiceData} ref={invoiceRef} />
     </div>
   );
