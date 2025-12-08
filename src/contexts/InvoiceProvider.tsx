@@ -31,9 +31,7 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
       vehicleNumber: "",
       date: dayjs().format("YYYY-MM-DD"),
 
-      buyerName: "",
-      buyerAddress: "",
-      buyerGstin: "",
+      buyer: null,
 
       items: [{ description: "", hsn: "", qty: 1, unit: "Kg", rate: 0 }],
 

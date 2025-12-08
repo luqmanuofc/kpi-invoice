@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import {
   getBuyerById,
@@ -10,6 +10,8 @@ import BuyerForm from "../components/BuyerForm";
 export default function BuyerEditPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
+  const returnUrl = searchParams.get("returnUrl");
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -56,8 +58,12 @@ export default function BuyerEditPage() {
       const result = await updateBuyer(id, data);
       console.log("Buyer updated:", result);
 
-      // Navigate back to buyers list after successful update
-      navigate("/buyer");
+      // Navigate back to return URL or buyers list after successful update
+      if (returnUrl) {
+        navigate(returnUrl);
+      } else {
+        navigate("/buyer");
+      }
     } catch (err: any) {
       setError(err.message || "An error occurred while updating the buyer");
     } finally {

@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import {
   Box,
@@ -32,6 +32,8 @@ export default function BuyerForm({
   error = null,
 }: BuyerFormProps) {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const returnUrl = searchParams.get("returnUrl");
 
   const {
     register,
@@ -49,7 +51,11 @@ export default function BuyerForm({
   }, [initialData, reset]);
 
   const handleBack = () => {
-    navigate("/buyer");
+    if (returnUrl) {
+      navigate(returnUrl);
+    } else {
+      navigate("/buyer");
+    }
   };
 
   const title = mode === "create" ? "New Buyer" : "Edit Buyer";
@@ -78,13 +84,17 @@ export default function BuyerForm({
         <Link
           underline="hover"
           color="inherit"
-          href="/buyer"
+          href={returnUrl || "/buyer"}
           onClick={(e) => {
             e.preventDefault();
-            navigate("/buyer");
+            if (returnUrl) {
+              navigate(returnUrl);
+            } else {
+              navigate("/buyer");
+            }
           }}
         >
-          Buyers
+          {returnUrl ? "Back" : "Buyers"}
         </Link>
         <Typography>{breadcrumbText}</Typography>
       </Breadcrumbs>

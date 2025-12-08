@@ -1,3 +1,5 @@
+import type { Buyer } from "../api/buyers";
+
 export type InvoiceItem = {
   description: string;
   hsn: string;
@@ -11,9 +13,7 @@ export type InvoiceForm = {
   vehicleNumber: string;
   date: string;
 
-  buyerName: string;
-  buyerAddress: string;
-  buyerGstin: string;
+  buyer: Buyer | null;
 
   items: InvoiceItem[];
 

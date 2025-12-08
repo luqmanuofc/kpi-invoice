@@ -14,11 +14,11 @@ export default async function handler(request: Request) {
         date: new Date(data.date),
         vehicleNumber: data.vehicleNumber,
 
-        buyerId: data.buyerId,
+        buyerId: data.buyer.buyerId,
 
-        buyerNameSnapshot: data.buyerName,
-        buyerAddressSnapshot: data.buyerAddress,
-        buyerGstinSnapshot: data.buyerGstin,
+        buyerNameSnapshot: data.buyer.name,
+        buyerAddressSnapshot: data.buyer.address,
+        buyerGstinSnapshot: data.buyer.gstin,
 
         sellerNameSnapshot: data.sellerName,
         sellerAddressSnapshot: data.sellerAddress,

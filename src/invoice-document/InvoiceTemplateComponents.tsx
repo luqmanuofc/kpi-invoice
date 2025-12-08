@@ -40,17 +40,17 @@ export function ReceiverSection({ data }: { data: InvoiceForm }) {
 
         <div className="receiver-field">
           <label>Name:</label>
-          <span>{data.buyerName}</span>
+          <span>{data.buyer?.name}</span>
         </div>
 
         <div className="receiver-field">
           <label>Address:</label>
-          <span className="preserve-newlines">{data.buyerAddress}</span>
+          <span className="preserve-newlines">{data.buyer?.address}</span>
         </div>
 
         <div className="receiver-field">
           <label>GSTIN No:</label>
-          <span>{data.buyerGstin}</span>
+          <span>{data?.buyer?.gstin}</span>
         </div>
       </div>
 
