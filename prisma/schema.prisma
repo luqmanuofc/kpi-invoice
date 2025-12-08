@@ -76,7 +76,6 @@ model InvoiceItem {
   qty         Decimal @db.Decimal(10, 2)
   unit        String
   rate        Decimal @db.Decimal(10, 2)
-  lineTotal   Decimal @db.Decimal(10, 2)
 
   @@index([invoiceId])
 }

@@ -14,7 +14,7 @@ export default async function handler(request: Request) {
         date: new Date(data.date),
         vehicleNumber: data.vehicleNumber,
 
-        buyerId: data.buyer.buyerId,
+        buyerId: data.buyer.id,
 
         buyerNameSnapshot: data.buyer.name,
         buyerAddressSnapshot: data.buyer.address,

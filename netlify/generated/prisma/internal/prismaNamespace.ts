@@ -714,8 +714,7 @@ export const InvoiceItemScalarFieldEnum = {
   hsn: 'hsn',
   qty: 'qty',
   unit: 'unit',
-  rate: 'rate',
-  lineTotal: 'lineTotal'
+  rate: 'rate'
 } as const
 
 export type InvoiceItemScalarFieldEnum = (typeof InvoiceItemScalarFieldEnum)[keyof typeof InvoiceItemScalarFieldEnum]

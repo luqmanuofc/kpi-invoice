@@ -1,18 +1,10 @@
+import type { Buyer } from "../invoice-form/types";
+
 export interface BuyerFormData {
   name: string;
   address: string;
   gstin?: string;
   phone?: string;
-}
-
-export interface Buyer {
-  id: string;
-  name: string;
-  address: string;
-  gstin: string | null;
-  phone: string | null;
-  createdAt: string;
-  updatedAt: string;
 }
 
 export async function createBuyer(data: BuyerFormData) {

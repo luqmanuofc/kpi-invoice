@@ -1,4 +1,12 @@
-import type { Buyer } from "../api/buyers";
+export interface Buyer {
+  id: string;
+  name: string;
+  address: string;
+  gstin: string | null;
+  phone: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export type InvoiceItem = {
   description: string;
