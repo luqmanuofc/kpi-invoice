@@ -7,6 +7,7 @@ import InvoiceDocument, {
 } from "../invoice-document/InvoiceDocument";
 import { getInvoiceById, type Invoice } from "../api/invoices";
 import type { InvoiceForm } from "../invoice-form/types";
+import dayjs from "dayjs";
 
 export default function InvoiceViewPage() {
   const { id } = useParams<{ id: string }>();
@@ -51,7 +52,7 @@ export default function InvoiceViewPage() {
     return {
       invoiceNumber: invoice.invoiceNumber,
       vehicleNumber: invoice.vehicleNumber,
-      date: invoice.date,
+      date: dayjs(invoice.date).format("YYYY-MM-DD"),
       buyer: invoice.buyer,
       items: invoice.items || [],
       discount: Number(invoice.discount),
