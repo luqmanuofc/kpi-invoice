@@ -22,7 +22,6 @@ export type InvoiceForm = {
   sgst: number;
   igst: number;
 
-  // NEW TOTAL SECTIONS (computed automatically)
   subtotal: number;
   cgstAmount: number;
   sgstAmount: number;
