@@ -3,3 +3,6 @@ dist
 .env
 .env.local
 /src/generated/prisma
+
+# Local Netlify folder
+.netlify
