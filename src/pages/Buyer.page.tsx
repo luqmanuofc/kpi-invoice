@@ -1,17 +1,9 @@
-import { Typography, Box, Button } from "@mui/material";
+import { Typography, Box, Button, CircularProgress, Alert } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import type { GridColDef } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
-
-interface BuyerRow {
-  id: string;
-  name: string;
-  address: string;
-  gstin: string | null;
-  phone: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
+import { useEffect, useState } from "react";
+import { getBuyers, type Buyer } from "../api/buyers";
 
 const columns: GridColDef[] = [
   { field: "id", headerName: "ID", width: 200 },
@@ -21,16 +13,47 @@ const columns: GridColDef[] = [
   { field: "phone", headerName: "Phone", width: 150 },
 ];
 
-const rows: BuyerRow[] = [
-  // TODO: Replace with actual data from API
-];
-
 export default function BuyerPage() {
   const navigate = useNavigate();
+  const [buyers, setBuyers] = useState<Buyer[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchBuyers = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const data = await getBuyers();
+        setBuyers(data);
+      } catch (err: any) {
+        setError(err.message || "Failed to load buyers");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchBuyers();
+  }, []);
 
   const handleCreateClick = () => {
     navigate("/buyer/create");
   };
+
+  if (isLoading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "400px",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <div style={{ margin: "2rem" }}>
@@ -50,9 +73,16 @@ export default function BuyerPage() {
           </Button>
         </div>
       </Box>
+
+      {error && (
+        <Alert severity="error" sx={{ mb: 3 }}>
+          {error}
+        </Alert>
+      )}
+
       <Box sx={{ height: 600, width: "100%" }}>
         <DataGrid
-          rows={rows}
+          rows={buyers}
           columns={columns}
           initialState={{
             pagination: {
