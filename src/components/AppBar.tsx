@@ -24,6 +24,13 @@ export default function NavigationAppBar() {
           </Button>
           <Button
             color="inherit"
+            onClick={() => navigate("/invoices")}
+            sx={{ textTransform: "none" }}
+          >
+            Invoices
+          </Button>
+          <Button
+            color="inherit"
             onClick={() => navigate("/buyer")}
             sx={{ textTransform: "none" }}
           >
