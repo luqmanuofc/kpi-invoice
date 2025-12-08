@@ -1,17 +1,17 @@
-import { Typography, Box, Button, CircularProgress, Alert } from "@mui/material";
+import {
+  Typography,
+  Box,
+  Button,
+  CircularProgress,
+  Alert,
+  IconButton,
+} from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import type { GridColDef } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getBuyers, type Buyer } from "../api/buyers";
-
-const columns: GridColDef[] = [
-  { field: "id", headerName: "ID", width: 200 },
-  { field: "name", headerName: "Name", width: 200 },
-  { field: "address", headerName: "Address", width: 300 },
-  { field: "gstin", headerName: "GSTIN", width: 150 },
-  { field: "phone", headerName: "Phone", width: 150 },
-];
+import EditIcon from "@mui/icons-material/Edit";
 
 export default function BuyerPage() {
   const navigate = useNavigate();
@@ -39,6 +39,32 @@ export default function BuyerPage() {
   const handleCreateClick = () => {
     navigate("/buyer/create");
   };
+
+  const handleEditClick = (id: string) => {
+    navigate(`/buyer/${id}`);
+  };
+
+  const columns: GridColDef[] = [
+    { field: "name", headerName: "Name", width: 200 },
+    { field: "address", headerName: "Address", width: 300 },
+    { field: "gstin", headerName: "GSTIN", width: 150 },
+    { field: "phone", headerName: "Phone", width: 150 },
+    {
+      field: "actions",
+      headerName: "Actions",
+      width: 100,
+      sortable: false,
+      renderCell: (params) => (
+        <IconButton
+          color="primary"
+          size="small"
+          onClick={() => handleEditClick(params.row.id)}
+        >
+          <EditIcon />
+        </IconButton>
+      ),
+    },
+  ];
 
   if (isLoading) {
     return (

@@ -5,6 +5,7 @@ import NavigationAppBar from "./components/AppBar";
 import InvoicePage from "./pages/Invoice.page";
 import BuyerPage from "./pages/Buyer.page";
 import BuyerCreatePage from "./pages/BuyerCreate.page";
+import BuyerEditPage from "./pages/BuyerEdit.page";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/" element={<InvoicePage />} />
         <Route path="/buyer" element={<BuyerPage />} />
         <Route path="/buyer/create" element={<BuyerCreatePage />} />
+        <Route path="/buyer/:id" element={<BuyerEditPage />} />
       </Routes>
     </div>
   );
