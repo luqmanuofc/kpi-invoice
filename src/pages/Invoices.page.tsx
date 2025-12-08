@@ -12,7 +12,6 @@ import type { GridColDef } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getInvoices, type Invoice } from "../api/invoices";
-import EditIcon from "@mui/icons-material/Edit";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 
 export default function InvoicesPage() {
@@ -72,7 +71,7 @@ export default function InvoicesPage() {
       headerName: "Total Items",
       width: 110,
       sortable: true,
-      valueGetter: (value) => {
+      valueGetter: (value: Invoice["items"]) => {
         return value?.length || 0;
       },
     },
@@ -99,7 +98,7 @@ export default function InvoicesPage() {
       field: "total",
       headerName: "Total",
       width: 130,
-      valueFormatter: (value) => {
+      valueFormatter: (value: number) => {
         return `₹${value.toLocaleString("en-IN", {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
