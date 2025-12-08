@@ -3,6 +3,7 @@ import {
   useContext,
   useMemo,
   useRef,
+  useState,
   type ReactNode,
 } from "react";
 import { useForm, type UseFormReturn } from "react-hook-form";
@@ -19,12 +20,15 @@ type InvoiceContextType = {
   form: UseFormReturn<InvoiceForm, any, InvoiceForm>;
   computedData: InvoiceForm;
   handleGeneratePDF: () => void;
+  activeStep: number;
+  setActiveStep: (step: number) => void;
 };
 
 const InvoiceContext = createContext<InvoiceContextType | undefined>(undefined);
 
 export function InvoiceProvider({ children }: { children: ReactNode }) {
   const invoiceRef = useRef<InvoiceDocumentHandle | null>(null);
+  const [activeStep, setActiveStep] = useState<number>(0);
   const form = useForm<InvoiceForm>({
     defaultValues: {
       invoiceNumber: "",
@@ -131,7 +135,7 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
 
   return (
     <InvoiceContext.Provider
-      value={{ form, computedData, invoiceRef, handleGeneratePDF }}
+      value={{ form, computedData, invoiceRef, handleGeneratePDF, activeStep, setActiveStep }}
     >
       {children}
     </InvoiceContext.Provider>

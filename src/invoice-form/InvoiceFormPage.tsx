@@ -15,7 +15,6 @@ import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 
 import { useInvoice } from "../contexts/InvoiceProvider";
-import { useState } from "react";
 import InvoiceFormDetailsPage from "./InvoiceFormDetailsPage";
 import InvoiceFormItemsPage from "./InvoiceFormItemsPage";
 import InvoiceFormTaxesAndDiscountsPage from "./InvoiceFormTaxesAndDiscountsPage";
@@ -23,8 +22,7 @@ import InvoiceFormTaxesAndDiscountsPage from "./InvoiceFormTaxesAndDiscountsPage
 const steps = ["Invoice & Buyer", "Items", "Taxes & Discounts"];
 
 export default function InvoiceFormPage() {
-  const [activeStep, setActiveStep] = useState<number>(0);
-  const { handleGeneratePDF: onGeneratePdf } = useInvoice();
+  const { handleGeneratePDF: onGeneratePdf, activeStep, setActiveStep } = useInvoice();
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Paper sx={{ p: 2, width: "100%", minWidth: "450px", mt: 3 }}>
