@@ -22,7 +22,11 @@ import InvoiceFormTaxesAndDiscountsPage from "./InvoiceFormTaxesAndDiscountsPage
 const steps = ["Invoice & Buyer", "Items", "Taxes & Discounts"];
 
 export default function InvoiceFormPage() {
-  const { handleGeneratePDF: onGeneratePdf, activeStep, setActiveStep } = useInvoice();
+  const {
+    handleCreateInvoice: onCreateInvoice,
+    activeStep,
+    setActiveStep,
+  } = useInvoice();
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Paper sx={{ p: 2, width: "100%", minWidth: "450px", mt: 3 }}>
@@ -94,9 +98,9 @@ export default function InvoiceFormPage() {
                 style={{ marginTop: "1rem" }}
                 fullWidth
                 variant="contained"
-                onClick={onGeneratePdf}
+                onClick={onCreateInvoice}
               >
-                Download PDF
+                Create Invoice
               </Button>
             </div>
           </>

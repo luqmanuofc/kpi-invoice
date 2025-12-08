@@ -2,7 +2,6 @@ import {
   createContext,
   useContext,
   useMemo,
-  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -10,16 +9,13 @@ import { useForm, type UseFormReturn } from "react-hook-form";
 import dayjs from "dayjs";
 import { ToWords } from "to-words";
 import type { InvoiceForm } from "../invoice-form/types";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
-import type { InvoiceDocumentHandle } from "../invoice-document/InvoiceDocument";
 import { createInvoice } from "../api/invoices";
+import { useNavigate } from "react-router-dom";
 
 type InvoiceContextType = {
-  invoiceRef: React.RefObject<InvoiceDocumentHandle | null>;
   form: UseFormReturn<InvoiceForm, any, InvoiceForm>;
   computedData: InvoiceForm;
-  handleGeneratePDF: () => void;
+  handleCreateInvoice: () => void;
   activeStep: number;
   setActiveStep: (step: number) => void;
 };
@@ -27,8 +23,9 @@ type InvoiceContextType = {
 const InvoiceContext = createContext<InvoiceContextType | undefined>(undefined);
 
 export function InvoiceProvider({ children }: { children: ReactNode }) {
-  const invoiceRef = useRef<InvoiceDocumentHandle | null>(null);
   const [activeStep, setActiveStep] = useState<number>(0);
+  const navigate = useNavigate();
+
   const form = useForm<InvoiceForm>({
     defaultValues: {
       invoiceNumber: "",
@@ -87,53 +84,17 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
     };
   }, [formData]);
 
-  const handleGeneratePDF = async () => {
-    if (!invoiceRef.current) return;
-
+  const handleCreateInvoice = async () => {
     try {
       const result = await createInvoice(computedData);
       console.log("Invoice created:", result);
+      setActiveStep(0);
+      form.reset();
+      navigate(`/invoice/${result.id}`);
     } catch (err) {
       console.error(err);
       alert("Failed to create invoice.");
     }
-
-    const pageElements = invoiceRef.current.getPageElements();
-    if (!pageElements.length) return;
-
-    const pdf = new jsPDF({
-      orientation: "portrait",
-      unit: "mm",
-      format: "a4",
-    });
-
-    let isFirstPage = true;
-
-    for (const pageEl of pageElements) {
-      const canvas = await html2canvas(pageEl, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-      });
-
-      const imgData = canvas.toDataURL("image/png");
-      const imgWidth = 210; // A4 width in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-      if (!isFirstPage) {
-        pdf.addPage();
-      }
-      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
-      isFirstPage = false;
-    }
-
-    const fileName = `Invoice_${
-      computedData.invoiceNumber || "draft"
-    }_${dayjs().format("YYYYMMDD")}.pdf`;
-    pdf.save(fileName);
-
-    form.reset();
-    setActiveStep(0);
   };
 
   return (
@@ -141,8 +102,7 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
       value={{
         form,
         computedData,
-        invoiceRef,
-        handleGeneratePDF,
+        handleCreateInvoice,
         activeStep,
         setActiveStep,
       }}
