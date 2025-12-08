@@ -1,6 +1,5 @@
 import { useEffect, useState, useRef } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { useInvoice } from "../contexts/InvoiceProvider";
 import type { InvoiceForm, InvoiceItem } from "../invoice-form/types";
 import {
   TaxLabel,
@@ -31,8 +30,7 @@ export type PageConfig = {
  * the next element (row/totals/words/footer) overlaps
  * the bottom of the page.
  */
-export function useInvoicePaginator() {
-  const { computedData: data } = useInvoice();
+export function useInvoicePaginator(data: InvoiceForm) {
   const [pages, setPages] = useState<PageConfig[]>([]);
   const probeRootRef = useRef<HTMLDivElement | null>(null);
 

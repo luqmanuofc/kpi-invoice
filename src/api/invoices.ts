@@ -1,4 +1,4 @@
-import type { InvoiceForm } from "../invoice-form/types";
+import type { Buyer, InvoiceForm } from "../invoice-form/types";
 
 export interface Invoice {
   id: string;
@@ -23,13 +23,7 @@ export interface Invoice {
   amountInWords: string;
   createdAt: string;
   updatedAt: string;
-  buyer?: {
-    id: string;
-    name: string;
-    address: string;
-    gstin: string | null;
-    phone: string | null;
-  };
+  buyer: Buyer;
   items?: Array<{
     id: string;
     description: string;
@@ -69,6 +63,22 @@ export async function getInvoices(): Promise<Invoice[]> {
   if (!response.ok) {
     const text = await response.text();
     throw new Error(`Get invoices failed: ${text}`);
+  }
+
+  return response.json();
+}
+
+export async function getInvoiceById(id: string): Promise<Invoice> {
+  const response = await fetch(`/.netlify/functions/getInvoice?id=${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`Get invoice failed: ${text}`);
   }
 
   return response.json();

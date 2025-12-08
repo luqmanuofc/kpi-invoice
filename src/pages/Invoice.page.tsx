@@ -3,7 +3,7 @@ import InvoiceDocument from "../invoice-document/InvoiceDocument";
 import { useInvoice } from "../contexts/InvoiceProvider";
 
 export default function InvoicePage() {
-  const { invoiceRef } = useInvoice();
+  const { invoiceRef, computedData } = useInvoice();
   return (
     <div
       style={{
@@ -24,7 +24,7 @@ export default function InvoicePage() {
         <InvoiceFormPage />
       </div>
 
-      <InvoiceDocument ref={invoiceRef} />
+      <InvoiceDocument data={computedData} ref={invoiceRef} />
     </div>
   );
 }
