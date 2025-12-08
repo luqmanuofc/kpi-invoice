@@ -46,7 +46,7 @@ export default function BuyerPage() {
 
   const columns: GridColDef[] = [
     { field: "name", headerName: "Name", width: 200 },
-    { field: "address", headerName: "Address", width: 300 },
+    { field: "address", headerName: "Address", flex: 1, minWidth: 300 },
     { field: "gstin", headerName: "GSTIN", width: 150 },
     { field: "phone", headerName: "Phone", width: 150 },
     {
@@ -54,6 +54,7 @@ export default function BuyerPage() {
       headerName: "Actions",
       width: 100,
       sortable: false,
+      disableColumnMenu: true,
       renderCell: (params) => (
         <IconButton
           color="primary"
@@ -113,6 +114,9 @@ export default function BuyerPage() {
           initialState={{
             pagination: {
               paginationModel: { page: 0, pageSize: 10 },
+            },
+            columns: {
+              columnVisibilityModel: {},
             },
           }}
           pageSizeOptions={[5, 10, 25]}
