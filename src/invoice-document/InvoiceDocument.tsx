@@ -46,6 +46,7 @@ const InvoiceDocument = forwardRef<InvoiceDocumentHandle, Props>(
                 ref={(el) => {
                   if (el) pageRefs[idx] = el;
                 }}
+                style={{ width: "fit-content" }}
               >
                 <InvoicePage
                   data={data}
