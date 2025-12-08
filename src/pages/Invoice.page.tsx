@@ -1,9 +1,14 @@
 import InvoiceFormPage from "../invoice-form/InvoiceFormPage";
-import InvoiceDocument from "../invoice-document/InvoiceDocument";
+import InvoiceDocument, {
+  type InvoiceDocumentHandle,
+} from "../invoice-document/InvoiceDocument";
 import { useInvoice } from "../contexts/InvoiceProvider";
+import { useRef } from "react";
 
 export default function InvoicePage() {
-  const { invoiceRef, computedData } = useInvoice();
+  const { computedData } = useInvoice();
+  const invoiceRef = useRef<InvoiceDocumentHandle | null>(null);
+
   return (
     <div
       style={{
