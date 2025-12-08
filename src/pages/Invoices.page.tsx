@@ -4,7 +4,6 @@ import {
   Button,
   CircularProgress,
   Alert,
-  IconButton,
   Chip,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
@@ -112,14 +111,14 @@ export default function InvoicesPage() {
       sortable: false,
       disableColumnMenu: true,
       renderCell: (params) => (
-        <Box sx={{ display: "flex", gap: 1 }}>
-          <IconButton
-            color="primary"
-            size="small"
+        <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
+          <Button
+            startIcon={<VisibilityIcon />}
+            variant="outlined"
             onClick={() => handleViewClick(params.row.id)}
           >
-            <VisibilityIcon />
-          </IconButton>
+            View
+          </Button>
         </Box>
       ),
     },
