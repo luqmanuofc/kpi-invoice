@@ -131,11 +131,21 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
       computedData.invoiceNumber || "draft"
     }_${dayjs().format("YYYYMMDD")}.pdf`;
     pdf.save(fileName);
+
+    form.reset();
+    setActiveStep(0);
   };
 
   return (
     <InvoiceContext.Provider
-      value={{ form, computedData, invoiceRef, handleGeneratePDF, activeStep, setActiveStep }}
+      value={{
+        form,
+        computedData,
+        invoiceRef,
+        handleGeneratePDF,
+        activeStep,
+        setActiveStep,
+      }}
     >
       {children}
     </InvoiceContext.Provider>
