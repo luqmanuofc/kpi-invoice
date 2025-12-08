@@ -6,6 +6,7 @@ import {
   CircularProgress,
   IconButton,
   Box,
+  Tooltip,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
@@ -114,20 +115,28 @@ export default function InvoiceFormDetailsPage() {
               )}
               sx={{ flex: 1 }}
             />
-            <IconButton
-              color="primary"
-              onClick={() => {
-                const returnUrl = encodeURIComponent(window.location.pathname);
-                if (selectedBuyer) {
-                  navigate(`/buyer/${selectedBuyer.id}?returnUrl=${returnUrl}`);
-                } else {
-                  navigate(`/buyer/create?returnUrl=${returnUrl}`);
-                }
-              }}
-              sx={{ mt: 1 }}
+            <Tooltip
+              title={selectedBuyer == null ? <>Add Buyer</> : <>Edit Buyer</>}
             >
-              {selectedBuyer ? <EditIcon /> : <AddIcon />}
-            </IconButton>
+              <IconButton
+                color="primary"
+                onClick={() => {
+                  const returnUrl = encodeURIComponent(
+                    window.location.pathname
+                  );
+                  if (selectedBuyer) {
+                    navigate(
+                      `/buyer/${selectedBuyer.id}?returnUrl=${returnUrl}`
+                    );
+                  } else {
+                    navigate(`/buyer/create?returnUrl=${returnUrl}`);
+                  }
+                }}
+                sx={{ mt: 1 }}
+              >
+                {selectedBuyer ? <EditIcon /> : <AddIcon />}
+              </IconButton>
+            </Tooltip>
           </Box>
         </Stack>
       </>
