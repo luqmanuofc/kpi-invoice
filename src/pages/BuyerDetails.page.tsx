@@ -159,7 +159,7 @@ export default function BuyerDetailsPage() {
         <Card sx={{ mb: 4 }}>
           <CardContent>
             <Grid container spacing={3}>
-              <Grid item xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Typography variant="subtitle2" color="text.secondary">
                   Name
                 </Typography>
@@ -168,7 +168,7 @@ export default function BuyerDetailsPage() {
                 </Typography>
               </Grid>
 
-              <Grid item xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Typography variant="subtitle2" color="text.secondary">
                   Phone
                 </Typography>
@@ -177,7 +177,7 @@ export default function BuyerDetailsPage() {
                 </Typography>
               </Grid>
 
-              <Grid item xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Typography variant="subtitle2" color="text.secondary">
                   Address
                 </Typography>
@@ -186,7 +186,7 @@ export default function BuyerDetailsPage() {
                 </Typography>
               </Grid>
 
-              <Grid item xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Typography variant="subtitle2" color="text.secondary">
                   GSTIN
                 </Typography>
