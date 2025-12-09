@@ -9,6 +9,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import "dayjs/locale/en-gb";
 
 import Box from "@mui/material/Box";
 import Stepper from "@mui/material/Stepper";
@@ -28,7 +29,7 @@ export default function InvoiceFormPage() {
     setActiveStep,
   } = useInvoice();
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
+    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
       <Paper sx={{ p: 2, width: "100%", minWidth: "450px", mt: 3 }}>
         <Typography variant="h5" sx={{ mb: 2 }}>
           Create Invoice
