@@ -66,12 +66,13 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
     const sgstAmount = (subtotal * formData.sgst) / 100;
     const igstAmount = (subtotal * formData.igst) / 100;
 
-    const total =
+    const computedTotal =
       subtotal - formData.discount + cgstAmount + sgstAmount + igstAmount;
 
+    const total = Math.round(computedTotal);
+
     const toWords = new ToWords({ localeCode: "en-IN" });
-    const amountInWords =
-      toWords.convert(Math.round(total)).toUpperCase() + " ONLY";
+    const amountInWords = toWords.convert(total).toUpperCase() + " ONLY";
 
     return {
       ...formData,
