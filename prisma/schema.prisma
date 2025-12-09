@@ -29,7 +29,7 @@ model Buyer {
 model Invoice {
   id String @id @default(cuid())
 
-  invoiceNumber String
+  invoiceNumber String @unique
   date          DateTime
   vehicleNumber String?
 
