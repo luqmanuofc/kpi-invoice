@@ -5,7 +5,10 @@ import {
   updateBuyer,
   type BuyerFormData,
 } from "../api/buyers";
+import { getInvoices, type Invoice } from "../api/invoices";
 import BuyerForm from "../components/BuyerForm";
+import InvoicesDataGrid from "../components/InvoicesDataGrid";
+import { Box, Typography, Divider } from "@mui/material";
 
 export default function BuyerEditPage() {
   const navigate = useNavigate();
@@ -16,6 +19,12 @@ export default function BuyerEditPage() {
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [initialData, setInitialData] = useState<BuyerFormData | undefined>();
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [invoicesLoading, setInvoicesLoading] = useState(true);
+  const [invoicesError, setInvoicesError] = useState<string | null>(null);
+  const [invoicesPage, setInvoicesPage] = useState(1);
+  const [invoicesPageSize, setInvoicesPageSize] = useState(10);
+  const [invoicesTotalCount, setInvoicesTotalCount] = useState(0);
 
   useEffect(() => {
     const fetchBuyer = async () => {
@@ -45,6 +54,33 @@ export default function BuyerEditPage() {
     fetchBuyer();
   }, [id]);
 
+  useEffect(() => {
+    const fetchInvoices = async () => {
+      if (!id) {
+        setInvoicesLoading(false);
+        return;
+      }
+
+      try {
+        setInvoicesLoading(true);
+        setInvoicesError(null);
+        const data = await getInvoices({
+          buyerId: id,
+          page: invoicesPage,
+          pageSize: invoicesPageSize,
+        });
+        setInvoices(data.invoices);
+        setInvoicesTotalCount(data.pagination.totalCount);
+      } catch (err: any) {
+        setInvoicesError(err.message || "Failed to load invoices");
+      } finally {
+        setInvoicesLoading(false);
+      }
+    };
+
+    fetchInvoices();
+  }, [id, invoicesPage, invoicesPageSize]);
+
   const handleSubmit = async (data: BuyerFormData) => {
     if (!id) {
       setError("Buyer ID is missing");
@@ -72,13 +108,39 @@ export default function BuyerEditPage() {
   };
 
   return (
-    <BuyerForm
-      mode="edit"
-      initialData={initialData}
-      onSubmit={handleSubmit}
-      isLoading={isLoading}
-      isFetching={isFetching}
-      error={error}
-    />
+    <Box>
+      <BuyerForm
+        mode="edit"
+        initialData={initialData}
+        onSubmit={handleSubmit}
+        isLoading={isLoading}
+        isFetching={isFetching}
+        error={error}
+      />
+
+      <Box sx={{ margin: "2rem" }}>
+        <Divider sx={{ mb: 4 }} />
+
+        <Typography variant="h5" sx={{ mb: 3 }}>
+          Invoices for this Buyer
+        </Typography>
+
+        <InvoicesDataGrid
+          invoices={invoices}
+          isLoading={invoicesLoading}
+          error={invoicesError}
+          showCheckboxes={false}
+          paginationMode="server"
+          rowCount={invoicesTotalCount}
+          page={invoicesPage - 1}
+          pageSize={invoicesPageSize}
+          onPageChange={(newPage) => setInvoicesPage(newPage + 1)}
+          onPageSizeChange={(newPageSize) => {
+            setInvoicesPageSize(newPageSize);
+            setInvoicesPage(1);
+          }}
+        />
+      </Box>
+    </Box>
   );
 }

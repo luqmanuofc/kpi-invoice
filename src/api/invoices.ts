@@ -35,6 +35,22 @@ export interface Invoice {
   }>;
 }
 
+export interface InvoicesPaginationResponse {
+  invoices: Invoice[];
+  pagination: {
+    page: number;
+    pageSize: number;
+    totalCount: number;
+    totalPages: number;
+  };
+}
+
+export interface GetInvoicesParams {
+  buyerId?: string;
+  page?: number;
+  pageSize?: number;
+}
+
 export async function createInvoice(data: InvoiceForm) {
   const response = await fetch("/.netlify/functions/createInvoice", {
     method: "POST",
@@ -52,8 +68,26 @@ export async function createInvoice(data: InvoiceForm) {
   return response.json();
 }
 
-export async function getInvoices(): Promise<Invoice[]> {
-  const response = await fetch("/.netlify/functions/getInvoices", {
+export async function getInvoices(
+  params?: GetInvoicesParams
+): Promise<InvoicesPaginationResponse> {
+  const searchParams = new URLSearchParams();
+
+  if (params?.buyerId) {
+    searchParams.append("buyerId", params.buyerId);
+  }
+  if (params?.page) {
+    searchParams.append("page", params.page.toString());
+  }
+  if (params?.pageSize) {
+    searchParams.append("pageSize", params.pageSize.toString());
+  }
+
+  const url = `/.netlify/functions/getInvoices${
+    searchParams.toString() ? `?${searchParams.toString()}` : ""
+  }`;
+
+  const response = await fetch(url, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

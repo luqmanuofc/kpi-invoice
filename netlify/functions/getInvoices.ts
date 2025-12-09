@@ -6,22 +6,57 @@ export default async function handler(request: Request) {
   }
 
   try {
-    const invoices = await prisma.invoice.findMany({
-      orderBy: {
-        createdAt: "desc",
-      },
-      include: {
-        buyer: true,
-        items: true,
-      },
-    });
+    const url = new URL(request.url);
+    const buyerId = url.searchParams.get("buyerId");
+    const page = parseInt(url.searchParams.get("page") || "1");
+    const pageSize = parseInt(url.searchParams.get("pageSize") || "10");
 
-    return new Response(JSON.stringify(invoices), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    // Build the where clause
+    const where: any = {};
+    if (buyerId) {
+      where.buyerId = buyerId;
+    }
+
+    // Calculate pagination
+    const skip = (page - 1) * pageSize;
+    const take = pageSize;
+
+    // Fetch invoices with pagination
+    const [invoices, totalCount] = await Promise.all([
+      prisma.invoice.findMany({
+        where,
+        orderBy: {
+          createdAt: "desc",
+        },
+        include: {
+          buyer: true,
+          items: true,
+        },
+        skip,
+        take,
+      }),
+      prisma.invoice.count({ where }),
+    ]);
+
+    const totalPages = Math.ceil(totalCount / pageSize);
+
+    return new Response(
+      JSON.stringify({
+        invoices,
+        pagination: {
+          page,
+          pageSize,
+          totalCount,
+          totalPages,
+        },
+      }),
+      {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
   } catch (err: any) {
     return new Response(JSON.stringify({ error: err.message }), {
       status: 500,
