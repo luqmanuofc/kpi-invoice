@@ -4,14 +4,12 @@ import {
   Button,
   CircularProgress,
   Alert,
-  IconButton,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import type { GridColDef } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getBuyers, type Buyer } from "../api/buyers";
-import EditIcon from "@mui/icons-material/Edit";
 
 export default function BuyerPage() {
   const navigate = useNavigate();
@@ -40,8 +38,8 @@ export default function BuyerPage() {
     navigate("/buyer/create");
   };
 
-  const handleEditClick = (id: string) => {
-    navigate(`/buyer/${id}`);
+  const handleRowClick = (params: any) => {
+    navigate(`/buyer/${params.id}`);
   };
 
   const columns: GridColDef[] = [
@@ -49,22 +47,6 @@ export default function BuyerPage() {
     { field: "address", headerName: "Address", flex: 1, minWidth: 300 },
     { field: "gstin", headerName: "GSTIN", width: 150 },
     { field: "phone", headerName: "Phone", width: 150 },
-    {
-      field: "actions",
-      headerName: "Actions",
-      width: 100,
-      sortable: false,
-      disableColumnMenu: true,
-      renderCell: (params) => (
-        <IconButton
-          color="primary"
-          size="small"
-          onClick={() => handleEditClick(params.row.id)}
-        >
-          <EditIcon />
-        </IconButton>
-      ),
-    },
   ];
 
   if (isLoading) {
@@ -121,6 +103,12 @@ export default function BuyerPage() {
           }}
           pageSizeOptions={[5, 10, 25]}
           checkboxSelection
+          onRowClick={handleRowClick}
+          sx={{
+            "& .MuiDataGrid-row": {
+              cursor: "pointer",
+            },
+          }}
         />
       </Box>
     </div>
