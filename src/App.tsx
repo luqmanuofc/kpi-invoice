@@ -7,6 +7,7 @@ import InvoicesPage from "./pages/Invoices.page";
 import InvoiceViewPage from "./pages/InvoiceView.page";
 import BuyerPage from "./pages/Buyer.page";
 import BuyerCreatePage from "./pages/BuyerCreate.page";
+import BuyerDetailsPage from "./pages/BuyerDetails.page";
 import BuyerEditPage from "./pages/BuyerEdit.page";
 
 function App() {
@@ -19,7 +20,8 @@ function App() {
         <Route path="/invoice/:id" element={<InvoiceViewPage />} />
         <Route path="/buyer" element={<BuyerPage />} />
         <Route path="/buyer/create" element={<BuyerCreatePage />} />
-        <Route path="/buyer/:id" element={<BuyerEditPage />} />
+        <Route path="/buyer/:id" element={<BuyerDetailsPage />} />
+        <Route path="/buyer/edit/:id" element={<BuyerEditPage />} />
       </Routes>
     </div>
   );

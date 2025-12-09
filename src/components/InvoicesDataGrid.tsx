@@ -42,6 +42,10 @@ export default function InvoicesDataGrid({
     navigate(`/invoice/${id}`);
   };
 
+  const handleBuyerClick = (buyerId: string) => {
+    navigate(`/buyer/${buyerId}`);
+  };
+
   const columns: GridColDef[] = [
     { field: "invoiceNumber", headerName: "Invoice #", width: 130 },
     {
@@ -57,6 +61,20 @@ export default function InvoicesDataGrid({
       headerName: "Buyer",
       flex: 1,
       minWidth: 200,
+      renderCell: (params) => (
+        <Box
+          sx={{
+            cursor: "pointer",
+            color: "primary.main",
+            "&:hover": {
+              textDecoration: "underline",
+            },
+          }}
+          onClick={() => handleBuyerClick(params.row.buyerId)}
+        >
+          {params.value}
+        </Box>
+      ),
     },
     {
       field: "vehicleNumber",
