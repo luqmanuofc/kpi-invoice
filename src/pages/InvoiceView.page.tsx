@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { Box, CircularProgress, Alert, Button } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import InvoiceDocument, {
@@ -15,6 +15,7 @@ import { GridDownloadIcon } from "@mui/x-data-grid";
 export default function InvoiceViewPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [invoice, setInvoice] = useState<Invoice | null>(null);
   const invoiceRef = useRef<InvoiceDocumentHandle | null>(null);
 
@@ -115,7 +116,8 @@ export default function InvoiceViewPage() {
   };
 
   const handleBack = () => {
-    navigate("/invoices");
+    const returnUrl = searchParams.get("returnUrl") || "/invoices";
+    navigate(returnUrl);
   };
 
   if (isLoading) {
@@ -144,7 +146,7 @@ export default function InvoiceViewPage() {
           startIcon={<ArrowBackIcon />}
           onClick={handleBack}
         >
-          Back to Invoices
+          Back
         </Button>
       </Box>
     );
@@ -161,7 +163,7 @@ export default function InvoiceViewPage() {
           startIcon={<ArrowBackIcon />}
           onClick={handleBack}
         >
-          Back to Invoices
+          Back
         </Button>
         <Button
           variant="contained"

@@ -7,7 +7,7 @@ import {
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import type { GridColDef } from "@mui/x-data-grid";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import type { Invoice } from "../api/invoices";
 
@@ -37,9 +37,11 @@ export default function InvoicesDataGrid({
   onPageSizeChange,
 }: InvoicesDataGridProps) {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleViewClick = (id: string) => {
-    navigate(`/invoice/${id}`);
+    const returnUrl = encodeURIComponent(location.pathname);
+    navigate(`/invoice/${id}?returnUrl=${returnUrl}`);
   };
 
   const handleBuyerClick = (buyerId: string) => {
