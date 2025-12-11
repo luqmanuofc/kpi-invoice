@@ -1,9 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
+// =============================================
+// PRISMA CONFIG
+// =============================================
 generator client {
   provider = "prisma-client"
   output   = "../netlify/generated/prisma"
@@ -13,9 +10,23 @@ datasource db {
   provider = "postgresql"
 }
 
+// =============================================
+// ENUMS
+// =============================================
+
+enum InvoiceStatus {
+  PENDING
+  PAID
+  VOID
+}
+
+// =============================================
+// MODELS
+// =============================================
+
 model Buyer {
   id      String  @id @default(cuid())
-  name    String
+  name    String  @unique
   address String
   gstin   String?
   phone   String?
@@ -26,18 +37,46 @@ model Buyer {
   invoices Invoice[]
 }
 
+// =============================================
+// PRODUCT
+// =============================================
+
+model Product {
+  id String @id @default(cuid())
+
+  description  String  @unique
+  abbreviation String? @unique
+  hsn          String?
+
+  defaultPrice    Decimal @db.Decimal(10, 2)
+  defaultQuantity Decimal @db.Decimal(10, 2)
+  defaultUnit     String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  invoiceItems InvoiceItem[]
+
+  @@index([description])
+  @@index([abbreviation])
+}
+
+// =============================================
+// INVOICE
+// =============================================
+
 model Invoice {
   id String @id @default(cuid())
 
-  invoiceNumber String @unique
+  invoiceNumber String   @unique
   date          DateTime
   vehicleNumber String?
 
-  // Relation (for grouping/querying)
+  // Relation to Buyer
   buyerId String
-  buyer   Buyer  @relation(fields: [buyerId], references: [id])
+  buyer   Buyer  @relation(fields: [buyerId], references: [id], onDelete: Restrict)
 
-  // SNAPSHOT fields — stored exactly as used on the invoice
+  // SNAPSHOT fields (static forever)
   buyerNameSnapshot    String
   buyerAddressSnapshot String
   buyerGstinSnapshot   String?
@@ -48,34 +87,82 @@ model Invoice {
   sellerEmailSnapshot   String
   sellerPhoneSnapshot   String
 
-  // Financial breakdown
-  subtotal      Decimal @db.Decimal(10, 2)
-  discount      Decimal @db.Decimal(10, 2)
-  cgst          Decimal @db.Decimal(5, 2)
-  sgst          Decimal @db.Decimal(5, 2)
-  igst          Decimal @db.Decimal(5, 2)
+  // Financial fields
+  subtotal Decimal @db.Decimal(10, 2)
+  discount Decimal @db.Decimal(10, 2)
+
+  // Tax rates
+  cgstRate Decimal @db.Decimal(5, 2)
+  sgstRate Decimal @db.Decimal(5, 2)
+  igstRate Decimal @db.Decimal(5, 2)
+
+  // Tax amounts
+  cgstAmount Decimal @db.Decimal(10, 2)
+  sgstAmount Decimal @db.Decimal(10, 2)
+  igstAmount Decimal @db.Decimal(10, 2)
+
+  // Totals
   total         Decimal @db.Decimal(10, 2)
   amountInWords String
 
-  items InvoiceItem[]
+  // Status (PENDING, PAID, VOID)
+  status       InvoiceStatus @default(PENDING)
+  internalNote String?
 
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items              InvoiceItem[]
+  statusChangeEvents InvoiceStatusLog[]
 
   @@index([buyerId])
   @@index([invoiceNumber])
+  @@index([status])
+  @@index([date])
 }
+
+// =============================================
+// INVOICE ITEM
+// =============================================
 
 model InvoiceItem {
   id String @id @default(cuid())
 
   invoiceId String
-  invoice   Invoice @relation(fields: [invoiceId], references: [id])
+  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
 
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  // Snapshot fields
   description String
   hsn         String?
   qty         Decimal @db.Decimal(10, 2)
   unit        String
   rate        Decimal @db.Decimal(10, 2)
 
+  lineTotal Decimal @db.Decimal(10, 2)
+  position  Int
+
   @@index([invoiceId])
+  @@index([productId])
+}
+
+// =============================================
+// STATUS CHANGE LOG (simple, clean audit)
+// =============================================
+
+model InvoiceStatusLog {
+  id String @id @default(cuid())
+
+  invoiceId String
+  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  oldStatus InvoiceStatus
+  newStatus InvoiceStatus
+
+  changedAt DateTime @default(now())
+
+  @@index([invoiceId])
+  @@index([newStatus])
 }
