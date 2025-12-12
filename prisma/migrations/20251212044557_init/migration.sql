@@ -1,4 +1,7 @@
 -- CreateEnum
+CREATE TYPE "ProductCategory" AS ENUM ('PVC_PIPE', 'PVC_BEND', 'PVC_CHANNEL', 'WIRE', 'ELECTRICAL_ACCESSORY');
+
+-- CreateEnum
 CREATE TYPE "InvoiceStatus" AS ENUM ('PENDING', 'PAID', 'VOID');
 
 -- CreateTable
@@ -17,12 +20,10 @@ CREATE TABLE "Buyer" (
 -- CreateTable
 CREATE TABLE "Product" (
     "id" TEXT NOT NULL,
-    "description" TEXT NOT NULL,
-    "abbreviation" TEXT,
-    "hsn" TEXT,
+    "name" TEXT NOT NULL,
+    "hsn" TEXT NOT NULL,
     "defaultPrice" DECIMAL(10,2) NOT NULL,
-    "defaultQuantity" DECIMAL(10,2) NOT NULL,
-    "defaultUnit" TEXT NOT NULL,
+    "category" "ProductCategory" NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -68,7 +69,7 @@ CREATE TABLE "InvoiceItem" (
     "invoiceId" TEXT NOT NULL,
     "productId" TEXT NOT NULL,
     "description" TEXT NOT NULL,
-    "hsn" TEXT,
+    "hsn" TEXT NOT NULL,
     "qty" DECIMAL(10,2) NOT NULL,
     "unit" TEXT NOT NULL,
     "rate" DECIMAL(10,2) NOT NULL,
@@ -93,16 +94,10 @@ CREATE TABLE "InvoiceStatusLog" (
 CREATE UNIQUE INDEX "Buyer_name_key" ON "Buyer"("name");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Product_description_key" ON "Product"("description");
+CREATE UNIQUE INDEX "Product_name_key" ON "Product"("name");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Product_abbreviation_key" ON "Product"("abbreviation");
-
--- CreateIndex
-CREATE INDEX "Product_description_idx" ON "Product"("description");
-
--- CreateIndex
-CREATE INDEX "Product_abbreviation_idx" ON "Product"("abbreviation");
+CREATE INDEX "Product_name_idx" ON "Product"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Invoice_invoiceNumber_key" ON "Invoice"("invoiceNumber");

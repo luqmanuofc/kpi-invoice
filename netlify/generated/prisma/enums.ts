@@ -9,6 +9,17 @@
 * 🟢 You can import this file directly.
 */
 
+export const ProductCategory = {
+  PVC_PIPE: 'PVC_PIPE',
+  PVC_BEND: 'PVC_BEND',
+  PVC_CHANNEL: 'PVC_CHANNEL',
+  WIRE: 'WIRE',
+  ELECTRICAL_ACCESSORY: 'ELECTRICAL_ACCESSORY'
+} as const
+
+export type ProductCategory = (typeof ProductCategory)[keyof typeof ProductCategory]
+
+
 export const InvoiceStatus = {
   PENDING: 'PENDING',
   PAID: 'PAID',

@@ -89,12 +89,10 @@ export type BuyerScalarFieldEnum = (typeof BuyerScalarFieldEnum)[keyof typeof Bu
 
 export const ProductScalarFieldEnum = {
   id: 'id',
-  description: 'description',
-  abbreviation: 'abbreviation',
+  name: 'name',
   hsn: 'hsn',
   defaultPrice: 'defaultPrice',
-  defaultQuantity: 'defaultQuantity',
-  defaultUnit: 'defaultUnit',
+  category: 'category',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

@@ -832,12 +832,10 @@ export type BuyerScalarFieldEnum = (typeof BuyerScalarFieldEnum)[keyof typeof Bu
 
 export const ProductScalarFieldEnum = {
   id: 'id',
-  description: 'description',
-  abbreviation: 'abbreviation',
+  name: 'name',
   hsn: 'hsn',
   defaultPrice: 'defaultPrice',
-  defaultQuantity: 'defaultQuantity',
-  defaultUnit: 'defaultUnit',
+  category: 'category',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -974,6 +972,20 @@ export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel,
  * Reference to a field of type 'Decimal[]'
  */
 export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ProductCategory'
+ */
+export type EnumProductCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProductCategory'>
+    
+
+
+/**
+ * Reference to a field of type 'ProductCategory[]'
+ */
+export type ListEnumProductCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProductCategory[]'>
     
 
 

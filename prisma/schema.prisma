@@ -7,64 +7,99 @@ datasource db {
   provider = "postgresql"
 }
 
+//
+// BUYER
+//
 model Buyer {
-  id        String    @id @default(cuid())
-  name      String    @unique
-  address   String
-  gstin     String?
-  phone     String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  invoices  Invoice[]
+  id      String  @id @default(cuid())
+  name    String  @unique
+  address String
+  gstin   String?
+  phone   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  invoices Invoice[]
 }
 
+//
+// PRODUCT
+//
 model Product {
-  id              String        @id @default(cuid())
-  description     String        @unique
-  abbreviation    String?       @unique
-  hsn             String?
-  defaultPrice    Decimal       @db.Decimal(10, 2)
-  defaultQuantity Decimal       @db.Decimal(10, 2)
-  defaultUnit     String
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-  invoiceItems    InvoiceItem[]
+  id           String          @id @default(cuid())
+  name         String          @unique
+  hsn          String
+  defaultPrice Decimal         @db.Decimal(10, 2)
+  category     ProductCategory
 
-  @@index([description])
-  @@index([abbreviation])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  invoiceItems InvoiceItem[]
+
+  @@index([name])
 }
 
+enum ProductCategory {
+  PVC_PIPE
+  PVC_BEND
+  PVC_CHANNEL
+  WIRE
+  ELECTRICAL_ACCESSORY
+}
+
+//
+// INVOICE
+//
 model Invoice {
-  id                    String             @id @default(cuid())
-  invoiceNumber         String             @unique
-  date                  DateTime
-  vehicleNumber         String?
-  buyerId               String
-  buyerNameSnapshot     String
-  buyerAddressSnapshot  String
-  buyerGstinSnapshot    String?
+  id            String   @id @default(cuid())
+  invoiceNumber String   @unique
+  date          DateTime
+  vehicleNumber String?
+
+  // Buyer relation
+  buyerId String
+  buyer   Buyer  @relation(fields: [buyerId], references: [id])
+
+  // Buyer snapshot
+  buyerNameSnapshot    String
+  buyerAddressSnapshot String
+  buyerGstinSnapshot   String?
+
+  // Seller snapshot
   sellerNameSnapshot    String
   sellerAddressSnapshot String
   sellerGstinSnapshot   String
   sellerEmailSnapshot   String
   sellerPhoneSnapshot   String
-  subtotal              Decimal            @db.Decimal(10, 2)
-  discount              Decimal            @db.Decimal(10, 2)
-  cgstRate              Decimal            @db.Decimal(5, 2)
-  sgstRate              Decimal            @db.Decimal(5, 2)
-  igstRate              Decimal            @db.Decimal(5, 2)
-  cgstAmount            Decimal            @db.Decimal(10, 2)
-  sgstAmount            Decimal            @db.Decimal(10, 2)
-  igstAmount            Decimal            @db.Decimal(10, 2)
-  total                 Decimal            @db.Decimal(10, 2)
-  amountInWords         String
-  status                InvoiceStatus      @default(PENDING)
-  internalNote          String?
-  createdAt             DateTime           @default(now())
-  updatedAt             DateTime           @updatedAt
-  buyer                 Buyer              @relation(fields: [buyerId], references: [id])
-  items                 InvoiceItem[]
-  statusChangeEvents    InvoiceStatusLog[]
+
+  // Financials
+  subtotal Decimal @db.Decimal(10, 2)
+  discount Decimal @db.Decimal(10, 2)
+
+  // Tax rates
+  cgstRate Decimal @db.Decimal(5, 2)
+  sgstRate Decimal @db.Decimal(5, 2)
+  igstRate Decimal @db.Decimal(5, 2)
+
+  // Tax amounts
+  cgstAmount Decimal @db.Decimal(10, 2)
+  sgstAmount Decimal @db.Decimal(10, 2)
+  igstAmount Decimal @db.Decimal(10, 2)
+
+  total         Decimal @db.Decimal(10, 2)
+  amountInWords String
+
+  // Status & Notes
+  status       InvoiceStatus @default(PENDING)
+  internalNote String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items              InvoiceItem[]
+  statusChangeEvents InvoiceStatusLog[]
 
   @@index([buyerId])
   @@index([invoiceNumber])
@@ -72,38 +107,51 @@ model Invoice {
   @@index([date])
 }
 
+enum InvoiceStatus {
+  PENDING
+  PAID
+  VOID
+}
+
+//
+// INVOICE ITEM
+//
 model InvoiceItem {
-  id          String  @id @default(cuid())
-  invoiceId   String
-  productId   String
+  id String @id @default(cuid())
+
+  invoiceId String
+  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  // Snapshot fields
   description String
-  hsn         String?
+  hsn         String
   qty         Decimal @db.Decimal(10, 2)
   unit        String
   rate        Decimal @db.Decimal(10, 2)
   lineTotal   Decimal @db.Decimal(10, 2)
-  position    Int
-  invoice     Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
-  product     Product @relation(fields: [productId], references: [id])
+
+  // Ordering
+  position Int
 
   @@index([invoiceId])
   @@index([productId])
 }
 
+//
+// STATUS CHANGE LOG
+//
 model InvoiceStatusLog {
   id        String        @id @default(cuid())
   invoiceId String
   oldStatus InvoiceStatus
   newStatus InvoiceStatus
   changedAt DateTime      @default(now())
-  invoice   Invoice       @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
 
   @@index([invoiceId])
   @@index([newStatus])
-}
-
-enum InvoiceStatus {
-  PENDING
-  PAID
-  VOID
 }
