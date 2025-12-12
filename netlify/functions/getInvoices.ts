@@ -8,6 +8,7 @@ export default async function handler(request: Request) {
   try {
     const url = new URL(request.url);
     const buyerId = url.searchParams.get("buyerId");
+    const productId = url.searchParams.get("productId");
     const page = parseInt(url.searchParams.get("page") || "1");
     const pageSize = parseInt(url.searchParams.get("pageSize") || "10");
 
@@ -15,6 +16,13 @@ export default async function handler(request: Request) {
     const where: any = {};
     if (buyerId) {
       where.buyerId = buyerId;
+    }
+    if (productId) {
+      where.items = {
+        some: {
+          productId: productId,
+        },
+      };
     }
 
     // Calculate pagination

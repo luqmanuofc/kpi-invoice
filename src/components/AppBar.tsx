@@ -36,6 +36,13 @@ export default function NavigationAppBar() {
           >
             Buyers
           </Button>
+          <Button
+            color="inherit"
+            onClick={() => navigate("/products")}
+            sx={{ textTransform: "none" }}
+          >
+            Products
+          </Button>
         </Box>
       </Toolbar>
     </AppBar>

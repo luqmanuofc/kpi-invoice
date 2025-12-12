@@ -47,6 +47,7 @@ export interface InvoicesPaginationResponse {
 
 export interface GetInvoicesParams {
   buyerId?: string;
+  productId?: string;
   page?: number;
   pageSize?: number;
 }
@@ -75,6 +76,9 @@ export async function getInvoices(
 
   if (params?.buyerId) {
     searchParams.append("buyerId", params.buyerId);
+  }
+  if (params?.productId) {
+    searchParams.append("productId", params.productId);
   }
   if (params?.page) {
     searchParams.append("page", params.page.toString());
