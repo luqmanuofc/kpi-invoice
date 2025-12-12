@@ -5,13 +5,15 @@ import {
   Typography,
   Stack,
   IconButton,
-  Autocomplete,
 } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
+import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
 
 import { Controller, useFieldArray } from "react-hook-form";
 import { useInvoice } from "../contexts/InvoiceProvider";
+import AddProductsModal from "./AddProductsModal";
+import type { Product } from "../api/products";
+import { useState, useEffect } from "react";
 
 export default function InvoiceFormItemsPage() {
   const { form } = useInvoice();
@@ -20,73 +22,85 @@ export default function InvoiceFormItemsPage() {
     control,
     name: "items",
   });
+  const [modalOpen, setModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (fields.length === 0) {
+      setModalOpen(true);
+    }
+  }, [fields.length]);
+
+  const handleAddProducts = (products: Product[]) => {
+    products.forEach((product) => {
+      append({
+        productId: product.id,
+        description: product.name,
+        hsn: product.hsn,
+        qty: 1,
+        unit: product.defaultUnit,
+        rate: product.defaultPrice,
+        lineTotal: product.defaultPrice,
+      });
+    });
+  };
   return (
     <>
       <Stack spacing={3}>
         {fields.map((item, index) => (
-          <Paper key={item.id} sx={{ p: 2 }} elevation={1}>
+          <Paper
+            key={item.id}
+            sx={{ p: 2, position: "relative" }}
+            elevation={1}
+          >
+            <IconButton
+              color="error"
+              onClick={() => remove(index)}
+              sx={{
+                position: "absolute",
+                top: -12,
+                right: -12,
+                backgroundColor: "white",
+                border: "1px solid",
+                borderColor: "divider",
+                "&:hover": {
+                  backgroundColor: "error.light",
+                  borderColor: "error.main",
+                },
+              }}
+              size="small"
+            >
+              <CloseIcon fontSize="small" />
+            </IconButton>
             <Stack spacing={2}>
-              <Stack direction="row" justifyContent="space-between">
-                <Typography variant="subtitle1">Item {index + 1}</Typography>
-                <IconButton color="error" onClick={() => remove(index)}>
-                  <DeleteIcon />
-                </IconButton>
-              </Stack>
+              <Typography align="left">
+                {index + 1}. {form.getValues("items")[index].description}
+              </Typography>
 
-              <Controller
-                name={`items.${index}.description`}
-                control={control}
-                render={({ field }) => (
-                  <TextField label="Description" fullWidth {...field} />
-                )}
-              />
-
-              <Controller
-                name={`items.${index}.hsn`}
-                control={control}
-                render={({ field }) => (
-                  <TextField label="HSN Code" fullWidth {...field} />
-                )}
-              />
-
-              <Stack direction="row" spacing={1}>
-                <Controller
-                  name={`items.${index}.qty`}
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      type="number"
-                      label="Qty"
-                      fullWidth
-                      {...field}
-                      onChange={(e) =>
-                        field.onChange(
-                          e.target.value === "" ? "" : Number(e.target.value)
-                        )
-                      }
-                    />
-                  )}
-                />
-
-                <Controller
-                  name={`items.${index}.unit`}
-                  control={control}
-                  render={({ field: { value, onChange } }) => (
-                    <Autocomplete
-                      freeSolo
-                      options={["Kg", "Pcs", "Bundle", "Dozen", "Bag"]}
-                      value={value || ""}
-                      onChange={(_, newValue) => onChange(newValue)}
-                      onInputChange={(_, newInputValue) =>
-                        onChange(newInputValue)
-                      }
-                      fullWidth
-                      renderInput={(params) => (
-                        <TextField {...params} label="Unit" />
-                      )}
-                    />
-                  )}
-                />
+              <Stack direction="column" spacing={1}>
+                <div
+                  style={{ display: "flex", gap: "1rem", alignItems: "center" }}
+                >
+                  <Controller
+                    name={`items.${index}.qty`}
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        type="number"
+                        label="Qty"
+                        fullWidth
+                        {...field}
+                        onChange={(e) =>
+                          field.onChange(
+                            e.target.value === "" ? "" : Number(e.target.value)
+                          )
+                        }
+                      />
+                    )}
+                  />
+                  <Typography align="left">
+                    {form.getValues("items")[index].unit}
+                  </Typography>
+                </div>
 
                 <Controller
                   name={`items.${index}.rate`}
@@ -113,19 +127,17 @@ export default function InvoiceFormItemsPage() {
         <Button
           variant="contained"
           startIcon={<AddIcon />}
-          onClick={() =>
-            append({
-              description: "",
-              hsn: "",
-              qty: 1,
-              unit: "Kg",
-              rate: 0,
-            })
-          }
+          onClick={() => setModalOpen(true)}
         >
-          Add Item
+          Add Items
         </Button>
       </Stack>
+
+      <AddProductsModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onAddProducts={handleAddProducts}
+      />
     </>
   );
 }

@@ -10,6 +10,7 @@ export interface Product {
   name: string;
   hsn: string;
   defaultPrice: number;
+  defaultUnit: string;
   category: ProductCategory;
   createdAt: string;
   updatedAt: string;

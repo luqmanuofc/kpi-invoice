@@ -9,11 +9,13 @@ export interface Buyer {
 }
 
 export type InvoiceItem = {
+  productId: string;
   description: string;
   hsn: string;
   qty: number;
   unit: string;
   rate: number;
+  lineTotal: number;
 };
 
 export type InvoiceForm = {
@@ -26,9 +28,9 @@ export type InvoiceForm = {
   items: InvoiceItem[];
 
   discount: number;
-  cgst: number;
-  sgst: number;
-  igst: number;
+  cgstRate: number;
+  sgstRate: number;
+  igstRate: number;
 
   subtotal: number;
   cgstAmount: number;

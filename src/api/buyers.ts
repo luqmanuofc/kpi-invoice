@@ -1,6 +1,12 @@
-import type { Buyer } from "../invoice-form/types";
-
-export type { Buyer };
+export interface Buyer {
+  id: string;
+  name: string;
+  address: string;
+  gstin: string | null;
+  phone: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export interface BuyerFormData {
   name: string;

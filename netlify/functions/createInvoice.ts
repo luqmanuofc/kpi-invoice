@@ -19,6 +19,7 @@ export default async function handler(request: Request) {
         buyerNameSnapshot: data.buyer.name,
         buyerAddressSnapshot: data.buyer.address,
         buyerGstinSnapshot: data.buyer.gstin,
+        buyerPhoneSnapshot: data.buyer.phone,
 
         sellerNameSnapshot: data.sellerName,
         sellerAddressSnapshot: data.sellerAddress,
@@ -28,20 +29,25 @@ export default async function handler(request: Request) {
 
         subtotal: data.subtotal,
         discount: data.discount,
-        cgst: data.cgst,
-        sgst: data.sgst,
-        igst: data.igst,
+        cgstRate: data.cgstRate,
+        sgstRate: data.sgstRate,
+        igstRate: data.igstRate,
+        cgstAmount: data.cgstAmount,
+        sgstAmount: data.sgstAmount,
+        igstAmount: data.igstAmount,
         total: data.total,
         amountInWords: data.amountInWords,
 
         items: {
-          create: data.items.map((item) => ({
+          create: data.items.map((item: any, index: number) => ({
+            productId: item.productId,
             description: item.description,
             hsn: item.hsn,
             qty: item.qty,
             unit: item.unit,
             rate: item.rate,
             lineTotal: item.lineTotal,
+            position: index,
           })),
         },
       },

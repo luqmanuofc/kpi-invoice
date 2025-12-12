@@ -34,12 +34,12 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
 
       buyer: null,
 
-      items: [{ description: "", hsn: "", qty: 1, unit: "Kg", rate: 0 }],
+      items: [],
 
       discount: 0,
-      cgst: 9,
-      sgst: 9,
-      igst: 0,
+      cgstRate: 9,
+      sgstRate: 9,
+      igstRate: 0,
 
       subtotal: 0,
       cgstAmount: 0,
@@ -62,9 +62,9 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
   const computedData = useMemo<InvoiceForm>(() => {
     const subtotal = formData.items.reduce((sum, i) => sum + i.qty * i.rate, 0);
 
-    const cgstAmount = (subtotal * formData.cgst) / 100;
-    const sgstAmount = (subtotal * formData.sgst) / 100;
-    const igstAmount = (subtotal * formData.igst) / 100;
+    const cgstAmount = (subtotal * formData.cgstRate) / 100;
+    const sgstAmount = (subtotal * formData.sgstRate) / 100;
+    const igstAmount = (subtotal * formData.igstRate) / 100;
 
     const computedTotal =
       subtotal - formData.discount + cgstAmount + sgstAmount + igstAmount;
@@ -74,8 +74,15 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
     const toWords = new ToWords({ localeCode: "en-IN" });
     const amountInWords = toWords.convert(total).toUpperCase() + " ONLY";
 
+    // Compute lineTotals for items
+    const itemsWithLineTotals = formData.items.map((item) => ({
+      ...item,
+      lineTotal: item.qty * item.rate,
+    }));
+
     return {
       ...formData,
+      items: itemsWithLineTotals,
       subtotal,
       cgstAmount,
       sgstAmount,
@@ -87,7 +94,9 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
 
   const handleCreateInvoice = async () => {
     try {
-      const result = await createInvoice(computedData);
+      // Map form data to API payload (includes seller config)
+      const payload = mapInvoiceFormToPayload(computedData);
+      const result = await createInvoice(payload);
       console.log("Invoice created:", result);
       setActiveStep(0);
       form.reset();

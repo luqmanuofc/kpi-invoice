@@ -1,4 +1,5 @@
-import type { Buyer, InvoiceForm } from "../invoice-form/types";
+import type { InvoiceForm } from "../invoice-form/types";
+import type { Buyer } from "./buyers";
 
 export interface Invoice {
   id: string;
@@ -16,22 +17,29 @@ export interface Invoice {
   sellerPhoneSnapshot: string;
   subtotal: number;
   discount: number;
-  cgst: number;
-  sgst: number;
-  igst: number;
+  cgstRate: number;
+  sgstRate: number;
+  igstRate: number;
+  cgstAmount: number;
+  sgstAmount: number;
+  igstAmount: number;
   total: number;
   amountInWords: string;
+  status: string;
+  internalNote: string | null;
   createdAt: string;
   updatedAt: string;
   buyer: Buyer;
   items?: Array<{
     id: string;
+    productId: string;
     description: string;
     hsn: string;
     qty: number;
     unit: string;
     rate: number;
     lineTotal: number;
+    position: number;
   }>;
 }
 
@@ -52,7 +60,7 @@ export interface GetInvoicesParams {
   pageSize?: number;
 }
 
-export async function createInvoice(data: InvoiceForm) {
+export async function createInvoice(data: InvoiceForm): Promise<Invoice> {
   const response = await fetch("/.netlify/functions/createInvoice", {
     method: "POST",
     headers: {
