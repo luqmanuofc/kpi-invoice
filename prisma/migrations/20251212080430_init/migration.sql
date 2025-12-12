@@ -22,6 +22,7 @@ CREATE TABLE "Product" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "hsn" TEXT NOT NULL,
+    "defaultUnit" TEXT NOT NULL,
     "defaultPrice" DECIMAL(10,2) NOT NULL,
     "category" "ProductCategory" NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,

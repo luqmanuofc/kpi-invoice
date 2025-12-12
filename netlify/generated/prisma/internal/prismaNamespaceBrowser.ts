@@ -91,6 +91,7 @@ export const ProductScalarFieldEnum = {
   id: 'id',
   name: 'name',
   hsn: 'hsn',
+  defaultUnit: 'defaultUnit',
   defaultPrice: 'defaultPrice',
   category: 'category',
   createdAt: 'createdAt',
