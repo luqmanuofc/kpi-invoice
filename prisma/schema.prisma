@@ -1,6 +1,3 @@
-// =============================================
-// PRISMA CONFIG
-// =============================================
 generator client {
   provider = "prisma-client"
   output   = "../netlify/generated/prisma"
@@ -10,110 +7,64 @@ datasource db {
   provider = "postgresql"
 }
 
-// =============================================
-// ENUMS
-// =============================================
-
-enum InvoiceStatus {
-  PENDING
-  PAID
-  VOID
-}
-
-// =============================================
-// MODELS
-// =============================================
-
 model Buyer {
-  id      String  @id @default(cuid())
-  name    String  @unique
-  address String
-  gstin   String?
-  phone   String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  invoices Invoice[]
+  id        String    @id @default(cuid())
+  name      String    @unique
+  address   String
+  gstin     String?
+  phone     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  invoices  Invoice[]
 }
-
-// =============================================
-// PRODUCT
-// =============================================
 
 model Product {
-  id String @id @default(cuid())
-
-  description  String  @unique
-  abbreviation String? @unique
-  hsn          String?
-
-  defaultPrice    Decimal @db.Decimal(10, 2)
-  defaultQuantity Decimal @db.Decimal(10, 2)
+  id              String        @id @default(cuid())
+  description     String        @unique
+  abbreviation    String?       @unique
+  hsn             String?
+  defaultPrice    Decimal       @db.Decimal(10, 2)
+  defaultQuantity Decimal       @db.Decimal(10, 2)
   defaultUnit     String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  invoiceItems InvoiceItem[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  invoiceItems    InvoiceItem[]
 
   @@index([description])
   @@index([abbreviation])
 }
 
-// =============================================
-// INVOICE
-// =============================================
-
 model Invoice {
-  id String @id @default(cuid())
-
-  invoiceNumber String   @unique
-  date          DateTime
-  vehicleNumber String?
-
-  // Relation to Buyer
-  buyerId String
-  buyer   Buyer  @relation(fields: [buyerId], references: [id], onDelete: Restrict)
-
-  // SNAPSHOT fields (static forever)
-  buyerNameSnapshot    String
-  buyerAddressSnapshot String
-  buyerGstinSnapshot   String?
-
+  id                    String             @id @default(cuid())
+  invoiceNumber         String             @unique
+  date                  DateTime
+  vehicleNumber         String?
+  buyerId               String
+  buyerNameSnapshot     String
+  buyerAddressSnapshot  String
+  buyerGstinSnapshot    String?
   sellerNameSnapshot    String
   sellerAddressSnapshot String
   sellerGstinSnapshot   String
   sellerEmailSnapshot   String
   sellerPhoneSnapshot   String
-
-  // Financial fields
-  subtotal Decimal @db.Decimal(10, 2)
-  discount Decimal @db.Decimal(10, 2)
-
-  // Tax rates
-  cgstRate Decimal @db.Decimal(5, 2)
-  sgstRate Decimal @db.Decimal(5, 2)
-  igstRate Decimal @db.Decimal(5, 2)
-
-  // Tax amounts
-  cgstAmount Decimal @db.Decimal(10, 2)
-  sgstAmount Decimal @db.Decimal(10, 2)
-  igstAmount Decimal @db.Decimal(10, 2)
-
-  // Totals
-  total         Decimal @db.Decimal(10, 2)
-  amountInWords String
-
-  // Status (PENDING, PAID, VOID)
-  status       InvoiceStatus @default(PENDING)
-  internalNote String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  items              InvoiceItem[]
-  statusChangeEvents InvoiceStatusLog[]
+  subtotal              Decimal            @db.Decimal(10, 2)
+  discount              Decimal            @db.Decimal(10, 2)
+  cgstRate              Decimal            @db.Decimal(5, 2)
+  sgstRate              Decimal            @db.Decimal(5, 2)
+  igstRate              Decimal            @db.Decimal(5, 2)
+  cgstAmount            Decimal            @db.Decimal(10, 2)
+  sgstAmount            Decimal            @db.Decimal(10, 2)
+  igstAmount            Decimal            @db.Decimal(10, 2)
+  total                 Decimal            @db.Decimal(10, 2)
+  amountInWords         String
+  status                InvoiceStatus      @default(PENDING)
+  internalNote          String?
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+  buyer                 Buyer              @relation(fields: [buyerId], references: [id])
+  items                 InvoiceItem[]
+  statusChangeEvents    InvoiceStatusLog[]
 
   @@index([buyerId])
   @@index([invoiceNumber])
@@ -121,48 +72,38 @@ model Invoice {
   @@index([date])
 }
 
-// =============================================
-// INVOICE ITEM
-// =============================================
-
 model InvoiceItem {
-  id String @id @default(cuid())
-
-  invoiceId String
-  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
-
-  productId String
-  product   Product @relation(fields: [productId], references: [id], onDelete: Restrict)
-
-  // Snapshot fields
+  id          String  @id @default(cuid())
+  invoiceId   String
+  productId   String
   description String
   hsn         String?
   qty         Decimal @db.Decimal(10, 2)
   unit        String
   rate        Decimal @db.Decimal(10, 2)
-
-  lineTotal Decimal @db.Decimal(10, 2)
-  position  Int
+  lineTotal   Decimal @db.Decimal(10, 2)
+  position    Int
+  invoice     Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  product     Product @relation(fields: [productId], references: [id])
 
   @@index([invoiceId])
   @@index([productId])
 }
 
-// =============================================
-// STATUS CHANGE LOG (simple, clean audit)
-// =============================================
-
 model InvoiceStatusLog {
-  id String @id @default(cuid())
-
+  id        String        @id @default(cuid())
   invoiceId String
-  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
-
   oldStatus InvoiceStatus
   newStatus InvoiceStatus
-
-  changedAt DateTime @default(now())
+  changedAt DateTime      @default(now())
+  invoice   Invoice       @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
 
   @@index([invoiceId])
   @@index([newStatus])
+}
+
+enum InvoiceStatus {
+  PENDING
+  PAID
+  VOID
 }
