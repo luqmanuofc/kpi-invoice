@@ -385,8 +385,10 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   Buyer: 'Buyer',
+  Product: 'Product',
   Invoice: 'Invoice',
-  InvoiceItem: 'InvoiceItem'
+  InvoiceItem: 'InvoiceItem',
+  InvoiceStatusLog: 'InvoiceStatusLog'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -402,7 +404,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "buyer" | "invoice" | "invoiceItem"
+    modelProps: "buyer" | "product" | "invoice" | "invoiceItem" | "invoiceStatusLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -477,6 +479,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.BuyerCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.BuyerCountAggregateOutputType> | number
+        }
+      }
+    }
+    Product: {
+      payload: Prisma.$ProductPayload<ExtArgs>
+      fields: Prisma.ProductFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ProductFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ProductFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductPayload>
+        }
+        findFirst: {
+          args: Prisma.ProductFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ProductFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductPayload>
+        }
+        findMany: {
+          args: Prisma.ProductFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductPayload>[]
+        }
+        create: {
+          args: Prisma.ProductCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductPayload>
+        }
+        createMany: {
+          args: Prisma.ProductCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ProductCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductPayload>[]
+        }
+        delete: {
+          args: Prisma.ProductDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductPayload>
+        }
+        update: {
+          args: Prisma.ProductUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductPayload>
+        }
+        deleteMany: {
+          args: Prisma.ProductDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ProductUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ProductUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductPayload>[]
+        }
+        upsert: {
+          args: Prisma.ProductUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductPayload>
+        }
+        aggregate: {
+          args: Prisma.ProductAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProduct>
+        }
+        groupBy: {
+          args: Prisma.ProductGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProductGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ProductCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProductCountAggregateOutputType> | number
         }
       }
     }
@@ -628,6 +704,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    InvoiceStatusLog: {
+      payload: Prisma.$InvoiceStatusLogPayload<ExtArgs>
+      fields: Prisma.InvoiceStatusLogFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.InvoiceStatusLogFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InvoiceStatusLogPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.InvoiceStatusLogFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InvoiceStatusLogPayload>
+        }
+        findFirst: {
+          args: Prisma.InvoiceStatusLogFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InvoiceStatusLogPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.InvoiceStatusLogFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InvoiceStatusLogPayload>
+        }
+        findMany: {
+          args: Prisma.InvoiceStatusLogFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InvoiceStatusLogPayload>[]
+        }
+        create: {
+          args: Prisma.InvoiceStatusLogCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InvoiceStatusLogPayload>
+        }
+        createMany: {
+          args: Prisma.InvoiceStatusLogCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.InvoiceStatusLogCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InvoiceStatusLogPayload>[]
+        }
+        delete: {
+          args: Prisma.InvoiceStatusLogDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InvoiceStatusLogPayload>
+        }
+        update: {
+          args: Prisma.InvoiceStatusLogUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InvoiceStatusLogPayload>
+        }
+        deleteMany: {
+          args: Prisma.InvoiceStatusLogDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.InvoiceStatusLogUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.InvoiceStatusLogUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InvoiceStatusLogPayload>[]
+        }
+        upsert: {
+          args: Prisma.InvoiceStatusLogUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InvoiceStatusLogPayload>
+        }
+        aggregate: {
+          args: Prisma.InvoiceStatusLogAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateInvoiceStatusLog>
+        }
+        groupBy: {
+          args: Prisma.InvoiceStatusLogGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.InvoiceStatusLogGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.InvoiceStatusLogCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.InvoiceStatusLogCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -680,6 +830,21 @@ export const BuyerScalarFieldEnum = {
 export type BuyerScalarFieldEnum = (typeof BuyerScalarFieldEnum)[keyof typeof BuyerScalarFieldEnum]
 
 
+export const ProductScalarFieldEnum = {
+  id: 'id',
+  description: 'description',
+  abbreviation: 'abbreviation',
+  hsn: 'hsn',
+  defaultPrice: 'defaultPrice',
+  defaultQuantity: 'defaultQuantity',
+  defaultUnit: 'defaultUnit',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProductScalarFieldEnum = (typeof ProductScalarFieldEnum)[keyof typeof ProductScalarFieldEnum]
+
+
 export const InvoiceScalarFieldEnum = {
   id: 'id',
   invoiceNumber: 'invoiceNumber',
@@ -696,12 +861,18 @@ export const InvoiceScalarFieldEnum = {
   sellerPhoneSnapshot: 'sellerPhoneSnapshot',
   subtotal: 'subtotal',
   discount: 'discount',
-  cgst: 'cgst',
-  sgst: 'sgst',
-  igst: 'igst',
+  cgstRate: 'cgstRate',
+  sgstRate: 'sgstRate',
+  igstRate: 'igstRate',
+  cgstAmount: 'cgstAmount',
+  sgstAmount: 'sgstAmount',
+  igstAmount: 'igstAmount',
   total: 'total',
   amountInWords: 'amountInWords',
-  createdAt: 'createdAt'
+  status: 'status',
+  internalNote: 'internalNote',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
 export type InvoiceScalarFieldEnum = (typeof InvoiceScalarFieldEnum)[keyof typeof InvoiceScalarFieldEnum]
@@ -710,14 +881,28 @@ export type InvoiceScalarFieldEnum = (typeof InvoiceScalarFieldEnum)[keyof typeo
 export const InvoiceItemScalarFieldEnum = {
   id: 'id',
   invoiceId: 'invoiceId',
+  productId: 'productId',
   description: 'description',
   hsn: 'hsn',
   qty: 'qty',
   unit: 'unit',
-  rate: 'rate'
+  rate: 'rate',
+  lineTotal: 'lineTotal',
+  position: 'position'
 } as const
 
 export type InvoiceItemScalarFieldEnum = (typeof InvoiceItemScalarFieldEnum)[keyof typeof InvoiceItemScalarFieldEnum]
+
+
+export const InvoiceStatusLogScalarFieldEnum = {
+  id: 'id',
+  invoiceId: 'invoiceId',
+  oldStatus: 'oldStatus',
+  newStatus: 'newStatus',
+  changedAt: 'changedAt'
+} as const
+
+export type InvoiceStatusLogScalarFieldEnum = (typeof InvoiceStatusLogScalarFieldEnum)[keyof typeof InvoiceStatusLogScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -793,6 +978,20 @@ export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaMo
 
 
 /**
+ * Reference to a field of type 'InvoiceStatus'
+ */
+export type EnumInvoiceStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InvoiceStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'InvoiceStatus[]'
+ */
+export type ListEnumInvoiceStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InvoiceStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'Int'
  */
 export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
@@ -803,6 +1002,20 @@ export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'In
  * Reference to a field of type 'Int[]'
  */
 export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Float'
+ */
+export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+    
+
+
+/**
+ * Reference to a field of type 'Float[]'
+ */
+export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
     
 
 /**
@@ -901,8 +1114,10 @@ export type PrismaClientOptions = ({
 }
 export type GlobalOmitConfig = {
   buyer?: Prisma.BuyerOmit
+  product?: Prisma.ProductOmit
   invoice?: Prisma.InvoiceOmit
   invoiceItem?: Prisma.InvoiceItemOmit
+  invoiceStatusLog?: Prisma.InvoiceStatusLogOmit
 }
 
 /* Types for Logging */

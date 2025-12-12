@@ -9,6 +9,8 @@
  * 🟢 You can import this file directly.
  */
 export type * from './models/Buyer'
+export type * from './models/Product'
 export type * from './models/Invoice'
 export type * from './models/InvoiceItem'
+export type * from './models/InvoiceStatusLog'
 export type * from './commonInputTypes'

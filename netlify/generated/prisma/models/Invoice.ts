@@ -29,18 +29,24 @@ export type AggregateInvoice = {
 export type InvoiceAvgAggregateOutputType = {
   subtotal: runtime.Decimal | null
   discount: runtime.Decimal | null
-  cgst: runtime.Decimal | null
-  sgst: runtime.Decimal | null
-  igst: runtime.Decimal | null
+  cgstRate: runtime.Decimal | null
+  sgstRate: runtime.Decimal | null
+  igstRate: runtime.Decimal | null
+  cgstAmount: runtime.Decimal | null
+  sgstAmount: runtime.Decimal | null
+  igstAmount: runtime.Decimal | null
   total: runtime.Decimal | null
 }
 
 export type InvoiceSumAggregateOutputType = {
   subtotal: runtime.Decimal | null
   discount: runtime.Decimal | null
-  cgst: runtime.Decimal | null
-  sgst: runtime.Decimal | null
-  igst: runtime.Decimal | null
+  cgstRate: runtime.Decimal | null
+  sgstRate: runtime.Decimal | null
+  igstRate: runtime.Decimal | null
+  cgstAmount: runtime.Decimal | null
+  sgstAmount: runtime.Decimal | null
+  igstAmount: runtime.Decimal | null
   total: runtime.Decimal | null
 }
 
@@ -60,12 +66,18 @@ export type InvoiceMinAggregateOutputType = {
   sellerPhoneSnapshot: string | null
   subtotal: runtime.Decimal | null
   discount: runtime.Decimal | null
-  cgst: runtime.Decimal | null
-  sgst: runtime.Decimal | null
-  igst: runtime.Decimal | null
+  cgstRate: runtime.Decimal | null
+  sgstRate: runtime.Decimal | null
+  igstRate: runtime.Decimal | null
+  cgstAmount: runtime.Decimal | null
+  sgstAmount: runtime.Decimal | null
+  igstAmount: runtime.Decimal | null
   total: runtime.Decimal | null
   amountInWords: string | null
+  status: $Enums.InvoiceStatus | null
+  internalNote: string | null
   createdAt: Date | null
+  updatedAt: Date | null
 }
 
 export type InvoiceMaxAggregateOutputType = {
@@ -84,12 +96,18 @@ export type InvoiceMaxAggregateOutputType = {
   sellerPhoneSnapshot: string | null
   subtotal: runtime.Decimal | null
   discount: runtime.Decimal | null
-  cgst: runtime.Decimal | null
-  sgst: runtime.Decimal | null
-  igst: runtime.Decimal | null
+  cgstRate: runtime.Decimal | null
+  sgstRate: runtime.Decimal | null
+  igstRate: runtime.Decimal | null
+  cgstAmount: runtime.Decimal | null
+  sgstAmount: runtime.Decimal | null
+  igstAmount: runtime.Decimal | null
   total: runtime.Decimal | null
   amountInWords: string | null
+  status: $Enums.InvoiceStatus | null
+  internalNote: string | null
   createdAt: Date | null
+  updatedAt: Date | null
 }
 
 export type InvoiceCountAggregateOutputType = {
@@ -108,12 +126,18 @@ export type InvoiceCountAggregateOutputType = {
   sellerPhoneSnapshot: number
   subtotal: number
   discount: number
-  cgst: number
-  sgst: number
-  igst: number
+  cgstRate: number
+  sgstRate: number
+  igstRate: number
+  cgstAmount: number
+  sgstAmount: number
+  igstAmount: number
   total: number
   amountInWords: number
+  status: number
+  internalNote: number
   createdAt: number
+  updatedAt: number
   _all: number
 }
 
@@ -121,18 +145,24 @@ export type InvoiceCountAggregateOutputType = {
 export type InvoiceAvgAggregateInputType = {
   subtotal?: true
   discount?: true
-  cgst?: true
-  sgst?: true
-  igst?: true
+  cgstRate?: true
+  sgstRate?: true
+  igstRate?: true
+  cgstAmount?: true
+  sgstAmount?: true
+  igstAmount?: true
   total?: true
 }
 
 export type InvoiceSumAggregateInputType = {
   subtotal?: true
   discount?: true
-  cgst?: true
-  sgst?: true
-  igst?: true
+  cgstRate?: true
+  sgstRate?: true
+  igstRate?: true
+  cgstAmount?: true
+  sgstAmount?: true
+  igstAmount?: true
   total?: true
 }
 
@@ -152,12 +182,18 @@ export type InvoiceMinAggregateInputType = {
   sellerPhoneSnapshot?: true
   subtotal?: true
   discount?: true
-  cgst?: true
-  sgst?: true
-  igst?: true
+  cgstRate?: true
+  sgstRate?: true
+  igstRate?: true
+  cgstAmount?: true
+  sgstAmount?: true
+  igstAmount?: true
   total?: true
   amountInWords?: true
+  status?: true
+  internalNote?: true
   createdAt?: true
+  updatedAt?: true
 }
 
 export type InvoiceMaxAggregateInputType = {
@@ -176,12 +212,18 @@ export type InvoiceMaxAggregateInputType = {
   sellerPhoneSnapshot?: true
   subtotal?: true
   discount?: true
-  cgst?: true
-  sgst?: true
-  igst?: true
+  cgstRate?: true
+  sgstRate?: true
+  igstRate?: true
+  cgstAmount?: true
+  sgstAmount?: true
+  igstAmount?: true
   total?: true
   amountInWords?: true
+  status?: true
+  internalNote?: true
   createdAt?: true
+  updatedAt?: true
 }
 
 export type InvoiceCountAggregateInputType = {
@@ -200,12 +242,18 @@ export type InvoiceCountAggregateInputType = {
   sellerPhoneSnapshot?: true
   subtotal?: true
   discount?: true
-  cgst?: true
-  sgst?: true
-  igst?: true
+  cgstRate?: true
+  sgstRate?: true
+  igstRate?: true
+  cgstAmount?: true
+  sgstAmount?: true
+  igstAmount?: true
   total?: true
   amountInWords?: true
+  status?: true
+  internalNote?: true
   createdAt?: true
+  updatedAt?: true
   _all?: true
 }
 
@@ -311,12 +359,18 @@ export type InvoiceGroupByOutputType = {
   sellerPhoneSnapshot: string
   subtotal: runtime.Decimal
   discount: runtime.Decimal
-  cgst: runtime.Decimal
-  sgst: runtime.Decimal
-  igst: runtime.Decimal
+  cgstRate: runtime.Decimal
+  sgstRate: runtime.Decimal
+  igstRate: runtime.Decimal
+  cgstAmount: runtime.Decimal
+  sgstAmount: runtime.Decimal
+  igstAmount: runtime.Decimal
   total: runtime.Decimal
   amountInWords: string
+  status: $Enums.InvoiceStatus
+  internalNote: string | null
   createdAt: Date
+  updatedAt: Date
   _count: InvoiceCountAggregateOutputType | null
   _avg: InvoiceAvgAggregateOutputType | null
   _sum: InvoiceSumAggregateOutputType | null
@@ -358,14 +412,21 @@ export type InvoiceWhereInput = {
   sellerPhoneSnapshot?: Prisma.StringFilter<"Invoice"> | string
   subtotal?: Prisma.DecimalFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  cgst?: Prisma.DecimalFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  sgst?: Prisma.DecimalFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  igst?: Prisma.DecimalFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstRate?: Prisma.DecimalFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstRate?: Prisma.DecimalFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstRate?: Prisma.DecimalFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstAmount?: Prisma.DecimalFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstAmount?: Prisma.DecimalFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstAmount?: Prisma.DecimalFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   total?: Prisma.DecimalFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   amountInWords?: Prisma.StringFilter<"Invoice"> | string
+  status?: Prisma.EnumInvoiceStatusFilter<"Invoice"> | $Enums.InvoiceStatus
+  internalNote?: Prisma.StringNullableFilter<"Invoice"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Invoice"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Invoice"> | Date | string
   buyer?: Prisma.XOR<Prisma.BuyerScalarRelationFilter, Prisma.BuyerWhereInput>
   items?: Prisma.InvoiceItemListRelationFilter
+  statusChangeEvents?: Prisma.InvoiceStatusLogListRelationFilter
 }
 
 export type InvoiceOrderByWithRelationInput = {
@@ -384,22 +445,29 @@ export type InvoiceOrderByWithRelationInput = {
   sellerPhoneSnapshot?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
   discount?: Prisma.SortOrder
-  cgst?: Prisma.SortOrder
-  sgst?: Prisma.SortOrder
-  igst?: Prisma.SortOrder
+  cgstRate?: Prisma.SortOrder
+  sgstRate?: Prisma.SortOrder
+  igstRate?: Prisma.SortOrder
+  cgstAmount?: Prisma.SortOrder
+  sgstAmount?: Prisma.SortOrder
+  igstAmount?: Prisma.SortOrder
   total?: Prisma.SortOrder
   amountInWords?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  internalNote?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
   buyer?: Prisma.BuyerOrderByWithRelationInput
   items?: Prisma.InvoiceItemOrderByRelationAggregateInput
+  statusChangeEvents?: Prisma.InvoiceStatusLogOrderByRelationAggregateInput
 }
 
 export type InvoiceWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  invoiceNumber?: string
   AND?: Prisma.InvoiceWhereInput | Prisma.InvoiceWhereInput[]
   OR?: Prisma.InvoiceWhereInput[]
   NOT?: Prisma.InvoiceWhereInput | Prisma.InvoiceWhereInput[]
-  invoiceNumber?: Prisma.StringFilter<"Invoice"> | string
   date?: Prisma.DateTimeFilter<"Invoice"> | Date | string
   vehicleNumber?: Prisma.StringNullableFilter<"Invoice"> | string | null
   buyerId?: Prisma.StringFilter<"Invoice"> | string
@@ -413,15 +481,22 @@ export type InvoiceWhereUniqueInput = Prisma.AtLeast<{
   sellerPhoneSnapshot?: Prisma.StringFilter<"Invoice"> | string
   subtotal?: Prisma.DecimalFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  cgst?: Prisma.DecimalFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  sgst?: Prisma.DecimalFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  igst?: Prisma.DecimalFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstRate?: Prisma.DecimalFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstRate?: Prisma.DecimalFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstRate?: Prisma.DecimalFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstAmount?: Prisma.DecimalFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstAmount?: Prisma.DecimalFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstAmount?: Prisma.DecimalFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   total?: Prisma.DecimalFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   amountInWords?: Prisma.StringFilter<"Invoice"> | string
+  status?: Prisma.EnumInvoiceStatusFilter<"Invoice"> | $Enums.InvoiceStatus
+  internalNote?: Prisma.StringNullableFilter<"Invoice"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Invoice"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Invoice"> | Date | string
   buyer?: Prisma.XOR<Prisma.BuyerScalarRelationFilter, Prisma.BuyerWhereInput>
   items?: Prisma.InvoiceItemListRelationFilter
-}, "id">
+  statusChangeEvents?: Prisma.InvoiceStatusLogListRelationFilter
+}, "id" | "invoiceNumber">
 
 export type InvoiceOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -439,12 +514,18 @@ export type InvoiceOrderByWithAggregationInput = {
   sellerPhoneSnapshot?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
   discount?: Prisma.SortOrder
-  cgst?: Prisma.SortOrder
-  sgst?: Prisma.SortOrder
-  igst?: Prisma.SortOrder
+  cgstRate?: Prisma.SortOrder
+  sgstRate?: Prisma.SortOrder
+  igstRate?: Prisma.SortOrder
+  cgstAmount?: Prisma.SortOrder
+  sgstAmount?: Prisma.SortOrder
+  igstAmount?: Prisma.SortOrder
   total?: Prisma.SortOrder
   amountInWords?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  internalNote?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
   _count?: Prisma.InvoiceCountOrderByAggregateInput
   _avg?: Prisma.InvoiceAvgOrderByAggregateInput
   _max?: Prisma.InvoiceMaxOrderByAggregateInput
@@ -471,12 +552,18 @@ export type InvoiceScalarWhereWithAggregatesInput = {
   sellerPhoneSnapshot?: Prisma.StringWithAggregatesFilter<"Invoice"> | string
   subtotal?: Prisma.DecimalWithAggregatesFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalWithAggregatesFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  cgst?: Prisma.DecimalWithAggregatesFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  sgst?: Prisma.DecimalWithAggregatesFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  igst?: Prisma.DecimalWithAggregatesFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstRate?: Prisma.DecimalWithAggregatesFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstRate?: Prisma.DecimalWithAggregatesFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstRate?: Prisma.DecimalWithAggregatesFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstAmount?: Prisma.DecimalWithAggregatesFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstAmount?: Prisma.DecimalWithAggregatesFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstAmount?: Prisma.DecimalWithAggregatesFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   total?: Prisma.DecimalWithAggregatesFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   amountInWords?: Prisma.StringWithAggregatesFilter<"Invoice"> | string
+  status?: Prisma.EnumInvoiceStatusWithAggregatesFilter<"Invoice"> | $Enums.InvoiceStatus
+  internalNote?: Prisma.StringNullableWithAggregatesFilter<"Invoice"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Invoice"> | Date | string
+  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Invoice"> | Date | string
 }
 
 export type InvoiceCreateInput = {
@@ -494,14 +581,21 @@ export type InvoiceCreateInput = {
   sellerPhoneSnapshot: string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   discount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  cgst: runtime.Decimal | runtime.DecimalJsLike | number | string
-  sgst: runtime.Decimal | runtime.DecimalJsLike | number | string
-  igst: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   total: runtime.Decimal | runtime.DecimalJsLike | number | string
   amountInWords: string
+  status?: $Enums.InvoiceStatus
+  internalNote?: string | null
   createdAt?: Date | string
+  updatedAt?: Date | string
   buyer: Prisma.BuyerCreateNestedOneWithoutInvoicesInput
   items?: Prisma.InvoiceItemCreateNestedManyWithoutInvoiceInput
+  statusChangeEvents?: Prisma.InvoiceStatusLogCreateNestedManyWithoutInvoiceInput
 }
 
 export type InvoiceUncheckedCreateInput = {
@@ -520,13 +614,20 @@ export type InvoiceUncheckedCreateInput = {
   sellerPhoneSnapshot: string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   discount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  cgst: runtime.Decimal | runtime.DecimalJsLike | number | string
-  sgst: runtime.Decimal | runtime.DecimalJsLike | number | string
-  igst: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   total: runtime.Decimal | runtime.DecimalJsLike | number | string
   amountInWords: string
+  status?: $Enums.InvoiceStatus
+  internalNote?: string | null
   createdAt?: Date | string
+  updatedAt?: Date | string
   items?: Prisma.InvoiceItemUncheckedCreateNestedManyWithoutInvoiceInput
+  statusChangeEvents?: Prisma.InvoiceStatusLogUncheckedCreateNestedManyWithoutInvoiceInput
 }
 
 export type InvoiceUpdateInput = {
@@ -544,14 +645,21 @@ export type InvoiceUpdateInput = {
   sellerPhoneSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  cgst?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  sgst?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  igst?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   amountInWords?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
+  internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   buyer?: Prisma.BuyerUpdateOneRequiredWithoutInvoicesNestedInput
   items?: Prisma.InvoiceItemUpdateManyWithoutInvoiceNestedInput
+  statusChangeEvents?: Prisma.InvoiceStatusLogUpdateManyWithoutInvoiceNestedInput
 }
 
 export type InvoiceUncheckedUpdateInput = {
@@ -570,13 +678,20 @@ export type InvoiceUncheckedUpdateInput = {
   sellerPhoneSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  cgst?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  sgst?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  igst?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   amountInWords?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
+  internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.InvoiceItemUncheckedUpdateManyWithoutInvoiceNestedInput
+  statusChangeEvents?: Prisma.InvoiceStatusLogUncheckedUpdateManyWithoutInvoiceNestedInput
 }
 
 export type InvoiceCreateManyInput = {
@@ -595,12 +710,18 @@ export type InvoiceCreateManyInput = {
   sellerPhoneSnapshot: string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   discount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  cgst: runtime.Decimal | runtime.DecimalJsLike | number | string
-  sgst: runtime.Decimal | runtime.DecimalJsLike | number | string
-  igst: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   total: runtime.Decimal | runtime.DecimalJsLike | number | string
   amountInWords: string
+  status?: $Enums.InvoiceStatus
+  internalNote?: string | null
   createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type InvoiceUpdateManyMutationInput = {
@@ -618,12 +739,18 @@ export type InvoiceUpdateManyMutationInput = {
   sellerPhoneSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  cgst?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  sgst?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  igst?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   amountInWords?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
+  internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type InvoiceUncheckedUpdateManyInput = {
@@ -642,12 +769,18 @@ export type InvoiceUncheckedUpdateManyInput = {
   sellerPhoneSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  cgst?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  sgst?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  igst?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   amountInWords?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
+  internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type InvoiceListRelationFilter = {
@@ -676,20 +809,29 @@ export type InvoiceCountOrderByAggregateInput = {
   sellerPhoneSnapshot?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
   discount?: Prisma.SortOrder
-  cgst?: Prisma.SortOrder
-  sgst?: Prisma.SortOrder
-  igst?: Prisma.SortOrder
+  cgstRate?: Prisma.SortOrder
+  sgstRate?: Prisma.SortOrder
+  igstRate?: Prisma.SortOrder
+  cgstAmount?: Prisma.SortOrder
+  sgstAmount?: Prisma.SortOrder
+  igstAmount?: Prisma.SortOrder
   total?: Prisma.SortOrder
   amountInWords?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  internalNote?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type InvoiceAvgOrderByAggregateInput = {
   subtotal?: Prisma.SortOrder
   discount?: Prisma.SortOrder
-  cgst?: Prisma.SortOrder
-  sgst?: Prisma.SortOrder
-  igst?: Prisma.SortOrder
+  cgstRate?: Prisma.SortOrder
+  sgstRate?: Prisma.SortOrder
+  igstRate?: Prisma.SortOrder
+  cgstAmount?: Prisma.SortOrder
+  sgstAmount?: Prisma.SortOrder
+  igstAmount?: Prisma.SortOrder
   total?: Prisma.SortOrder
 }
 
@@ -709,12 +851,18 @@ export type InvoiceMaxOrderByAggregateInput = {
   sellerPhoneSnapshot?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
   discount?: Prisma.SortOrder
-  cgst?: Prisma.SortOrder
-  sgst?: Prisma.SortOrder
-  igst?: Prisma.SortOrder
+  cgstRate?: Prisma.SortOrder
+  sgstRate?: Prisma.SortOrder
+  igstRate?: Prisma.SortOrder
+  cgstAmount?: Prisma.SortOrder
+  sgstAmount?: Prisma.SortOrder
+  igstAmount?: Prisma.SortOrder
   total?: Prisma.SortOrder
   amountInWords?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  internalNote?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type InvoiceMinOrderByAggregateInput = {
@@ -733,20 +881,29 @@ export type InvoiceMinOrderByAggregateInput = {
   sellerPhoneSnapshot?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
   discount?: Prisma.SortOrder
-  cgst?: Prisma.SortOrder
-  sgst?: Prisma.SortOrder
-  igst?: Prisma.SortOrder
+  cgstRate?: Prisma.SortOrder
+  sgstRate?: Prisma.SortOrder
+  igstRate?: Prisma.SortOrder
+  cgstAmount?: Prisma.SortOrder
+  sgstAmount?: Prisma.SortOrder
+  igstAmount?: Prisma.SortOrder
   total?: Prisma.SortOrder
   amountInWords?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  internalNote?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type InvoiceSumOrderByAggregateInput = {
   subtotal?: Prisma.SortOrder
   discount?: Prisma.SortOrder
-  cgst?: Prisma.SortOrder
-  sgst?: Prisma.SortOrder
-  igst?: Prisma.SortOrder
+  cgstRate?: Prisma.SortOrder
+  sgstRate?: Prisma.SortOrder
+  igstRate?: Prisma.SortOrder
+  cgstAmount?: Prisma.SortOrder
+  sgstAmount?: Prisma.SortOrder
+  igstAmount?: Prisma.SortOrder
   total?: Prisma.SortOrder
 }
 
@@ -797,12 +954,8 @@ export type InvoiceUncheckedUpdateManyWithoutBuyerNestedInput = {
   deleteMany?: Prisma.InvoiceScalarWhereInput | Prisma.InvoiceScalarWhereInput[]
 }
 
-export type DecimalFieldUpdateOperationsInput = {
-  set?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
+export type EnumInvoiceStatusFieldUpdateOperationsInput = {
+  set?: $Enums.InvoiceStatus
 }
 
 export type InvoiceCreateNestedOneWithoutItemsInput = {
@@ -817,6 +970,20 @@ export type InvoiceUpdateOneRequiredWithoutItemsNestedInput = {
   upsert?: Prisma.InvoiceUpsertWithoutItemsInput
   connect?: Prisma.InvoiceWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.InvoiceUpdateToOneWithWhereWithoutItemsInput, Prisma.InvoiceUpdateWithoutItemsInput>, Prisma.InvoiceUncheckedUpdateWithoutItemsInput>
+}
+
+export type InvoiceCreateNestedOneWithoutStatusChangeEventsInput = {
+  create?: Prisma.XOR<Prisma.InvoiceCreateWithoutStatusChangeEventsInput, Prisma.InvoiceUncheckedCreateWithoutStatusChangeEventsInput>
+  connectOrCreate?: Prisma.InvoiceCreateOrConnectWithoutStatusChangeEventsInput
+  connect?: Prisma.InvoiceWhereUniqueInput
+}
+
+export type InvoiceUpdateOneRequiredWithoutStatusChangeEventsNestedInput = {
+  create?: Prisma.XOR<Prisma.InvoiceCreateWithoutStatusChangeEventsInput, Prisma.InvoiceUncheckedCreateWithoutStatusChangeEventsInput>
+  connectOrCreate?: Prisma.InvoiceCreateOrConnectWithoutStatusChangeEventsInput
+  upsert?: Prisma.InvoiceUpsertWithoutStatusChangeEventsInput
+  connect?: Prisma.InvoiceWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.InvoiceUpdateToOneWithWhereWithoutStatusChangeEventsInput, Prisma.InvoiceUpdateWithoutStatusChangeEventsInput>, Prisma.InvoiceUncheckedUpdateWithoutStatusChangeEventsInput>
 }
 
 export type InvoiceCreateWithoutBuyerInput = {
@@ -834,13 +1001,20 @@ export type InvoiceCreateWithoutBuyerInput = {
   sellerPhoneSnapshot: string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   discount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  cgst: runtime.Decimal | runtime.DecimalJsLike | number | string
-  sgst: runtime.Decimal | runtime.DecimalJsLike | number | string
-  igst: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   total: runtime.Decimal | runtime.DecimalJsLike | number | string
   amountInWords: string
+  status?: $Enums.InvoiceStatus
+  internalNote?: string | null
   createdAt?: Date | string
+  updatedAt?: Date | string
   items?: Prisma.InvoiceItemCreateNestedManyWithoutInvoiceInput
+  statusChangeEvents?: Prisma.InvoiceStatusLogCreateNestedManyWithoutInvoiceInput
 }
 
 export type InvoiceUncheckedCreateWithoutBuyerInput = {
@@ -858,13 +1032,20 @@ export type InvoiceUncheckedCreateWithoutBuyerInput = {
   sellerPhoneSnapshot: string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   discount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  cgst: runtime.Decimal | runtime.DecimalJsLike | number | string
-  sgst: runtime.Decimal | runtime.DecimalJsLike | number | string
-  igst: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   total: runtime.Decimal | runtime.DecimalJsLike | number | string
   amountInWords: string
+  status?: $Enums.InvoiceStatus
+  internalNote?: string | null
   createdAt?: Date | string
+  updatedAt?: Date | string
   items?: Prisma.InvoiceItemUncheckedCreateNestedManyWithoutInvoiceInput
+  statusChangeEvents?: Prisma.InvoiceStatusLogUncheckedCreateNestedManyWithoutInvoiceInput
 }
 
 export type InvoiceCreateOrConnectWithoutBuyerInput = {
@@ -912,12 +1093,18 @@ export type InvoiceScalarWhereInput = {
   sellerPhoneSnapshot?: Prisma.StringFilter<"Invoice"> | string
   subtotal?: Prisma.DecimalFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  cgst?: Prisma.DecimalFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  sgst?: Prisma.DecimalFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  igst?: Prisma.DecimalFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstRate?: Prisma.DecimalFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstRate?: Prisma.DecimalFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstRate?: Prisma.DecimalFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstAmount?: Prisma.DecimalFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstAmount?: Prisma.DecimalFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstAmount?: Prisma.DecimalFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   total?: Prisma.DecimalFilter<"Invoice"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   amountInWords?: Prisma.StringFilter<"Invoice"> | string
+  status?: Prisma.EnumInvoiceStatusFilter<"Invoice"> | $Enums.InvoiceStatus
+  internalNote?: Prisma.StringNullableFilter<"Invoice"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Invoice"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Invoice"> | Date | string
 }
 
 export type InvoiceCreateWithoutItemsInput = {
@@ -935,13 +1122,20 @@ export type InvoiceCreateWithoutItemsInput = {
   sellerPhoneSnapshot: string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   discount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  cgst: runtime.Decimal | runtime.DecimalJsLike | number | string
-  sgst: runtime.Decimal | runtime.DecimalJsLike | number | string
-  igst: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   total: runtime.Decimal | runtime.DecimalJsLike | number | string
   amountInWords: string
+  status?: $Enums.InvoiceStatus
+  internalNote?: string | null
   createdAt?: Date | string
+  updatedAt?: Date | string
   buyer: Prisma.BuyerCreateNestedOneWithoutInvoicesInput
+  statusChangeEvents?: Prisma.InvoiceStatusLogCreateNestedManyWithoutInvoiceInput
 }
 
 export type InvoiceUncheckedCreateWithoutItemsInput = {
@@ -960,12 +1154,19 @@ export type InvoiceUncheckedCreateWithoutItemsInput = {
   sellerPhoneSnapshot: string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   discount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  cgst: runtime.Decimal | runtime.DecimalJsLike | number | string
-  sgst: runtime.Decimal | runtime.DecimalJsLike | number | string
-  igst: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   total: runtime.Decimal | runtime.DecimalJsLike | number | string
   amountInWords: string
+  status?: $Enums.InvoiceStatus
+  internalNote?: string | null
   createdAt?: Date | string
+  updatedAt?: Date | string
+  statusChangeEvents?: Prisma.InvoiceStatusLogUncheckedCreateNestedManyWithoutInvoiceInput
 }
 
 export type InvoiceCreateOrConnectWithoutItemsInput = {
@@ -999,13 +1200,20 @@ export type InvoiceUpdateWithoutItemsInput = {
   sellerPhoneSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  cgst?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  sgst?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  igst?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   amountInWords?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
+  internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   buyer?: Prisma.BuyerUpdateOneRequiredWithoutInvoicesNestedInput
+  statusChangeEvents?: Prisma.InvoiceStatusLogUpdateManyWithoutInvoiceNestedInput
 }
 
 export type InvoiceUncheckedUpdateWithoutItemsInput = {
@@ -1024,12 +1232,159 @@ export type InvoiceUncheckedUpdateWithoutItemsInput = {
   sellerPhoneSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  cgst?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  sgst?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  igst?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   amountInWords?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
+  internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusChangeEvents?: Prisma.InvoiceStatusLogUncheckedUpdateManyWithoutInvoiceNestedInput
+}
+
+export type InvoiceCreateWithoutStatusChangeEventsInput = {
+  id?: string
+  invoiceNumber: string
+  date: Date | string
+  vehicleNumber?: string | null
+  buyerNameSnapshot: string
+  buyerAddressSnapshot: string
+  buyerGstinSnapshot?: string | null
+  sellerNameSnapshot: string
+  sellerAddressSnapshot: string
+  sellerGstinSnapshot: string
+  sellerEmailSnapshot: string
+  sellerPhoneSnapshot: string
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  total: runtime.Decimal | runtime.DecimalJsLike | number | string
+  amountInWords: string
+  status?: $Enums.InvoiceStatus
+  internalNote?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  buyer: Prisma.BuyerCreateNestedOneWithoutInvoicesInput
+  items?: Prisma.InvoiceItemCreateNestedManyWithoutInvoiceInput
+}
+
+export type InvoiceUncheckedCreateWithoutStatusChangeEventsInput = {
+  id?: string
+  invoiceNumber: string
+  date: Date | string
+  vehicleNumber?: string | null
+  buyerId: string
+  buyerNameSnapshot: string
+  buyerAddressSnapshot: string
+  buyerGstinSnapshot?: string | null
+  sellerNameSnapshot: string
+  sellerAddressSnapshot: string
+  sellerGstinSnapshot: string
+  sellerEmailSnapshot: string
+  sellerPhoneSnapshot: string
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  total: runtime.Decimal | runtime.DecimalJsLike | number | string
+  amountInWords: string
+  status?: $Enums.InvoiceStatus
+  internalNote?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  items?: Prisma.InvoiceItemUncheckedCreateNestedManyWithoutInvoiceInput
+}
+
+export type InvoiceCreateOrConnectWithoutStatusChangeEventsInput = {
+  where: Prisma.InvoiceWhereUniqueInput
+  create: Prisma.XOR<Prisma.InvoiceCreateWithoutStatusChangeEventsInput, Prisma.InvoiceUncheckedCreateWithoutStatusChangeEventsInput>
+}
+
+export type InvoiceUpsertWithoutStatusChangeEventsInput = {
+  update: Prisma.XOR<Prisma.InvoiceUpdateWithoutStatusChangeEventsInput, Prisma.InvoiceUncheckedUpdateWithoutStatusChangeEventsInput>
+  create: Prisma.XOR<Prisma.InvoiceCreateWithoutStatusChangeEventsInput, Prisma.InvoiceUncheckedCreateWithoutStatusChangeEventsInput>
+  where?: Prisma.InvoiceWhereInput
+}
+
+export type InvoiceUpdateToOneWithWhereWithoutStatusChangeEventsInput = {
+  where?: Prisma.InvoiceWhereInput
+  data: Prisma.XOR<Prisma.InvoiceUpdateWithoutStatusChangeEventsInput, Prisma.InvoiceUncheckedUpdateWithoutStatusChangeEventsInput>
+}
+
+export type InvoiceUpdateWithoutStatusChangeEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  invoiceNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicleNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerNameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerAddressSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerGstinSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerNameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerAddressSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerGstinSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerEmailSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerPhoneSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amountInWords?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
+  internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  buyer?: Prisma.BuyerUpdateOneRequiredWithoutInvoicesNestedInput
+  items?: Prisma.InvoiceItemUpdateManyWithoutInvoiceNestedInput
+}
+
+export type InvoiceUncheckedUpdateWithoutStatusChangeEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  invoiceNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicleNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerId?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerNameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerAddressSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerGstinSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerNameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerAddressSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerGstinSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerEmailSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerPhoneSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amountInWords?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
+  internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  items?: Prisma.InvoiceItemUncheckedUpdateManyWithoutInvoiceNestedInput
 }
 
 export type InvoiceCreateManyBuyerInput = {
@@ -1047,12 +1402,18 @@ export type InvoiceCreateManyBuyerInput = {
   sellerPhoneSnapshot: string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   discount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  cgst: runtime.Decimal | runtime.DecimalJsLike | number | string
-  sgst: runtime.Decimal | runtime.DecimalJsLike | number | string
-  igst: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   total: runtime.Decimal | runtime.DecimalJsLike | number | string
   amountInWords: string
+  status?: $Enums.InvoiceStatus
+  internalNote?: string | null
   createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type InvoiceUpdateWithoutBuyerInput = {
@@ -1070,13 +1431,20 @@ export type InvoiceUpdateWithoutBuyerInput = {
   sellerPhoneSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  cgst?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  sgst?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  igst?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   amountInWords?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
+  internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.InvoiceItemUpdateManyWithoutInvoiceNestedInput
+  statusChangeEvents?: Prisma.InvoiceStatusLogUpdateManyWithoutInvoiceNestedInput
 }
 
 export type InvoiceUncheckedUpdateWithoutBuyerInput = {
@@ -1094,13 +1462,20 @@ export type InvoiceUncheckedUpdateWithoutBuyerInput = {
   sellerPhoneSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  cgst?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  sgst?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  igst?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   amountInWords?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
+  internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.InvoiceItemUncheckedUpdateManyWithoutInvoiceNestedInput
+  statusChangeEvents?: Prisma.InvoiceStatusLogUncheckedUpdateManyWithoutInvoiceNestedInput
 }
 
 export type InvoiceUncheckedUpdateManyWithoutBuyerInput = {
@@ -1118,12 +1493,18 @@ export type InvoiceUncheckedUpdateManyWithoutBuyerInput = {
   sellerPhoneSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  cgst?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  sgst?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  igst?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   amountInWords?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
+  internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -1133,10 +1514,12 @@ export type InvoiceUncheckedUpdateManyWithoutBuyerInput = {
 
 export type InvoiceCountOutputType = {
   items: number
+  statusChangeEvents: number
 }
 
 export type InvoiceCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   items?: boolean | InvoiceCountOutputTypeCountItemsArgs
+  statusChangeEvents?: boolean | InvoiceCountOutputTypeCountStatusChangeEventsArgs
 }
 
 /**
@@ -1156,6 +1539,13 @@ export type InvoiceCountOutputTypeCountItemsArgs<ExtArgs extends runtime.Types.E
   where?: Prisma.InvoiceItemWhereInput
 }
 
+/**
+ * InvoiceCountOutputType without action
+ */
+export type InvoiceCountOutputTypeCountStatusChangeEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.InvoiceStatusLogWhereInput
+}
+
 
 export type InvoiceSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1173,14 +1563,21 @@ export type InvoiceSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   sellerPhoneSnapshot?: boolean
   subtotal?: boolean
   discount?: boolean
-  cgst?: boolean
-  sgst?: boolean
-  igst?: boolean
+  cgstRate?: boolean
+  sgstRate?: boolean
+  igstRate?: boolean
+  cgstAmount?: boolean
+  sgstAmount?: boolean
+  igstAmount?: boolean
   total?: boolean
   amountInWords?: boolean
+  status?: boolean
+  internalNote?: boolean
   createdAt?: boolean
+  updatedAt?: boolean
   buyer?: boolean | Prisma.BuyerDefaultArgs<ExtArgs>
   items?: boolean | Prisma.Invoice$itemsArgs<ExtArgs>
+  statusChangeEvents?: boolean | Prisma.Invoice$statusChangeEventsArgs<ExtArgs>
   _count?: boolean | Prisma.InvoiceCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["invoice"]>
 
@@ -1200,12 +1597,18 @@ export type InvoiceSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   sellerPhoneSnapshot?: boolean
   subtotal?: boolean
   discount?: boolean
-  cgst?: boolean
-  sgst?: boolean
-  igst?: boolean
+  cgstRate?: boolean
+  sgstRate?: boolean
+  igstRate?: boolean
+  cgstAmount?: boolean
+  sgstAmount?: boolean
+  igstAmount?: boolean
   total?: boolean
   amountInWords?: boolean
+  status?: boolean
+  internalNote?: boolean
   createdAt?: boolean
+  updatedAt?: boolean
   buyer?: boolean | Prisma.BuyerDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["invoice"]>
 
@@ -1225,12 +1628,18 @@ export type InvoiceSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   sellerPhoneSnapshot?: boolean
   subtotal?: boolean
   discount?: boolean
-  cgst?: boolean
-  sgst?: boolean
-  igst?: boolean
+  cgstRate?: boolean
+  sgstRate?: boolean
+  igstRate?: boolean
+  cgstAmount?: boolean
+  sgstAmount?: boolean
+  igstAmount?: boolean
   total?: boolean
   amountInWords?: boolean
+  status?: boolean
+  internalNote?: boolean
   createdAt?: boolean
+  updatedAt?: boolean
   buyer?: boolean | Prisma.BuyerDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["invoice"]>
 
@@ -1250,18 +1659,25 @@ export type InvoiceSelectScalar = {
   sellerPhoneSnapshot?: boolean
   subtotal?: boolean
   discount?: boolean
-  cgst?: boolean
-  sgst?: boolean
-  igst?: boolean
+  cgstRate?: boolean
+  sgstRate?: boolean
+  igstRate?: boolean
+  cgstAmount?: boolean
+  sgstAmount?: boolean
+  igstAmount?: boolean
   total?: boolean
   amountInWords?: boolean
+  status?: boolean
+  internalNote?: boolean
   createdAt?: boolean
+  updatedAt?: boolean
 }
 
-export type InvoiceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "invoiceNumber" | "date" | "vehicleNumber" | "buyerId" | "buyerNameSnapshot" | "buyerAddressSnapshot" | "buyerGstinSnapshot" | "sellerNameSnapshot" | "sellerAddressSnapshot" | "sellerGstinSnapshot" | "sellerEmailSnapshot" | "sellerPhoneSnapshot" | "subtotal" | "discount" | "cgst" | "sgst" | "igst" | "total" | "amountInWords" | "createdAt", ExtArgs["result"]["invoice"]>
+export type InvoiceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "invoiceNumber" | "date" | "vehicleNumber" | "buyerId" | "buyerNameSnapshot" | "buyerAddressSnapshot" | "buyerGstinSnapshot" | "sellerNameSnapshot" | "sellerAddressSnapshot" | "sellerGstinSnapshot" | "sellerEmailSnapshot" | "sellerPhoneSnapshot" | "subtotal" | "discount" | "cgstRate" | "sgstRate" | "igstRate" | "cgstAmount" | "sgstAmount" | "igstAmount" | "total" | "amountInWords" | "status" | "internalNote" | "createdAt" | "updatedAt", ExtArgs["result"]["invoice"]>
 export type InvoiceInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   buyer?: boolean | Prisma.BuyerDefaultArgs<ExtArgs>
   items?: boolean | Prisma.Invoice$itemsArgs<ExtArgs>
+  statusChangeEvents?: boolean | Prisma.Invoice$statusChangeEventsArgs<ExtArgs>
   _count?: boolean | Prisma.InvoiceCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type InvoiceIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1276,6 +1692,7 @@ export type $InvoicePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   objects: {
     buyer: Prisma.$BuyerPayload<ExtArgs>
     items: Prisma.$InvoiceItemPayload<ExtArgs>[]
+    statusChangeEvents: Prisma.$InvoiceStatusLogPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1293,12 +1710,18 @@ export type $InvoicePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     sellerPhoneSnapshot: string
     subtotal: runtime.Decimal
     discount: runtime.Decimal
-    cgst: runtime.Decimal
-    sgst: runtime.Decimal
-    igst: runtime.Decimal
+    cgstRate: runtime.Decimal
+    sgstRate: runtime.Decimal
+    igstRate: runtime.Decimal
+    cgstAmount: runtime.Decimal
+    sgstAmount: runtime.Decimal
+    igstAmount: runtime.Decimal
     total: runtime.Decimal
     amountInWords: string
+    status: $Enums.InvoiceStatus
+    internalNote: string | null
     createdAt: Date
+    updatedAt: Date
   }, ExtArgs["result"]["invoice"]>
   composites: {}
 }
@@ -1695,6 +2118,7 @@ export interface Prisma__InvoiceClient<T, Null = never, ExtArgs extends runtime.
   readonly [Symbol.toStringTag]: "PrismaPromise"
   buyer<T extends Prisma.BuyerDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BuyerDefaultArgs<ExtArgs>>): Prisma.Prisma__BuyerClient<runtime.Types.Result.GetResult<Prisma.$BuyerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   items<T extends Prisma.Invoice$itemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Invoice$itemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InvoiceItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  statusChangeEvents<T extends Prisma.Invoice$statusChangeEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Invoice$statusChangeEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InvoiceStatusLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1739,12 +2163,18 @@ export interface InvoiceFieldRefs {
   readonly sellerPhoneSnapshot: Prisma.FieldRef<"Invoice", 'String'>
   readonly subtotal: Prisma.FieldRef<"Invoice", 'Decimal'>
   readonly discount: Prisma.FieldRef<"Invoice", 'Decimal'>
-  readonly cgst: Prisma.FieldRef<"Invoice", 'Decimal'>
-  readonly sgst: Prisma.FieldRef<"Invoice", 'Decimal'>
-  readonly igst: Prisma.FieldRef<"Invoice", 'Decimal'>
+  readonly cgstRate: Prisma.FieldRef<"Invoice", 'Decimal'>
+  readonly sgstRate: Prisma.FieldRef<"Invoice", 'Decimal'>
+  readonly igstRate: Prisma.FieldRef<"Invoice", 'Decimal'>
+  readonly cgstAmount: Prisma.FieldRef<"Invoice", 'Decimal'>
+  readonly sgstAmount: Prisma.FieldRef<"Invoice", 'Decimal'>
+  readonly igstAmount: Prisma.FieldRef<"Invoice", 'Decimal'>
   readonly total: Prisma.FieldRef<"Invoice", 'Decimal'>
   readonly amountInWords: Prisma.FieldRef<"Invoice", 'String'>
+  readonly status: Prisma.FieldRef<"Invoice", 'InvoiceStatus'>
+  readonly internalNote: Prisma.FieldRef<"Invoice", 'String'>
   readonly createdAt: Prisma.FieldRef<"Invoice", 'DateTime'>
+  readonly updatedAt: Prisma.FieldRef<"Invoice", 'DateTime'>
 }
     
 
@@ -2162,6 +2592,30 @@ export type Invoice$itemsArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.InvoiceItemScalarFieldEnum | Prisma.InvoiceItemScalarFieldEnum[]
+}
+
+/**
+ * Invoice.statusChangeEvents
+ */
+export type Invoice$statusChangeEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the InvoiceStatusLog
+   */
+  select?: Prisma.InvoiceStatusLogSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the InvoiceStatusLog
+   */
+  omit?: Prisma.InvoiceStatusLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.InvoiceStatusLogInclude<ExtArgs> | null
+  where?: Prisma.InvoiceStatusLogWhereInput
+  orderBy?: Prisma.InvoiceStatusLogOrderByWithRelationInput | Prisma.InvoiceStatusLogOrderByWithRelationInput[]
+  cursor?: Prisma.InvoiceStatusLogWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.InvoiceStatusLogScalarFieldEnum | Prisma.InvoiceStatusLogScalarFieldEnum[]
 }
 
 /**

@@ -214,17 +214,17 @@ export type BuyerOrderByWithRelationInput = {
 
 export type BuyerWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  name?: string
   AND?: Prisma.BuyerWhereInput | Prisma.BuyerWhereInput[]
   OR?: Prisma.BuyerWhereInput[]
   NOT?: Prisma.BuyerWhereInput | Prisma.BuyerWhereInput[]
-  name?: Prisma.StringFilter<"Buyer"> | string
   address?: Prisma.StringFilter<"Buyer"> | string
   gstin?: Prisma.StringNullableFilter<"Buyer"> | string | null
   phone?: Prisma.StringNullableFilter<"Buyer"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Buyer"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Buyer"> | Date | string
   invoices?: Prisma.InvoiceListRelationFilter
-}, "id">
+}, "id" | "name">
 
 export type BuyerOrderByWithAggregationInput = {
   id?: Prisma.SortOrder

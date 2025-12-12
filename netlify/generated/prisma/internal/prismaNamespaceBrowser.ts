@@ -52,8 +52,10 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   Buyer: 'Buyer',
+  Product: 'Product',
   Invoice: 'Invoice',
-  InvoiceItem: 'InvoiceItem'
+  InvoiceItem: 'InvoiceItem',
+  InvoiceStatusLog: 'InvoiceStatusLog'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -85,6 +87,21 @@ export const BuyerScalarFieldEnum = {
 export type BuyerScalarFieldEnum = (typeof BuyerScalarFieldEnum)[keyof typeof BuyerScalarFieldEnum]
 
 
+export const ProductScalarFieldEnum = {
+  id: 'id',
+  description: 'description',
+  abbreviation: 'abbreviation',
+  hsn: 'hsn',
+  defaultPrice: 'defaultPrice',
+  defaultQuantity: 'defaultQuantity',
+  defaultUnit: 'defaultUnit',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProductScalarFieldEnum = (typeof ProductScalarFieldEnum)[keyof typeof ProductScalarFieldEnum]
+
+
 export const InvoiceScalarFieldEnum = {
   id: 'id',
   invoiceNumber: 'invoiceNumber',
@@ -101,12 +118,18 @@ export const InvoiceScalarFieldEnum = {
   sellerPhoneSnapshot: 'sellerPhoneSnapshot',
   subtotal: 'subtotal',
   discount: 'discount',
-  cgst: 'cgst',
-  sgst: 'sgst',
-  igst: 'igst',
+  cgstRate: 'cgstRate',
+  sgstRate: 'sgstRate',
+  igstRate: 'igstRate',
+  cgstAmount: 'cgstAmount',
+  sgstAmount: 'sgstAmount',
+  igstAmount: 'igstAmount',
   total: 'total',
   amountInWords: 'amountInWords',
-  createdAt: 'createdAt'
+  status: 'status',
+  internalNote: 'internalNote',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
 export type InvoiceScalarFieldEnum = (typeof InvoiceScalarFieldEnum)[keyof typeof InvoiceScalarFieldEnum]
@@ -115,14 +138,28 @@ export type InvoiceScalarFieldEnum = (typeof InvoiceScalarFieldEnum)[keyof typeo
 export const InvoiceItemScalarFieldEnum = {
   id: 'id',
   invoiceId: 'invoiceId',
+  productId: 'productId',
   description: 'description',
   hsn: 'hsn',
   qty: 'qty',
   unit: 'unit',
-  rate: 'rate'
+  rate: 'rate',
+  lineTotal: 'lineTotal',
+  position: 'position'
 } as const
 
 export type InvoiceItemScalarFieldEnum = (typeof InvoiceItemScalarFieldEnum)[keyof typeof InvoiceItemScalarFieldEnum]
+
+
+export const InvoiceStatusLogScalarFieldEnum = {
+  id: 'id',
+  invoiceId: 'invoiceId',
+  oldStatus: 'oldStatus',
+  newStatus: 'newStatus',
+  changedAt: 'changedAt'
+} as const
+
+export type InvoiceStatusLogScalarFieldEnum = (typeof InvoiceStatusLogScalarFieldEnum)[keyof typeof InvoiceStatusLogScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -23,6 +23,11 @@ export * from './enums';
  */
 export type Buyer = Prisma.BuyerModel
 /**
+ * Model Product
+ * 
+ */
+export type Product = Prisma.ProductModel
+/**
  * Model Invoice
  * 
  */
@@ -32,3 +37,8 @@ export type Invoice = Prisma.InvoiceModel
  * 
  */
 export type InvoiceItem = Prisma.InvoiceItemModel
+/**
+ * Model InvoiceStatusLog
+ * 
+ */
+export type InvoiceStatusLog = Prisma.InvoiceStatusLogModel
