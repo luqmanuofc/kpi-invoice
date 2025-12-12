@@ -109,6 +109,7 @@ export const InvoiceScalarFieldEnum = {
   buyerNameSnapshot: 'buyerNameSnapshot',
   buyerAddressSnapshot: 'buyerAddressSnapshot',
   buyerGstinSnapshot: 'buyerGstinSnapshot',
+  buyerPhoneSnapshot: 'buyerPhoneSnapshot',
   sellerNameSnapshot: 'sellerNameSnapshot',
   sellerAddressSnapshot: 'sellerAddressSnapshot',
   sellerGstinSnapshot: 'sellerGstinSnapshot',

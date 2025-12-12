@@ -59,6 +59,7 @@ export type InvoiceMinAggregateOutputType = {
   buyerNameSnapshot: string | null
   buyerAddressSnapshot: string | null
   buyerGstinSnapshot: string | null
+  buyerPhoneSnapshot: string | null
   sellerNameSnapshot: string | null
   sellerAddressSnapshot: string | null
   sellerGstinSnapshot: string | null
@@ -89,6 +90,7 @@ export type InvoiceMaxAggregateOutputType = {
   buyerNameSnapshot: string | null
   buyerAddressSnapshot: string | null
   buyerGstinSnapshot: string | null
+  buyerPhoneSnapshot: string | null
   sellerNameSnapshot: string | null
   sellerAddressSnapshot: string | null
   sellerGstinSnapshot: string | null
@@ -119,6 +121,7 @@ export type InvoiceCountAggregateOutputType = {
   buyerNameSnapshot: number
   buyerAddressSnapshot: number
   buyerGstinSnapshot: number
+  buyerPhoneSnapshot: number
   sellerNameSnapshot: number
   sellerAddressSnapshot: number
   sellerGstinSnapshot: number
@@ -175,6 +178,7 @@ export type InvoiceMinAggregateInputType = {
   buyerNameSnapshot?: true
   buyerAddressSnapshot?: true
   buyerGstinSnapshot?: true
+  buyerPhoneSnapshot?: true
   sellerNameSnapshot?: true
   sellerAddressSnapshot?: true
   sellerGstinSnapshot?: true
@@ -205,6 +209,7 @@ export type InvoiceMaxAggregateInputType = {
   buyerNameSnapshot?: true
   buyerAddressSnapshot?: true
   buyerGstinSnapshot?: true
+  buyerPhoneSnapshot?: true
   sellerNameSnapshot?: true
   sellerAddressSnapshot?: true
   sellerGstinSnapshot?: true
@@ -235,6 +240,7 @@ export type InvoiceCountAggregateInputType = {
   buyerNameSnapshot?: true
   buyerAddressSnapshot?: true
   buyerGstinSnapshot?: true
+  buyerPhoneSnapshot?: true
   sellerNameSnapshot?: true
   sellerAddressSnapshot?: true
   sellerGstinSnapshot?: true
@@ -352,6 +358,7 @@ export type InvoiceGroupByOutputType = {
   buyerNameSnapshot: string
   buyerAddressSnapshot: string
   buyerGstinSnapshot: string | null
+  buyerPhoneSnapshot: string | null
   sellerNameSnapshot: string
   sellerAddressSnapshot: string
   sellerGstinSnapshot: string
@@ -405,6 +412,7 @@ export type InvoiceWhereInput = {
   buyerNameSnapshot?: Prisma.StringFilter<"Invoice"> | string
   buyerAddressSnapshot?: Prisma.StringFilter<"Invoice"> | string
   buyerGstinSnapshot?: Prisma.StringNullableFilter<"Invoice"> | string | null
+  buyerPhoneSnapshot?: Prisma.StringNullableFilter<"Invoice"> | string | null
   sellerNameSnapshot?: Prisma.StringFilter<"Invoice"> | string
   sellerAddressSnapshot?: Prisma.StringFilter<"Invoice"> | string
   sellerGstinSnapshot?: Prisma.StringFilter<"Invoice"> | string
@@ -438,6 +446,7 @@ export type InvoiceOrderByWithRelationInput = {
   buyerNameSnapshot?: Prisma.SortOrder
   buyerAddressSnapshot?: Prisma.SortOrder
   buyerGstinSnapshot?: Prisma.SortOrderInput | Prisma.SortOrder
+  buyerPhoneSnapshot?: Prisma.SortOrderInput | Prisma.SortOrder
   sellerNameSnapshot?: Prisma.SortOrder
   sellerAddressSnapshot?: Prisma.SortOrder
   sellerGstinSnapshot?: Prisma.SortOrder
@@ -474,6 +483,7 @@ export type InvoiceWhereUniqueInput = Prisma.AtLeast<{
   buyerNameSnapshot?: Prisma.StringFilter<"Invoice"> | string
   buyerAddressSnapshot?: Prisma.StringFilter<"Invoice"> | string
   buyerGstinSnapshot?: Prisma.StringNullableFilter<"Invoice"> | string | null
+  buyerPhoneSnapshot?: Prisma.StringNullableFilter<"Invoice"> | string | null
   sellerNameSnapshot?: Prisma.StringFilter<"Invoice"> | string
   sellerAddressSnapshot?: Prisma.StringFilter<"Invoice"> | string
   sellerGstinSnapshot?: Prisma.StringFilter<"Invoice"> | string
@@ -507,6 +517,7 @@ export type InvoiceOrderByWithAggregationInput = {
   buyerNameSnapshot?: Prisma.SortOrder
   buyerAddressSnapshot?: Prisma.SortOrder
   buyerGstinSnapshot?: Prisma.SortOrderInput | Prisma.SortOrder
+  buyerPhoneSnapshot?: Prisma.SortOrderInput | Prisma.SortOrder
   sellerNameSnapshot?: Prisma.SortOrder
   sellerAddressSnapshot?: Prisma.SortOrder
   sellerGstinSnapshot?: Prisma.SortOrder
@@ -545,6 +556,7 @@ export type InvoiceScalarWhereWithAggregatesInput = {
   buyerNameSnapshot?: Prisma.StringWithAggregatesFilter<"Invoice"> | string
   buyerAddressSnapshot?: Prisma.StringWithAggregatesFilter<"Invoice"> | string
   buyerGstinSnapshot?: Prisma.StringNullableWithAggregatesFilter<"Invoice"> | string | null
+  buyerPhoneSnapshot?: Prisma.StringNullableWithAggregatesFilter<"Invoice"> | string | null
   sellerNameSnapshot?: Prisma.StringWithAggregatesFilter<"Invoice"> | string
   sellerAddressSnapshot?: Prisma.StringWithAggregatesFilter<"Invoice"> | string
   sellerGstinSnapshot?: Prisma.StringWithAggregatesFilter<"Invoice"> | string
@@ -574,6 +586,7 @@ export type InvoiceCreateInput = {
   buyerNameSnapshot: string
   buyerAddressSnapshot: string
   buyerGstinSnapshot?: string | null
+  buyerPhoneSnapshot?: string | null
   sellerNameSnapshot: string
   sellerAddressSnapshot: string
   sellerGstinSnapshot: string
@@ -607,6 +620,7 @@ export type InvoiceUncheckedCreateInput = {
   buyerNameSnapshot: string
   buyerAddressSnapshot: string
   buyerGstinSnapshot?: string | null
+  buyerPhoneSnapshot?: string | null
   sellerNameSnapshot: string
   sellerAddressSnapshot: string
   sellerGstinSnapshot: string
@@ -638,6 +652,7 @@ export type InvoiceUpdateInput = {
   buyerNameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   buyerAddressSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   buyerGstinSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerPhoneSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sellerNameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   sellerAddressSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   sellerGstinSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
@@ -671,6 +686,7 @@ export type InvoiceUncheckedUpdateInput = {
   buyerNameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   buyerAddressSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   buyerGstinSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerPhoneSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sellerNameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   sellerAddressSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   sellerGstinSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
@@ -703,6 +719,7 @@ export type InvoiceCreateManyInput = {
   buyerNameSnapshot: string
   buyerAddressSnapshot: string
   buyerGstinSnapshot?: string | null
+  buyerPhoneSnapshot?: string | null
   sellerNameSnapshot: string
   sellerAddressSnapshot: string
   sellerGstinSnapshot: string
@@ -732,6 +749,7 @@ export type InvoiceUpdateManyMutationInput = {
   buyerNameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   buyerAddressSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   buyerGstinSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerPhoneSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sellerNameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   sellerAddressSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   sellerGstinSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
@@ -762,6 +780,7 @@ export type InvoiceUncheckedUpdateManyInput = {
   buyerNameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   buyerAddressSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   buyerGstinSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerPhoneSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sellerNameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   sellerAddressSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   sellerGstinSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
@@ -802,6 +821,7 @@ export type InvoiceCountOrderByAggregateInput = {
   buyerNameSnapshot?: Prisma.SortOrder
   buyerAddressSnapshot?: Prisma.SortOrder
   buyerGstinSnapshot?: Prisma.SortOrder
+  buyerPhoneSnapshot?: Prisma.SortOrder
   sellerNameSnapshot?: Prisma.SortOrder
   sellerAddressSnapshot?: Prisma.SortOrder
   sellerGstinSnapshot?: Prisma.SortOrder
@@ -844,6 +864,7 @@ export type InvoiceMaxOrderByAggregateInput = {
   buyerNameSnapshot?: Prisma.SortOrder
   buyerAddressSnapshot?: Prisma.SortOrder
   buyerGstinSnapshot?: Prisma.SortOrder
+  buyerPhoneSnapshot?: Prisma.SortOrder
   sellerNameSnapshot?: Prisma.SortOrder
   sellerAddressSnapshot?: Prisma.SortOrder
   sellerGstinSnapshot?: Prisma.SortOrder
@@ -874,6 +895,7 @@ export type InvoiceMinOrderByAggregateInput = {
   buyerNameSnapshot?: Prisma.SortOrder
   buyerAddressSnapshot?: Prisma.SortOrder
   buyerGstinSnapshot?: Prisma.SortOrder
+  buyerPhoneSnapshot?: Prisma.SortOrder
   sellerNameSnapshot?: Prisma.SortOrder
   sellerAddressSnapshot?: Prisma.SortOrder
   sellerGstinSnapshot?: Prisma.SortOrder
@@ -994,6 +1016,7 @@ export type InvoiceCreateWithoutBuyerInput = {
   buyerNameSnapshot: string
   buyerAddressSnapshot: string
   buyerGstinSnapshot?: string | null
+  buyerPhoneSnapshot?: string | null
   sellerNameSnapshot: string
   sellerAddressSnapshot: string
   sellerGstinSnapshot: string
@@ -1025,6 +1048,7 @@ export type InvoiceUncheckedCreateWithoutBuyerInput = {
   buyerNameSnapshot: string
   buyerAddressSnapshot: string
   buyerGstinSnapshot?: string | null
+  buyerPhoneSnapshot?: string | null
   sellerNameSnapshot: string
   sellerAddressSnapshot: string
   sellerGstinSnapshot: string
@@ -1086,6 +1110,7 @@ export type InvoiceScalarWhereInput = {
   buyerNameSnapshot?: Prisma.StringFilter<"Invoice"> | string
   buyerAddressSnapshot?: Prisma.StringFilter<"Invoice"> | string
   buyerGstinSnapshot?: Prisma.StringNullableFilter<"Invoice"> | string | null
+  buyerPhoneSnapshot?: Prisma.StringNullableFilter<"Invoice"> | string | null
   sellerNameSnapshot?: Prisma.StringFilter<"Invoice"> | string
   sellerAddressSnapshot?: Prisma.StringFilter<"Invoice"> | string
   sellerGstinSnapshot?: Prisma.StringFilter<"Invoice"> | string
@@ -1115,6 +1140,7 @@ export type InvoiceCreateWithoutItemsInput = {
   buyerNameSnapshot: string
   buyerAddressSnapshot: string
   buyerGstinSnapshot?: string | null
+  buyerPhoneSnapshot?: string | null
   sellerNameSnapshot: string
   sellerAddressSnapshot: string
   sellerGstinSnapshot: string
@@ -1147,6 +1173,7 @@ export type InvoiceUncheckedCreateWithoutItemsInput = {
   buyerNameSnapshot: string
   buyerAddressSnapshot: string
   buyerGstinSnapshot?: string | null
+  buyerPhoneSnapshot?: string | null
   sellerNameSnapshot: string
   sellerAddressSnapshot: string
   sellerGstinSnapshot: string
@@ -1193,6 +1220,7 @@ export type InvoiceUpdateWithoutItemsInput = {
   buyerNameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   buyerAddressSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   buyerGstinSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerPhoneSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sellerNameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   sellerAddressSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   sellerGstinSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1225,6 +1253,7 @@ export type InvoiceUncheckedUpdateWithoutItemsInput = {
   buyerNameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   buyerAddressSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   buyerGstinSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerPhoneSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sellerNameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   sellerAddressSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   sellerGstinSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1255,6 +1284,7 @@ export type InvoiceCreateWithoutStatusChangeEventsInput = {
   buyerNameSnapshot: string
   buyerAddressSnapshot: string
   buyerGstinSnapshot?: string | null
+  buyerPhoneSnapshot?: string | null
   sellerNameSnapshot: string
   sellerAddressSnapshot: string
   sellerGstinSnapshot: string
@@ -1287,6 +1317,7 @@ export type InvoiceUncheckedCreateWithoutStatusChangeEventsInput = {
   buyerNameSnapshot: string
   buyerAddressSnapshot: string
   buyerGstinSnapshot?: string | null
+  buyerPhoneSnapshot?: string | null
   sellerNameSnapshot: string
   sellerAddressSnapshot: string
   sellerGstinSnapshot: string
@@ -1333,6 +1364,7 @@ export type InvoiceUpdateWithoutStatusChangeEventsInput = {
   buyerNameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   buyerAddressSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   buyerGstinSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerPhoneSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sellerNameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   sellerAddressSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   sellerGstinSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1365,6 +1397,7 @@ export type InvoiceUncheckedUpdateWithoutStatusChangeEventsInput = {
   buyerNameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   buyerAddressSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   buyerGstinSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerPhoneSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sellerNameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   sellerAddressSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   sellerGstinSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1395,6 +1428,7 @@ export type InvoiceCreateManyBuyerInput = {
   buyerNameSnapshot: string
   buyerAddressSnapshot: string
   buyerGstinSnapshot?: string | null
+  buyerPhoneSnapshot?: string | null
   sellerNameSnapshot: string
   sellerAddressSnapshot: string
   sellerGstinSnapshot: string
@@ -1424,6 +1458,7 @@ export type InvoiceUpdateWithoutBuyerInput = {
   buyerNameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   buyerAddressSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   buyerGstinSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerPhoneSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sellerNameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   sellerAddressSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   sellerGstinSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1455,6 +1490,7 @@ export type InvoiceUncheckedUpdateWithoutBuyerInput = {
   buyerNameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   buyerAddressSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   buyerGstinSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerPhoneSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sellerNameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   sellerAddressSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   sellerGstinSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1486,6 +1522,7 @@ export type InvoiceUncheckedUpdateManyWithoutBuyerInput = {
   buyerNameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   buyerAddressSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   buyerGstinSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerPhoneSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sellerNameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   sellerAddressSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   sellerGstinSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1556,6 +1593,7 @@ export type InvoiceSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   buyerNameSnapshot?: boolean
   buyerAddressSnapshot?: boolean
   buyerGstinSnapshot?: boolean
+  buyerPhoneSnapshot?: boolean
   sellerNameSnapshot?: boolean
   sellerAddressSnapshot?: boolean
   sellerGstinSnapshot?: boolean
@@ -1590,6 +1628,7 @@ export type InvoiceSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   buyerNameSnapshot?: boolean
   buyerAddressSnapshot?: boolean
   buyerGstinSnapshot?: boolean
+  buyerPhoneSnapshot?: boolean
   sellerNameSnapshot?: boolean
   sellerAddressSnapshot?: boolean
   sellerGstinSnapshot?: boolean
@@ -1621,6 +1660,7 @@ export type InvoiceSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   buyerNameSnapshot?: boolean
   buyerAddressSnapshot?: boolean
   buyerGstinSnapshot?: boolean
+  buyerPhoneSnapshot?: boolean
   sellerNameSnapshot?: boolean
   sellerAddressSnapshot?: boolean
   sellerGstinSnapshot?: boolean
@@ -1652,6 +1692,7 @@ export type InvoiceSelectScalar = {
   buyerNameSnapshot?: boolean
   buyerAddressSnapshot?: boolean
   buyerGstinSnapshot?: boolean
+  buyerPhoneSnapshot?: boolean
   sellerNameSnapshot?: boolean
   sellerAddressSnapshot?: boolean
   sellerGstinSnapshot?: boolean
@@ -1673,7 +1714,7 @@ export type InvoiceSelectScalar = {
   updatedAt?: boolean
 }
 
-export type InvoiceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "invoiceNumber" | "date" | "vehicleNumber" | "buyerId" | "buyerNameSnapshot" | "buyerAddressSnapshot" | "buyerGstinSnapshot" | "sellerNameSnapshot" | "sellerAddressSnapshot" | "sellerGstinSnapshot" | "sellerEmailSnapshot" | "sellerPhoneSnapshot" | "subtotal" | "discount" | "cgstRate" | "sgstRate" | "igstRate" | "cgstAmount" | "sgstAmount" | "igstAmount" | "total" | "amountInWords" | "status" | "internalNote" | "createdAt" | "updatedAt", ExtArgs["result"]["invoice"]>
+export type InvoiceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "invoiceNumber" | "date" | "vehicleNumber" | "buyerId" | "buyerNameSnapshot" | "buyerAddressSnapshot" | "buyerGstinSnapshot" | "buyerPhoneSnapshot" | "sellerNameSnapshot" | "sellerAddressSnapshot" | "sellerGstinSnapshot" | "sellerEmailSnapshot" | "sellerPhoneSnapshot" | "subtotal" | "discount" | "cgstRate" | "sgstRate" | "igstRate" | "cgstAmount" | "sgstAmount" | "igstAmount" | "total" | "amountInWords" | "status" | "internalNote" | "createdAt" | "updatedAt", ExtArgs["result"]["invoice"]>
 export type InvoiceInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   buyer?: boolean | Prisma.BuyerDefaultArgs<ExtArgs>
   items?: boolean | Prisma.Invoice$itemsArgs<ExtArgs>
@@ -1703,6 +1744,7 @@ export type $InvoicePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     buyerNameSnapshot: string
     buyerAddressSnapshot: string
     buyerGstinSnapshot: string | null
+    buyerPhoneSnapshot: string | null
     sellerNameSnapshot: string
     sellerAddressSnapshot: string
     sellerGstinSnapshot: string
@@ -2156,6 +2198,7 @@ export interface InvoiceFieldRefs {
   readonly buyerNameSnapshot: Prisma.FieldRef<"Invoice", 'String'>
   readonly buyerAddressSnapshot: Prisma.FieldRef<"Invoice", 'String'>
   readonly buyerGstinSnapshot: Prisma.FieldRef<"Invoice", 'String'>
+  readonly buyerPhoneSnapshot: Prisma.FieldRef<"Invoice", 'String'>
   readonly sellerNameSnapshot: Prisma.FieldRef<"Invoice", 'String'>
   readonly sellerAddressSnapshot: Prisma.FieldRef<"Invoice", 'String'>
   readonly sellerGstinSnapshot: Prisma.FieldRef<"Invoice", 'String'>

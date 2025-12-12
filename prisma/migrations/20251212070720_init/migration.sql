@@ -40,6 +40,7 @@ CREATE TABLE "Invoice" (
     "buyerNameSnapshot" TEXT NOT NULL,
     "buyerAddressSnapshot" TEXT NOT NULL,
     "buyerGstinSnapshot" TEXT,
+    "buyerPhoneSnapshot" TEXT,
     "sellerNameSnapshot" TEXT NOT NULL,
     "sellerAddressSnapshot" TEXT NOT NULL,
     "sellerGstinSnapshot" TEXT NOT NULL,

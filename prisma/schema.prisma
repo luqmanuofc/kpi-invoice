@@ -66,6 +66,7 @@ model Invoice {
   buyerNameSnapshot    String
   buyerAddressSnapshot String
   buyerGstinSnapshot   String?
+  buyerPhoneSnapshot   String?
 
   // Seller snapshot
   sellerNameSnapshot    String
