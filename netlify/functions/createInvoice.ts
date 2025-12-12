@@ -11,11 +11,10 @@ export default async function handler(request: Request) {
     const invoice = await prisma.invoice.create({
       data: {
         invoiceNumber: data.invoiceNumber,
-        date: new Date(data.date),
         vehicleNumber: data.vehicleNumber,
+        date: new Date(data.date),
 
         buyerId: data.buyer.id,
-
         buyerNameSnapshot: data.buyer.name,
         buyerAddressSnapshot: data.buyer.address,
         buyerGstinSnapshot: data.buyer.gstin,
@@ -27,14 +26,16 @@ export default async function handler(request: Request) {
         sellerEmailSnapshot: data.sellerEmail,
         sellerPhoneSnapshot: data.sellerPhone,
 
-        subtotal: data.subtotal,
-        discount: data.discount,
         cgstRate: data.cgstRate,
         sgstRate: data.sgstRate,
         igstRate: data.igstRate,
+
         cgstAmount: data.cgstAmount,
         sgstAmount: data.sgstAmount,
         igstAmount: data.igstAmount,
+
+        discount: data.discount,
+        subtotal: data.subtotal,
         total: data.total,
         amountInWords: data.amountInWords,
 

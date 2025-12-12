@@ -1,7 +1,4 @@
-import {
-  TextField,
-  Stack,
-} from "@mui/material";
+import { TextField, Stack } from "@mui/material";
 
 import { Controller } from "react-hook-form";
 import { useInvoice } from "../contexts/InvoiceProvider";
@@ -27,7 +24,7 @@ export default function InvoiceFormTaxesAndDiscountsPage() {
         />
 
         <Controller
-          name="cgst"
+          name="cgstRate"
           control={control}
           render={({ field }) => (
             <TextField
@@ -40,7 +37,7 @@ export default function InvoiceFormTaxesAndDiscountsPage() {
         />
 
         <Controller
-          name="sgst"
+          name="sgstRate"
           control={control}
           render={({ field }) => (
             <TextField
@@ -53,7 +50,7 @@ export default function InvoiceFormTaxesAndDiscountsPage() {
         />
 
         <Controller
-          name="igst"
+          name="igstRate"
           control={control}
           render={({ field }) => (
             <TextField

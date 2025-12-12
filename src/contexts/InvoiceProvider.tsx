@@ -34,26 +34,26 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
 
       buyer: null,
 
-      items: [],
-
-      discount: 0,
-      cgstRate: 9,
-      sgstRate: 9,
-      igstRate: 0,
-
-      subtotal: 0,
-      cgstAmount: 0,
-      sgstAmount: 0,
-      igstAmount: 0,
-      total: 0,
-
       sellerName: "Khaldun Plastic Industries",
       sellerAddress: "28A-SIDCO INDL. COMPLEX SHALLATENG SRINAGAR (J&K)",
       sellerEmail: "kpikashmir@gmail.com",
       sellerPhone: "9419009217",
       sellerGstin: "01BSGPB0427H1ZJ",
 
+      cgstRate: 9,
+      sgstRate: 9,
+      igstRate: 0,
+
+      cgstAmount: 0,
+      sgstAmount: 0,
+      igstAmount: 0,
+
+      discount: 0,
+      subtotal: 0,
+      total: 0,
       amountInWords: "",
+
+      items: [],
     },
   });
 
@@ -94,9 +94,7 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
 
   const handleCreateInvoice = async () => {
     try {
-      // Map form data to API payload (includes seller config)
-      const payload = mapInvoiceFormToPayload(computedData);
-      const result = await createInvoice(payload);
+      const result = await createInvoice(computedData);
       console.log("Invoice created:", result);
       setActiveStep(0);
       form.reset();
