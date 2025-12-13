@@ -3,11 +3,29 @@ import InvoiceDocument, {
   type InvoiceDocumentHandle,
 } from "../invoice-document/InvoiceDocument";
 import { useInvoice } from "../contexts/InvoiceProvider";
-import { useRef } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
+import { debounce } from "lodash";
 
 export default function InvoicePage() {
   const { computedData } = useInvoice();
   const invoiceRef = useRef<InvoiceDocumentHandle | null>(null);
+  const [debouncedData, setDebouncedData] = useState(computedData);
+
+  // Debounce computedData updates to prevent constant PDF re-renders
+  const updateDebouncedData = useCallback(
+    debounce((data: typeof computedData) => {
+      setDebouncedData(data);
+    }, 500),
+    []
+  );
+
+  useEffect(() => {
+    updateDebouncedData(computedData);
+
+    return () => {
+      updateDebouncedData.cancel();
+    };
+  }, [computedData, updateDebouncedData]);
 
   return (
     <div
@@ -29,7 +47,7 @@ export default function InvoicePage() {
         <InvoiceFormPage />
       </div>
 
-      <InvoiceDocument data={computedData} ref={invoiceRef} />
+      <InvoiceDocument data={debouncedData} ref={invoiceRef} />
     </div>
   );
 }
