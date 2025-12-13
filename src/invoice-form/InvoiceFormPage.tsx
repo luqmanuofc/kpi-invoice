@@ -28,6 +28,7 @@ export default function InvoiceFormPage() {
     activeStep,
     setActiveStep,
     invoiceNumberExists,
+    isCheckingInvoiceNumber,
     form,
   } = useInvoice();
 
@@ -84,7 +85,7 @@ export default function InvoiceFormPage() {
               fullWidth
               variant="outlined"
               onClick={handleNextFromStep0}
-              disabled={invoiceNumberExists}
+              disabled={invoiceNumberExists || isCheckingInvoiceNumber}
             >
               Next
             </Button>

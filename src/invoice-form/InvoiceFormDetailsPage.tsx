@@ -16,18 +16,24 @@ import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
 import { Controller } from "react-hook-form";
 import dayjs from "dayjs";
 import { useInvoice } from "../contexts/InvoiceProvider";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { getBuyers, type Buyer } from "../api/buyers";
 import { useNavigate } from "react-router-dom";
 import { checkInvoiceNumber } from "../api/invoices";
+import { debounce } from "lodash";
 
 export default function InvoiceFormDetailsPage() {
-  const { form, invoiceNumberExists, setInvoiceNumberExists } = useInvoice();
+  const {
+    form,
+    invoiceNumberExists,
+    setInvoiceNumberExists,
+    isCheckingInvoiceNumber,
+    setIsCheckingInvoiceNumber,
+  } = useInvoice();
   const { control, watch } = form;
   const navigate = useNavigate();
   const [buyers, setBuyers] = useState<Buyer[]>([]);
   const [isLoadingBuyers, setIsLoadingBuyers] = useState(true);
-  const [isCheckingInvoiceNumber, setIsCheckingInvoiceNumber] = useState(false);
   const selectedBuyer = form.getValues("buyer");
   const invoiceNumber = watch("invoiceNumber");
 
@@ -48,29 +54,40 @@ export default function InvoiceFormDetailsPage() {
   }, []);
 
   // Debounced invoice number validation
-  useEffect(() => {
-    if (!invoiceNumber || invoiceNumber.trim() === "") {
-      setInvoiceNumberExists(false);
-      return;
-    }
+  const debouncedCheckInvoiceNumber = useCallback(
+    debounce(async (invoiceNumberValue: string) => {
+      if (!invoiceNumberValue || invoiceNumberValue.trim() === "") {
+        setInvoiceNumberExists(false);
+        setIsCheckingInvoiceNumber(false);
+        return;
+      }
 
-    setIsCheckingInvoiceNumber(true);
-    const timer = setTimeout(async () => {
       try {
-        const result = await checkInvoiceNumber(invoiceNumber);
+        const result = await checkInvoiceNumber(invoiceNumberValue);
         setInvoiceNumberExists(result.exists);
       } catch (err) {
         console.error("Failed to check invoice number:", err);
       } finally {
         setIsCheckingInvoiceNumber(false);
       }
-    }, 500); // 500ms debounce
+    }, 500),
+    []
+  );
+
+  useEffect(() => {
+    if (!invoiceNumber || invoiceNumber.trim() === "") {
+      setInvoiceNumberExists(false);
+      setIsCheckingInvoiceNumber(false);
+      return;
+    }
+
+    setIsCheckingInvoiceNumber(true);
+    debouncedCheckInvoiceNumber(invoiceNumber);
 
     return () => {
-      clearTimeout(timer);
-      setIsCheckingInvoiceNumber(false);
+      debouncedCheckInvoiceNumber.cancel();
     };
-  }, [invoiceNumber]);
+  }, [invoiceNumber, debouncedCheckInvoiceNumber]);
   return (
     <>
       <Stack spacing={2}>
