@@ -5,6 +5,7 @@ import InvoiceDocument, {
 import { useInvoice } from "../contexts/InvoiceProvider";
 import { useRef, useState, useEffect, useCallback } from "react";
 import { debounce } from "lodash";
+import { Box } from "@mui/material";
 
 export default function InvoicePage() {
   const { computedData } = useInvoice();
@@ -28,26 +29,22 @@ export default function InvoicePage() {
   }, [computedData, updateDebouncedData]);
 
   return (
-    <div
-      style={{
+    <Box
+      sx={{
         display: "flex",
+        margin: 0,
         padding: "1rem",
         gap: "1rem",
         flexDirection: "row",
+        justifyContent: { xs: "center", md: "inherit" },
       }}
     >
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "flex-start",
-          gap: "1rem",
-        }}
-      >
+      <Box className="invoice-input-form-wrapper">
         <InvoiceFormPage />
-      </div>
-
-      <InvoiceDocument data={debouncedData} ref={invoiceRef} />
-    </div>
+      </Box>
+      <Box sx={{ display: { xs: "none", md: "block" } }}>
+        <InvoiceDocument data={debouncedData} ref={invoiceRef} />
+      </Box>
+    </Box>
   );
 }

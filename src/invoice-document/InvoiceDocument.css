@@ -19,12 +19,19 @@
 }
 
 /* Mobile responsive scaling */
-@media (max-width: 768px) {
-  .invoice-page:not(.no-zoom) {
+.invoice-page:not(.no-zoom) {
+    /* Use zoom to scale everything including layout dimensions */
+    zoom: calc((50vw - 32px) / 595pt);
+  }
+@media (max-width: 900px) {
+/* Mobile responsive scaling */
+.invoice-page:not(.no-zoom) {
     /* Use zoom to scale everything including layout dimensions */
     zoom: calc((100vw - 32px) / 595pt);
   }
 }
+
+
 
 .invoice-border {
   border: 2pt solid #373b75;

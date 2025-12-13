@@ -61,7 +61,14 @@ export default function InvoiceFormPage() {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
-      <Paper sx={{ p: 2, width: "100%", minWidth: "450px", mt: 3 }}>
+      <Paper
+        sx={{
+          p: 2,
+          m: 0,
+          width: "450px",
+          maxWidth: "100%",
+        }}
+      >
         <Typography variant="h5" sx={{ mb: 2 }}>
           Create Invoice
         </Typography>

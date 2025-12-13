@@ -74,3 +74,10 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+@media (max-width: 450px) {
+  .invoice-input-form-wrapper{
+    width: 100%;
+    min-width: 350px;
+  }
+}
