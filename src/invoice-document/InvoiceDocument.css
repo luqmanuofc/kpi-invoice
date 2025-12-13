@@ -1,23 +1,6 @@
 .invoice-page-wrapper {
   width: 100%;
-  overflow-y: scroll;
-}
-
-/* Scale down on smaller screens - ONLY transform scale, no dimension changes */
-@media (max-width: 800px) {
-  .invoice-page {
-    transform: scale(0.6);
-  }
-}
-
-@media (max-width: 600px) {
-  .invoice-page-wrapper {
-    padding: 5px;
-  }
-
-  .invoice-page {
-    transform: scale(0.45);
-  }
+  overflow-y: auto;
 }
 
 .invoice-page {
@@ -33,33 +16,6 @@
   font-family: Helvetica, Arial, sans-serif;
   color: #373b75;
   transform-origin: top left;
-}
-
-/* Scale down on smaller screens - ONLY transform scale, no dimension changes */
-@media (max-width: 800px) {
-  .invoice-page {
-    transform: scale(0.6);
-  }
-}
-
-@media (max-width: 600px) {
-  .invoice-page-wrapper {
-    padding: 5px;
-  }
-
-  .invoice-page {
-    transform: scale(0.45);
-  }
-}
-
-@media (max-width: 400px) {
-  .invoice-page-wrapper {
-    padding: 2px;
-  }
-
-  .invoice-page {
-    transform: scale(0.35);
-  }
 }
 
 .invoice-border {
