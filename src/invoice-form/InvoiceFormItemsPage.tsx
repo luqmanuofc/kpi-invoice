@@ -31,17 +31,18 @@ export default function InvoiceFormItemsPage() {
   }, [fields.length]);
 
   const handleAddProducts = (products: Product[]) => {
-    products.forEach((product) => {
-      append({
-        productId: product.id,
-        description: product.name,
-        hsn: product.hsn,
-        qty: 1,
-        unit: product.defaultUnit,
-        rate: product.defaultPrice,
-        lineTotal: product.defaultPrice,
-      });
-    });
+    // Batch append all products at once to trigger only one re-render
+    const newItems = products.map((product) => ({
+      productId: product.id,
+      description: product.name,
+      hsn: product.hsn,
+      qty: 1,
+      unit: product.defaultUnit,
+      rate: product.defaultPrice,
+      lineTotal: product.defaultPrice,
+    }));
+
+    append(newItems);
   };
   return (
     <>
