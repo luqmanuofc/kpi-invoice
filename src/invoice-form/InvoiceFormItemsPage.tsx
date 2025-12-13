@@ -65,6 +65,7 @@ export default function InvoiceFormItemsPage() {
                 "&:hover": {
                   backgroundColor: "error.light",
                   borderColor: "error.main",
+                  color: "white",
                 },
               }}
               size="small"
@@ -86,8 +87,8 @@ export default function InvoiceFormItemsPage() {
                     render={({ field }) => (
                       <TextField
                         type="number"
-                        label="Qty"
-                        fullWidth
+                        label="Quantity"
+                        size="small"
                         {...field}
                         onChange={(e) =>
                           field.onChange(
@@ -97,9 +98,13 @@ export default function InvoiceFormItemsPage() {
                       />
                     )}
                   />
-                  <Typography align="left">
-                    {form.getValues("items")[index].unit}
-                  </Typography>
+                  <Controller
+                    name={`items.${index}.unit`}
+                    control={control}
+                    render={({ field }) => (
+                      <TextField label="Unit" size="small" {...field} />
+                    )}
+                  />
                 </div>
 
                 <Controller
@@ -109,7 +114,8 @@ export default function InvoiceFormItemsPage() {
                     <TextField
                       type="number"
                       label="Rate"
-                      sx={{ width: "100%" }}
+                      size="small"
+                      fullWidth
                       {...field}
                       onChange={(e) =>
                         field.onChange(
