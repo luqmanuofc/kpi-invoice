@@ -136,3 +136,26 @@ export async function getInvoiceById(id: string): Promise<Invoice> {
 
   return response.json();
 }
+
+export async function checkInvoiceNumber(
+  invoiceNumber: string
+): Promise<{ exists: boolean }> {
+  const response = await fetch(
+    `/.netlify/functions/checkInvoiceNumber?invoiceNumber=${encodeURIComponent(
+      invoiceNumber
+    )}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`Check invoice number failed: ${text}`);
+  }
+
+  return response.json();
+}

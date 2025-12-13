@@ -18,12 +18,15 @@ type InvoiceContextType = {
   handleCreateInvoice: () => void;
   activeStep: number;
   setActiveStep: (step: number) => void;
+  invoiceNumberExists: boolean;
+  setInvoiceNumberExists: (exists: boolean) => void;
 };
 
 const InvoiceContext = createContext<InvoiceContextType | undefined>(undefined);
 
 export function InvoiceProvider({ children }: { children: ReactNode }) {
   const [activeStep, setActiveStep] = useState<number>(0);
+  const [invoiceNumberExists, setInvoiceNumberExists] = useState(false);
   const navigate = useNavigate();
 
   const form = useForm<InvoiceForm>({
@@ -113,6 +116,8 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
         handleCreateInvoice,
         activeStep,
         setActiveStep,
+        invoiceNumberExists,
+        setInvoiceNumberExists,
       }}
     >
       {children}

@@ -27,6 +27,7 @@ export default function InvoiceFormPage() {
     handleCreateInvoice: onCreateInvoice,
     activeStep,
     setActiveStep,
+    invoiceNumberExists,
   } = useInvoice();
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
@@ -54,6 +55,7 @@ export default function InvoiceFormPage() {
               fullWidth
               variant="outlined"
               onClick={() => setActiveStep(1)}
+              disabled={invoiceNumberExists}
             >
               Next
             </Button>

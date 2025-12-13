@@ -19,14 +19,18 @@ import { useInvoice } from "../contexts/InvoiceProvider";
 import { useEffect, useState } from "react";
 import { getBuyers, type Buyer } from "../api/buyers";
 import { useNavigate } from "react-router-dom";
+import { checkInvoiceNumber } from "../api/invoices";
 
 export default function InvoiceFormDetailsPage() {
-  const { form } = useInvoice();
-  const { control, setValue } = form;
+  const { form, invoiceNumberExists, setInvoiceNumberExists } = useInvoice();
+  const { control, setValue, watch } = form;
   const navigate = useNavigate();
   const [buyers, setBuyers] = useState<Buyer[]>([]);
   const [isLoadingBuyers, setIsLoadingBuyers] = useState(true);
+  const [isCheckingInvoiceNumber, setIsCheckingInvoiceNumber] = useState(false);
   const selectedBuyer = form.getValues("buyer");
+  const invoiceNumber = watch("invoiceNumber");
+
   useEffect(() => {
     const fetchBuyers = async () => {
       try {
@@ -42,6 +46,31 @@ export default function InvoiceFormDetailsPage() {
 
     fetchBuyers();
   }, []);
+
+  // Debounced invoice number validation
+  useEffect(() => {
+    if (!invoiceNumber || invoiceNumber.trim() === "") {
+      setInvoiceNumberExists(false);
+      return;
+    }
+
+    setIsCheckingInvoiceNumber(true);
+    const timer = setTimeout(async () => {
+      try {
+        const result = await checkInvoiceNumber(invoiceNumber);
+        setInvoiceNumberExists(result.exists);
+      } catch (err) {
+        console.error("Failed to check invoice number:", err);
+      } finally {
+        setIsCheckingInvoiceNumber(false);
+      }
+    }, 500); // 500ms debounce
+
+    return () => {
+      clearTimeout(timer);
+      setIsCheckingInvoiceNumber(false);
+    };
+  }, [invoiceNumber]);
   return (
     <>
       <Stack spacing={2}>
@@ -49,7 +78,24 @@ export default function InvoiceFormDetailsPage() {
           name="invoiceNumber"
           control={control}
           render={({ field }) => (
-            <TextField label="Invoice Number" fullWidth {...field} />
+            <TextField
+              label="Invoice Number"
+              fullWidth
+              {...field}
+              error={invoiceNumberExists}
+              helperText={
+                invoiceNumberExists
+                  ? "This invoice number is already in use"
+                  : ""
+              }
+              slotProps={{
+                input: {
+                  endAdornment: isCheckingInvoiceNumber ? (
+                    <CircularProgress size={20} />
+                  ) : null,
+                },
+              }}
+            />
           )}
         />
 
