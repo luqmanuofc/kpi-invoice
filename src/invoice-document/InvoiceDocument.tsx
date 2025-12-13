@@ -1,6 +1,9 @@
 // InvoiceDocument.tsx
 import "./InvoiceDocument.css";
-import { forwardRef, useImperativeHandle } from "react";
+import { forwardRef, useImperativeHandle, useState } from "react";
+import { Box, IconButton, Typography } from "@mui/material";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import InvoicePage from "./InvoicePage";
 import { useInvoicePaginator } from "./useInvoicePaginator";
 import type { InvoiceForm } from "../invoice-form/types";
@@ -16,12 +19,21 @@ type Props = {
 const InvoiceDocument = forwardRef<InvoiceDocumentHandle, Props>(
   ({ data }, ref) => {
     const { pages, probeRootRef } = useInvoicePaginator(data);
+    const [currentPageIndex, setCurrentPageIndex] = useState(0);
 
     let pageRefs: HTMLDivElement[] = [];
 
     useImperativeHandle(ref, () => ({
       getPageElements: () => pageRefs,
     }));
+
+    const handlePrevPage = () => {
+      setCurrentPageIndex((prev) => Math.max(0, prev - 1));
+    };
+
+    const handleNextPage = () => {
+      setCurrentPageIndex((prev) => Math.min(pages.length - 1, prev + 1));
+    };
 
     return (
       <div>
@@ -36,8 +48,9 @@ const InvoiceDocument = forwardRef<InvoiceDocumentHandle, Props>(
             pointerEvents: "none",
           }}
         />
+
         <div className="invoice-page-wrapper">
-          {/* Visible paginated pages */}
+          {/* Visible paginated pages - show only current page */}
           {pages.map((p, idx) => {
             const items = data.items.slice(p.startRow, p.endRow);
             return (
@@ -46,7 +59,11 @@ const InvoiceDocument = forwardRef<InvoiceDocumentHandle, Props>(
                 ref={(el) => {
                   if (el) pageRefs[idx] = el;
                 }}
-                style={{ width: "fit-content", marginInline: "auto" }}
+                style={{
+                  width: "fit-content",
+                  marginInline: "auto",
+                  display: idx === currentPageIndex ? "block" : "none",
+                }}
               >
                 <InvoicePage
                   data={data}
@@ -63,6 +80,45 @@ const InvoiceDocument = forwardRef<InvoiceDocumentHandle, Props>(
             );
           })}
         </div>
+
+        {/* Toolbar */}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 2,
+            padding: "8px 16px",
+            backgroundColor: "#f5f5f5",
+            borderRadius: "4px",
+            marginBottom: "16px",
+            width: "fit-content",
+            marginInline: "auto",
+          }}
+        >
+          <IconButton
+            onClick={handlePrevPage}
+            disabled={currentPageIndex === 0}
+            size="small"
+          >
+            <ChevronLeftIcon />
+          </IconButton>
+
+          <Typography
+            variant="body2"
+            sx={{ fontWeight: 500, minWidth: "80px", textAlign: "center" }}
+          >
+            Page {currentPageIndex + 1} of {pages.length}
+          </Typography>
+
+          <IconButton
+            onClick={handleNextPage}
+            disabled={currentPageIndex === pages.length - 1}
+            size="small"
+          >
+            <ChevronRightIcon />
+          </IconButton>
+        </Box>
       </div>
     );
   }

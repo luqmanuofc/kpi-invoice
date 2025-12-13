@@ -96,14 +96,19 @@ export default function InvoiceViewPage() {
       .map((el) => el.querySelector(".invoice-page") as HTMLElement)
       .filter(Boolean);
 
-    invoicePages.forEach((el) => {
-      el.classList.add("no-zoom");
-    });
-
-    // Wait for layout to update after removing zoom
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    // Store original display styles
+    const originalStyles = pageElements.map((el) => el.style.display);
 
     try {
+      // Show all pages and remove zoom for PDF generation
+      pageElements.forEach((el, idx) => {
+        el.style.display = "block";
+        invoicePages[idx]?.classList.add("no-zoom");
+      });
+
+      // Wait for layout to update
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
       const pdf = new jsPDF({
         orientation: "portrait",
         unit: "mm",
@@ -135,9 +140,10 @@ export default function InvoiceViewPage() {
       }_${dayjs().format("YYYYMMDD")}.pdf`;
       pdf.save(fileName);
     } finally {
-      // Remove no-zoom class to restore zoom
-      invoicePages.forEach((el) => {
-        el.classList.remove("no-zoom");
+      // Restore original display styles and remove no-zoom class
+      pageElements.forEach((el, idx) => {
+        el.style.display = originalStyles[idx];
+        invoicePages[idx]?.classList.remove("no-zoom");
       });
     }
   };
