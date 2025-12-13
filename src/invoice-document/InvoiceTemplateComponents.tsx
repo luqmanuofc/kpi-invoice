@@ -164,6 +164,8 @@ export function FooterSection({ data }: { data: InvoiceForm }) {
           3. Interest @ 18% p.a. if unpaid within 30 days.
           <br />
           4. Goods once sold cannot be taken back.
+          <br />
+          5. Our responsibility ceases once goods leave our premises.
         </div>
       </div>
 
