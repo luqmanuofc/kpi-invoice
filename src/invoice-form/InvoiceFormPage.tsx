@@ -28,7 +28,36 @@ export default function InvoiceFormPage() {
     activeStep,
     setActiveStep,
     invoiceNumberExists,
+    form,
   } = useInvoice();
+
+  const handleNextFromStep0 = () => {
+    const invoiceNumber = form.getValues("invoiceNumber");
+    const buyer = form.getValues("buyer");
+
+    let hasError = false;
+
+    if (!invoiceNumber || invoiceNumber.trim() === "") {
+      form.setError("invoiceNumber", {
+        type: "manual",
+        message: "Invoice number is required",
+      });
+      hasError = true;
+    }
+
+    if (!buyer) {
+      form.setError("buyer", {
+        type: "manual",
+        message: "Buyer is required",
+      });
+      hasError = true;
+    }
+
+    if (!hasError && !invoiceNumberExists) {
+      setActiveStep(1);
+    }
+  };
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
       <Paper sx={{ p: 2, width: "100%", minWidth: "450px", mt: 3 }}>
@@ -54,7 +83,7 @@ export default function InvoiceFormPage() {
               style={{ marginTop: "1rem" }}
               fullWidth
               variant="outlined"
-              onClick={() => setActiveStep(1)}
+              onClick={handleNextFromStep0}
               disabled={invoiceNumberExists}
             >
               Next

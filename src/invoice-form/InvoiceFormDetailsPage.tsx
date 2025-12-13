@@ -23,7 +23,7 @@ import { checkInvoiceNumber } from "../api/invoices";
 
 export default function InvoiceFormDetailsPage() {
   const { form, invoiceNumberExists, setInvoiceNumberExists } = useInvoice();
-  const { control, setValue, watch } = form;
+  const { control, watch } = form;
   const navigate = useNavigate();
   const [buyers, setBuyers] = useState<Buyer[]>([]);
   const [isLoadingBuyers, setIsLoadingBuyers] = useState(true);
@@ -77,16 +77,23 @@ export default function InvoiceFormDetailsPage() {
         <Controller
           name="invoiceNumber"
           control={control}
-          render={({ field }) => (
+          render={({ field, fieldState: { error } }) => (
             <TextField
               label="Invoice Number"
               fullWidth
               {...field}
-              error={invoiceNumberExists}
+              onChange={(e) => {
+                field.onChange(e);
+                if (error) {
+                  form.clearErrors("invoiceNumber");
+                }
+              }}
+              error={invoiceNumberExists || !!error}
               helperText={
-                invoiceNumberExists
+                error?.message ||
+                (invoiceNumberExists
                   ? "This invoice number is already in use"
-                  : ""
+                  : "")
               }
               slotProps={{
                 input: {
@@ -128,38 +135,49 @@ export default function InvoiceFormDetailsPage() {
       <>
         <Stack spacing={2}>
           <Box sx={{ display: "flex", gap: 1, alignItems: "flex-start" }}>
-            <Autocomplete
-              options={buyers}
-              getOptionLabel={(option) => option.name}
-              getOptionKey={(option) => option.id}
-              isOptionEqualToValue={(option, value) => option.id === value.id}
-              loading={isLoadingBuyers}
-              value={selectedBuyer}
-              onChange={(_, value) => {
-                if (value) {
-                  setValue("buyer", value);
-                } else {
-                  setValue("buyer", null);
-                }
-              }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Select Buyer"
-                  InputProps={{
-                    ...params.InputProps,
-                    endAdornment: (
-                      <>
-                        {isLoadingBuyers ? (
-                          <CircularProgress color="inherit" size={20} />
-                        ) : null}
-                        {params.InputProps.endAdornment}
-                      </>
-                    ),
+            <Controller
+              name="buyer"
+              control={control}
+              render={({ field, fieldState: { error } }) => (
+                <Autocomplete
+                  options={buyers}
+                  getOptionLabel={(option) => option.name}
+                  getOptionKey={(option) => option.id}
+                  isOptionEqualToValue={(option, value) =>
+                    option.id === value.id
+                  }
+                  loading={isLoadingBuyers}
+                  value={field.value}
+                  onChange={(_, value) => {
+                    field.onChange(value);
+                    if (error) {
+                      form.clearErrors("buyer");
+                    }
                   }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Select Buyer"
+                      error={!!error}
+                      helperText={error?.message}
+                      slotProps={{
+                        input: {
+                          ...params.InputProps,
+                          endAdornment: (
+                            <>
+                              {isLoadingBuyers ? (
+                                <CircularProgress color="inherit" size={20} />
+                              ) : null}
+                              {params.InputProps.endAdornment}
+                            </>
+                          ),
+                        },
+                      }}
+                    />
+                  )}
+                  sx={{ flex: 1 }}
                 />
               )}
-              sx={{ flex: 1 }}
             />
             <Tooltip
               title={selectedBuyer == null ? <>Add Buyer</> : <>Edit Buyer</>}
