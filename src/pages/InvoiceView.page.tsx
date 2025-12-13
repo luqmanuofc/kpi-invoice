@@ -91,36 +91,55 @@ export default function InvoiceViewPage() {
     const pageElements = invoiceRef.current.getPageElements();
     if (!pageElements.length) return;
 
-    const pdf = new jsPDF({
-      orientation: "portrait",
-      unit: "mm",
-      format: "a4",
+    // Find all .invoice-page elements and add no-zoom class
+    const invoicePages = pageElements
+      .map((el) => el.querySelector(".invoice-page") as HTMLElement)
+      .filter(Boolean);
+
+    invoicePages.forEach((el) => {
+      el.classList.add("no-zoom");
     });
 
-    let isFirstPage = true;
+    // Wait for layout to update after removing zoom
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
-    for (const pageEl of pageElements) {
-      const canvas = await html2canvas(pageEl, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
+    try {
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
       });
 
-      const imgData = canvas.toDataURL("image/png");
-      const imgWidth = 210; // A4 width in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let isFirstPage = true;
 
-      if (!isFirstPage) {
-        pdf.addPage();
+      for (const pageEl of pageElements) {
+        const canvas = await html2canvas(pageEl, {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+        });
+
+        const imgData = canvas.toDataURL("image/png");
+        const imgWidth = 210; // A4 width in mm
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+        if (!isFirstPage) {
+          pdf.addPage();
+        }
+        pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+        isFirstPage = false;
       }
-      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
-      isFirstPage = false;
-    }
 
-    const fileName = `Invoice_${
-      invoiceData?.invoiceNumber || "draft"
-    }_${dayjs().format("YYYYMMDD")}.pdf`;
-    pdf.save(fileName);
+      const fileName = `Invoice_${
+        invoiceData?.invoiceNumber || "draft"
+      }_${dayjs().format("YYYYMMDD")}.pdf`;
+      pdf.save(fileName);
+    } finally {
+      // Remove no-zoom class to restore zoom
+      invoicePages.forEach((el) => {
+        el.classList.remove("no-zoom");
+      });
+    }
   };
 
   const handleBack = () => {

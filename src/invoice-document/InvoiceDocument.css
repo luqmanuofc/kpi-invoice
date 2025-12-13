@@ -18,6 +18,14 @@
   transform-origin: top left;
 }
 
+/* Mobile responsive scaling */
+@media (max-width: 768px) {
+  .invoice-page:not(.no-zoom) {
+    /* Use zoom to scale everything including layout dimensions */
+    zoom: calc((100vw - 32px) / 595pt);
+  }
+}
+
 .invoice-border {
   border: 2pt solid #373b75;
   position: absolute;
