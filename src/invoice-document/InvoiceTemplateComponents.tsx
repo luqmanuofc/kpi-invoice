@@ -154,7 +154,7 @@ export function FooterSection({ data }: { data: InvoiceForm }) {
           <br />
           2. Subject to Srinagar Jurisdiction.
           <br />
-          3. Interest @ 24% p.a. if unpaid within 30 days.
+          3. Interest @ 18% p.a. if unpaid within 30 days.
           <br />
           4. Goods once sold cannot be taken back.
         </div>
