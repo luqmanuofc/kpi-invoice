@@ -112,15 +112,15 @@ export function TotalsTable({ data }: { data: InvoiceForm }) {
           <td className="amount">₹{data.discount.toFixed(2)}</td>
         </tr>
         <tr>
-          <td>CGST @ {data.cgst}%</td>
+          <td>CGST @ {data.cgstRate}%</td>
           <td className="amount">₹{data.cgstAmount.toFixed(2)}</td>
         </tr>
         <tr>
-          <td>SGST @ {data.sgst}%</td>
+          <td>SGST @ {data.sgstRate}%</td>
           <td className="amount">₹{data.sgstAmount.toFixed(2)}</td>
         </tr>
         <tr>
-          <td>IGST @ {data.igst}%</td>
+          <td>IGST @ {data.igstRate}%</td>
           <td className="amount">₹{data.igstAmount.toFixed(2)}</td>
         </tr>
         <tr className="grand-total">

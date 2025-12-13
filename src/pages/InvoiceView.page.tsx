@@ -6,7 +6,7 @@ import InvoiceDocument, {
   type InvoiceDocumentHandle,
 } from "../invoice-document/InvoiceDocument";
 import { getInvoiceById, type Invoice } from "../api/invoices";
-import type { InvoiceForm } from "../invoice-form/types";
+import type { Buyer, InvoiceForm } from "../invoice-form/types";
 import dayjs from "dayjs";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
@@ -49,30 +49,38 @@ export default function InvoiceViewPage() {
   const invoiceData = useMemo<InvoiceForm | null>(() => {
     if (!invoice) return null;
 
-    if (!invoice.buyer) {
-      throw new Error("Buyer information is missing");
-    }
-
     return {
       invoiceNumber: invoice.invoiceNumber,
       vehicleNumber: invoice.vehicleNumber,
       date: dayjs(invoice.date).format("YYYY-MM-DD"),
-      buyer: invoice.buyer,
-      items: invoice.items || [],
-      discount: Number(invoice.discount),
-      cgst: invoice.cgst,
-      sgst: invoice.sgst,
-      igst: invoice.igst,
-      subtotal: Number(invoice.subtotal),
-      cgstAmount: (invoice.subtotal * invoice.cgst) / 100,
-      sgstAmount: (invoice.subtotal * invoice.sgst) / 100,
-      igstAmount: (invoice.subtotal * invoice.igst) / 100,
-      total: Number(invoice.total),
+
+      buyer: {
+        id: invoice.buyerId,
+        name: invoice.buyerNameSnapshot,
+        address: invoice.buyerAddressSnapshot,
+        gstin: invoice.buyerGstinSnapshot,
+        phone: invoice.buyerPhontSnapshot,
+      } as Buyer,
+
       sellerName: invoice.sellerNameSnapshot,
       sellerAddress: invoice.sellerAddressSnapshot,
       sellerEmail: invoice.sellerEmailSnapshot,
       sellerPhone: invoice.sellerPhoneSnapshot,
       sellerGstin: invoice.sellerGstinSnapshot,
+
+      items: invoice.items || [],
+
+      cgstRate: invoice.cgstRate,
+      sgstRate: invoice.sgstRate,
+      igstRate: invoice.igstRate,
+
+      cgstAmount: Number(invoice.cgstAmount),
+      sgstAmount: Number(invoice.sgstAmount),
+      igstAmount: Number(invoice.igstAmount),
+
+      discount: Number(invoice.discount),
+      subtotal: Number(invoice.subtotal),
+      total: Number(invoice.total),
       amountInWords: invoice.amountInWords,
     };
   }, [invoice]);

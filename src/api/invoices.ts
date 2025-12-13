@@ -1,35 +1,42 @@
 import type { InvoiceForm } from "../invoice-form/types";
-import type { Buyer } from "./buyers";
 
 export interface Invoice {
   id: string;
   invoiceNumber: string;
-  date: string;
   vehicleNumber: string;
+  date: string;
+
   buyerId: string;
   buyerNameSnapshot: string;
   buyerAddressSnapshot: string;
   buyerGstinSnapshot: string | null;
+  buyerPhontSnapshot: string | null;
+
   sellerNameSnapshot: string;
   sellerAddressSnapshot: string;
   sellerGstinSnapshot: string;
   sellerEmailSnapshot: string;
   sellerPhoneSnapshot: string;
-  subtotal: number;
-  discount: number;
+
   cgstRate: number;
   sgstRate: number;
   igstRate: number;
+
   cgstAmount: number;
   sgstAmount: number;
   igstAmount: number;
+
+  discount: number;
+  subtotal: number;
   total: number;
   amountInWords: string;
+
   status: string;
   internalNote: string | null;
+
   createdAt: string;
   updatedAt: string;
-  buyer: Buyer;
+
   items?: Array<{
     id: string;
     productId: string;
