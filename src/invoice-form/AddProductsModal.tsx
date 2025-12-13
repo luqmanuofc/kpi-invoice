@@ -11,7 +11,9 @@ import {
   CircularProgress,
   Box,
   Divider,
+  IconButton,
 } from "@mui/material";
+import { ExpandMore, ExpandLess } from "@mui/icons-material";
 import { useState, useEffect } from "react";
 import { getProducts } from "../api/products";
 import type { ProductCategory, Product } from "../api/products";
@@ -40,6 +42,9 @@ export default function AddProductsModal({
   const [selectedProductIds, setSelectedProductIds] = useState<Set<string>>(
     new Set()
   );
+  const [expandedCategories, setExpandedCategories] = useState<
+    Set<ProductCategory>
+  >(new Set());
 
   useEffect(() => {
     if (open) {
@@ -72,6 +77,18 @@ export default function AddProductsModal({
     });
   };
 
+  const handleToggleCategory = (category: ProductCategory) => {
+    setExpandedCategories((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(category)) {
+        newSet.delete(category);
+      } else {
+        newSet.add(category);
+      }
+      return newSet;
+    });
+  };
+
   const handleAddProducts = () => {
     const selectedProducts = products.filter((p) =>
       selectedProductIds.has(p.id)
@@ -98,42 +115,63 @@ export default function AddProductsModal({
           </Box>
         ) : (
           <Stack spacing={3} sx={{ mt: 1 }}>
-            {Object.entries(productsByCategory).map(([category, items]) => (
-              <Box key={category}>
-                <Typography
-                  variant="subtitle1"
-                  fontWeight="bold"
-                  color="primary"
-                  gutterBottom
-                >
-                  {CATEGORY_LABELS[category as ProductCategory]}
-                </Typography>
-                <Divider sx={{ mb: 1 }} />
-                <Stack spacing={0.5}>
-                  {items.map((product) => (
-                    <FormControlLabel
-                      key={product.id}
-                      control={
-                        <Checkbox
-                          checked={selectedProductIds.has(product.id)}
-                          onChange={() => handleToggleProduct(product.id)}
+            {Object.entries(productsByCategory).map(([category, items]) => {
+              const categoryKey = category as ProductCategory;
+              const isExpanded = expandedCategories.has(categoryKey);
+
+              return (
+                <Box key={category}>
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    sx={{ cursor: "pointer" }}
+                    onClick={() => handleToggleCategory(categoryKey)}
+                  >
+                    <IconButton size="small" sx={{ mr: 1 }}>
+                      {isExpanded ? <ExpandLess /> : <ExpandMore />}
+                    </IconButton>
+                    <Typography
+                      variant="subtitle1"
+                      fontWeight="bold"
+                      color="primary"
+                      sx={{ flexGrow: 1 }}
+                    >
+                      {CATEGORY_LABELS[categoryKey]}
+                    </Typography>
+                  </Box>
+                  <Divider sx={{ my: 1 }} />
+                  {isExpanded && (
+                    <Stack spacing={0.5} sx={{ pl: 5 }}>
+                      {items.map((product) => (
+                        <FormControlLabel
+                          key={product.id}
+                          control={
+                            <Checkbox
+                              checked={selectedProductIds.has(product.id)}
+                              onChange={() => handleToggleProduct(product.id)}
+                            />
+                          }
+                          label={
+                            <Box>
+                              <Typography variant="body1">
+                                {product.name}
+                              </Typography>
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                              >
+                                HSN: {product.hsn} | Rate: ₹
+                                {product.defaultPrice}
+                              </Typography>
+                            </Box>
+                          }
                         />
-                      }
-                      label={
-                        <Box>
-                          <Typography variant="body1">
-                            {product.name}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            HSN: {product.hsn} | Rate: ₹{product.defaultPrice}
-                          </Typography>
-                        </Box>
-                      }
-                    />
-                  ))}
-                </Stack>
-              </Box>
-            ))}
+                      ))}
+                    </Stack>
+                  )}
+                </Box>
+              );
+            })}
             {products.length === 0 && !loading && (
               <Typography color="text.secondary" align="center">
                 No products available. Please add products first.
