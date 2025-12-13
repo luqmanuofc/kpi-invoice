@@ -26,7 +26,9 @@ export function InvoiceMeta({ data }: { data: InvoiceForm }) {
   return (
     <div className="invoice-meta">
       <span>Invoice No: {data.invoiceNumber}</span>
-      <span className="center">Vehicle No: {data.vehicleNumber}</span>
+      {data.vehicleNumber && (
+        <span className="center">Vehicle No: {data.vehicleNumber}</span>
+      )}
       <span className="right">Date: {data.date}</span>
     </div>
   );
@@ -36,7 +38,7 @@ export function ReceiverSection({ data }: { data: InvoiceForm }) {
   return (
     <>
       <div className="receiver-section">
-        <div className="receiver-title">Details of Receiver (Billed To)</div>
+        <div className="receiver-title">Buyer Details</div>
 
         <div className="receiver-field">
           <label>Name:</label>
@@ -46,6 +48,11 @@ export function ReceiverSection({ data }: { data: InvoiceForm }) {
         <div className="receiver-field">
           <label>Address:</label>
           <span className="preserve-newlines">{data.buyer?.address}</span>
+        </div>
+
+        <div className="receiver-field">
+          <label>Phone:</label>
+          <span>{data?.buyer?.phone}</span>
         </div>
 
         <div className="receiver-field">
