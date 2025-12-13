@@ -49,7 +49,7 @@ export default function InvoiceFormItemsPage() {
         {fields.map((item, index) => (
           <Paper
             key={item.id}
-            sx={{ p: 2, position: "relative" }}
+            sx={{ p: 2, position: "relative", bgcolor: 'grey.50' }}
             elevation={1}
           >
             <IconButton
