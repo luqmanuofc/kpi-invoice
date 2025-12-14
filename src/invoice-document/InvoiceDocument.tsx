@@ -14,10 +14,11 @@ export type InvoiceDocumentHandle = {
 
 type Props = {
   data: InvoiceForm;
+  transformOrigin?: "top left" | "top center";
 };
 
 const InvoiceDocument = forwardRef<InvoiceDocumentHandle, Props>(
-  ({ data }, ref) => {
+  ({ data, transformOrigin }, ref) => {
     const { pages, probeRootRef } = useInvoicePaginator(data);
     const [currentPageIndex, setCurrentPageIndex] = useState(0);
 
@@ -62,6 +63,7 @@ const InvoiceDocument = forwardRef<InvoiceDocumentHandle, Props>(
                 className="invoice-page"
                 style={{
                   display: idx === currentPageIndex ? "block" : "none",
+                  transformOrigin,
                 }}
               >
                 <InvoicePage

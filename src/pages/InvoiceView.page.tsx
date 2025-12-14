@@ -205,7 +205,11 @@ export default function InvoiceViewPage() {
         </Button>
       </Box>
 
-      <InvoiceDocument data={invoiceData} ref={invoiceRef} />
+      <InvoiceDocument
+        data={invoiceData}
+        transformOrigin="top center"
+        ref={invoiceRef}
+      />
     </div>
   );
 }

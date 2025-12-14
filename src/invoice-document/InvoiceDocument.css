@@ -27,7 +27,7 @@
   background: white;
   font-family: Helvetica, Arial, sans-serif;
   color: #373b75;
-  transform-origin: top center;
+  /* transform-origin: top left; DON'T USE THIS PROPERTY HERE. ITS BEING PASSED AS A PROP BECAUSE IT NEEDS TO CHANGE BASED ON THE PAGE */
 }
 
 /* Desktop default */

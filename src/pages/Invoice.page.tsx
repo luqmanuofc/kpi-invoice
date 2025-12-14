@@ -43,7 +43,11 @@ export default function InvoicePage() {
         <InvoiceFormPage />
       </Box>
       <Box sx={{ display: { xs: "none", md: "block" } }}>
-        <InvoiceDocument data={debouncedData} ref={invoiceRef} />
+        <InvoiceDocument
+          data={debouncedData}
+          transformOrigin="top left"
+          ref={invoiceRef}
+        />
       </Box>
     </Box>
   );
