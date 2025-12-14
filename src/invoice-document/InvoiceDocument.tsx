@@ -83,43 +83,45 @@ const InvoiceDocument = forwardRef<InvoiceDocumentHandle, Props>(
         </div>
 
         {/* Toolbar */}
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 2,
-            padding: "8px 16px",
-            backgroundColor: "#f5f5f5",
-            borderRadius: "4px",
-            marginBottom: "16px",
-            width: "fit-content",
-            marginInline: "auto",
-          }}
-        >
-          <IconButton
-            onClick={handlePrevPage}
-            disabled={currentPageIndex === 0}
-            size="small"
+        {pages.length > 1 && (
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 2,
+              padding: "8px 16px",
+              backgroundColor: "#f5f5f5",
+              borderRadius: "4px",
+              marginBottom: "16px",
+              width: "fit-content",
+              marginInline: "auto",
+            }}
           >
-            <ChevronLeftIcon />
-          </IconButton>
+            <IconButton
+              onClick={handlePrevPage}
+              disabled={currentPageIndex === 0}
+              size="small"
+            >
+              <ChevronLeftIcon />
+            </IconButton>
 
-          <Typography
-            variant="body2"
-            sx={{ fontWeight: 500, minWidth: "80px", textAlign: "center" }}
-          >
-            Page {currentPageIndex + 1} of {pages.length}
-          </Typography>
+            <Typography
+              variant="body2"
+              sx={{ fontWeight: 500, minWidth: "80px", textAlign: "center" }}
+            >
+              Page {currentPageIndex + 1} of {pages.length}
+            </Typography>
 
-          <IconButton
-            onClick={handleNextPage}
-            disabled={currentPageIndex === pages.length - 1}
-            size="small"
-          >
-            <ChevronRightIcon />
-          </IconButton>
-        </Box>
+            <IconButton
+              onClick={handleNextPage}
+              disabled={currentPageIndex === pages.length - 1}
+              size="small"
+            >
+              <ChevronRightIcon />
+            </IconButton>
+          </Box>
+        )}
       </div>
     );
   }
