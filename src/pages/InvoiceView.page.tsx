@@ -91,11 +91,8 @@ export default function InvoiceViewPage() {
     const pageElements = invoiceRef.current.getPageElements();
     if (!pageElements.length) return;
 
-    // Find all .invoice-page elements and add no-zoom class
-    const invoicePages = pageElements
-      .map((el) => el.querySelector(".invoice-page") as HTMLElement)
-      .filter(Boolean);
-
+    // pageElements are already the .invoice-page divs
+    const invoicePages = pageElements;
     // Store original display styles
     const originalStyles = pageElements.map((el) => el.style.display);
 

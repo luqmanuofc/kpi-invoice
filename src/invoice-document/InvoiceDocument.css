@@ -1,6 +1,18 @@
+
 .invoice-page-wrapper {
   width: 100%;
-  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+
+  --raw-scale-desktop: calc((50vw - 32px) / 595pt);
+  --raw-scale-mobile: calc((100vw - 32px) / 595pt);
+  --scale-desktop: clamp(0, var(--raw-scale-desktop), 1);
+  --scale-mobile: clamp(0, var(--raw-scale-mobile), 1);
+  --height-desktop: calc(842pt * var(--scale-desktop));
+  --height-mobile: calc(842pt * var(--scale-mobile));
+  
+  height: var(--height-desktop);
+  overflow: hidden;
 }
 
 .invoice-page {
@@ -15,23 +27,23 @@
   background: white;
   font-family: Helvetica, Arial, sans-serif;
   color: #373b75;
-  transform-origin: top left;
+  transform-origin: top center;
 }
 
-/* Mobile responsive scaling */
+/* Desktop default */
 .invoice-page:not(.no-zoom) {
-    /* Use zoom to scale everything including layout dimensions */
-    zoom: calc((50vw - 32px) / 595pt);
-  }
+  transform: scale(var(--scale-desktop));
+}
+
+/* Mobile */
 @media (max-width: 900px) {
-/* Mobile responsive scaling */
-.invoice-page:not(.no-zoom) {
-    /* Use zoom to scale everything including layout dimensions */
-    zoom: calc((100vw - 32px) / 595pt);
+  .invoice-page-wrapper{
+    height: var(--height-mobile);
+  }
+  .invoice-page:not(.no-zoom) {
+    transform: scale(var(--scale-mobile));
   }
 }
-
-
 
 .invoice-border {
   border: 2pt solid #373b75;

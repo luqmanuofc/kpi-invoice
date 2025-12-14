@@ -36,47 +36,45 @@ export default function InvoicePage({
   totalPages,
 }: Props) {
   return (
-    <div className="invoice-page">
-      <div className="invoice-border">
-        <TaxLabel />
+    <div className="invoice-border">
+      <TaxLabel />
 
-        <HeaderSection data={data} />
+      <HeaderSection data={data} />
 
-        <hr className="divider" />
+      <hr className="divider" />
 
-        <InvoiceMeta data={data} />
+      <InvoiceMeta data={data} />
 
-        <hr className="divider" />
+      <hr className="divider" />
 
-        {isFirstPage && <ReceiverSection data={data} />}
+      {isFirstPage && <ReceiverSection data={data} />}
 
-        {(items.length > 0 || isFirstPage) && (
-          <table className="items-table">
-            <ItemsTableHeader />
+      {(items.length > 0 || isFirstPage) && (
+        <table className="items-table">
+          <ItemsTableHeader />
 
-            <tbody>
-              {items.map((item, idx) => {
-                const serial = rowStartIndex + idx + 1;
-                return <ItemsTableRow key={idx} item={item} serial={serial} />;
-              })}
-            </tbody>
-          </table>
-        )}
+          <tbody>
+            {items.map((item, idx) => {
+              const serial = rowStartIndex + idx + 1;
+              return <ItemsTableRow key={idx} item={item} serial={serial} />;
+            })}
+          </tbody>
+        </table>
+      )}
 
-        {showTotals && (
-          <>
-            <TotalsTable data={data} />
-            <div className="clear-float"></div>
-          </>
-        )}
+      {showTotals && (
+        <>
+          <TotalsTable data={data} />
+          <div className="clear-float"></div>
+        </>
+      )}
 
-        {showWords && <AmountWordsSection data={data} />}
+      {showWords && <AmountWordsSection data={data} />}
 
-        {showFooter && <FooterSection data={data} />}
+      {showFooter && <FooterSection data={data} />}
 
-        <div className="page-number-label">
-          Page {pageNumber} of {totalPages}
-        </div>
+      <div className="page-number-label">
+        Page {pageNumber} of {totalPages}
       </div>
     </div>
   );

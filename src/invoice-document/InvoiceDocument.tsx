@@ -59,9 +59,8 @@ const InvoiceDocument = forwardRef<InvoiceDocumentHandle, Props>(
                 ref={(el) => {
                   if (el) pageRefs[idx] = el;
                 }}
+                className="invoice-page"
                 style={{
-                  width: "fit-content",
-                  marginInline: "auto",
                   display: idx === currentPageIndex ? "block" : "none",
                 }}
               >
