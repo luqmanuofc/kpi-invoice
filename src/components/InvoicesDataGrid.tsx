@@ -65,8 +65,21 @@ export default function InvoicesDataGrid({
     navigate(`/invoice/${id}?returnUrl=${returnUrl}`);
   };
 
-  const handleBuyerClick = (buyerId: string) => {
-    navigate(`/buyer/${buyerId}`);
+  const handleRowClick = (params: any, event: any) => {
+    // Don't navigate if clicking on status or actions column
+    const target = event.target as HTMLElement;
+    const isStatusClick =
+      target.closest(".MuiSelect-root") ||
+      target.closest(".MuiMenuItem-root") ||
+      target.closest('[role="button"]');
+    const isActionsClick =
+      target.closest(".MuiIconButton-root") ||
+      params.field === "actions" ||
+      params.field === "status";
+
+    if (!isStatusClick && !isActionsClick) {
+      handleViewClick(params.id);
+    }
   };
 
   const handleStatusChange = async (
@@ -256,6 +269,12 @@ export default function InvoicesDataGrid({
           }}
           pageSizeOptions={[5, 10, 25]}
           checkboxSelection={showCheckboxes}
+          onCellClick={handleRowClick}
+          sx={{
+            "& .MuiDataGrid-row": {
+              cursor: "pointer",
+            },
+          }}
         />
       </Box>
 
