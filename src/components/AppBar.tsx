@@ -1,50 +1,100 @@
-import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+  Box,
+  IconButton,
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 export default function NavigationAppBar() {
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const menuItems = [
+    { label: "Create Invoice", path: "/" },
+    { label: "Invoices", path: "/invoices" },
+    { label: "Buyers", path: "/buyer" },
+    { label: "Products", path: "/products" },
+  ];
+
+  const handleDrawerToggle = () => {
+    setDrawerOpen(!drawerOpen);
+  };
+
+  const handleNavigate = (path: string) => {
+    navigate(path);
+    setDrawerOpen(false);
+  };
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: "#373b75" }}>
-      <Toolbar>
-        <Typography
-          variant="h6"
-          component="div"
-          sx={{ flexGrow: 1, textAlign: "left" }}
+    <>
+      <AppBar position="static" sx={{ backgroundColor: "#373b75" }}>
+        <Toolbar>
+          <Typography
+            variant="h6"
+            component="div"
+            sx={{ flexGrow: 1, textAlign: "left" }}
+          >
+            KPI
+          </Typography>
+
+          {isMobile ? (
+            <IconButton
+              color="inherit"
+              edge="end"
+              onClick={handleDrawerToggle}
+              aria-label="menu"
+            >
+              <MenuIcon />
+            </IconButton>
+          ) : (
+            <Box sx={{ display: "flex", gap: 2 }}>
+              {menuItems.map((item) => (
+                <Button
+                  key={item.path}
+                  color="inherit"
+                  onClick={() => navigate(item.path)}
+                  sx={{ textTransform: "none" }}
+                >
+                  {item.label}
+                </Button>
+              ))}
+            </Box>
+          )}
+        </Toolbar>
+      </AppBar>
+
+      <Drawer anchor="right" open={drawerOpen} onClose={handleDrawerToggle}>
+        <Box
+          sx={{ width: 250 }}
+          role="presentation"
+          onClick={handleDrawerToggle}
+          onKeyDown={handleDrawerToggle}
         >
-          KPI
-        </Typography>
-        <Box sx={{ display: "flex", gap: 2 }}>
-          <Button
-            color="inherit"
-            onClick={() => navigate("/")}
-            sx={{ textTransform: "none" }}
-          >
-            Create Invoice
-          </Button>
-          <Button
-            color="inherit"
-            onClick={() => navigate("/invoices")}
-            sx={{ textTransform: "none" }}
-          >
-            Invoices
-          </Button>
-          <Button
-            color="inherit"
-            onClick={() => navigate("/buyer")}
-            sx={{ textTransform: "none" }}
-          >
-            Buyers
-          </Button>
-          <Button
-            color="inherit"
-            onClick={() => navigate("/products")}
-            sx={{ textTransform: "none" }}
-          >
-            Products
-          </Button>
+          <List>
+            {menuItems.map((item) => (
+              <ListItem key={item.path} disablePadding>
+                <ListItemButton onClick={() => handleNavigate(item.path)}>
+                  <ListItemText primary={item.label} />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
         </Box>
-      </Toolbar>
-    </AppBar>
+      </Drawer>
+    </>
   );
 }
