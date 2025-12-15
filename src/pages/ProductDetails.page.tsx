@@ -99,6 +99,14 @@ export default function ProductDetailsPage() {
     navigate(`/products/edit/${id}`);
   };
 
+  const handleStatusChange = (updatedInvoice: Invoice) => {
+    setInvoices((prevInvoices) =>
+      prevInvoices.map((invoice) =>
+        invoice.id === updatedInvoice.id ? updatedInvoice : invoice
+      )
+    );
+  };
+
   if (isFetching) {
     return (
       <Box
@@ -236,6 +244,7 @@ export default function ProductDetailsPage() {
           setInvoicesPageSize(newPageSize);
           setInvoicesPage(1);
         }}
+        onStatusChange={handleStatusChange}
       />
     </Box>
   );

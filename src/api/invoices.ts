@@ -31,7 +31,7 @@ export interface Invoice {
   total: number;
   amountInWords: string;
 
-  status: string;
+  status: "pending" | "paid" | "void";
   internalNote: string | null;
 
   createdAt: string;
@@ -155,6 +155,35 @@ export async function checkInvoiceNumber(
   if (!response.ok) {
     const text = await response.text();
     throw new Error(`Check invoice number failed: ${text}`);
+  }
+
+  return response.json();
+}
+
+export async function updateInvoiceStatus(
+  id: string,
+  status: "pending" | "paid" | "void"
+): Promise<Invoice> {
+  const statusMap = {
+    pending: "PENDING",
+    paid: "PAID",
+    void: "VOID",
+  };
+
+  const response = await fetch("/.netlify/functions/updateInvoiceStatus", {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      id,
+      status: statusMap[status],
+    }),
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`Update invoice status failed: ${text}`);
   }
 
   return response.json();

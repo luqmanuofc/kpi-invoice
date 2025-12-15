@@ -37,7 +37,13 @@ export default async function handler(request: Request) {
       });
     }
 
-    return new Response(JSON.stringify(invoice), {
+    // Map status to lowercase for frontend
+    const invoiceWithLowercaseStatus = {
+      ...invoice,
+      status: invoice.status.toLowerCase(),
+    };
+
+    return new Response(JSON.stringify(invoiceWithLowercaseStatus), {
       status: 200,
       headers: {
         "Content-Type": "application/json",

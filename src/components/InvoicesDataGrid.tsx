@@ -1,9 +1,19 @@
-import { Box, Button, CircularProgress, Alert } from "@mui/material";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Alert,
+  Select,
+  MenuItem,
+  Chip,
+} from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import type { GridColDef } from "@mui/x-data-grid";
 import { useNavigate, useLocation } from "react-router-dom";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import type { Invoice } from "../api/invoices";
+import { updateInvoiceStatus } from "../api/invoices";
+import { useState } from "react";
 
 interface InvoicesDataGridProps {
   invoices: Invoice[];
@@ -16,6 +26,7 @@ interface InvoicesDataGridProps {
   pageSize?: number;
   onPageChange?: (page: number) => void;
   onPageSizeChange?: (pageSize: number) => void;
+  onStatusChange?: (updatedInvoice: Invoice) => void;
 }
 
 export default function InvoicesDataGrid({
@@ -29,9 +40,11 @@ export default function InvoicesDataGrid({
   pageSize = 10,
   onPageChange,
   onPageSizeChange,
+  onStatusChange,
 }: InvoicesDataGridProps) {
   const navigate = useNavigate();
   const location = useLocation();
+  const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
 
   const handleViewClick = (id: string) => {
     const returnUrl = encodeURIComponent(location.pathname);
@@ -40,6 +53,21 @@ export default function InvoicesDataGrid({
 
   const handleBuyerClick = (buyerId: string) => {
     navigate(`/buyer/${buyerId}`);
+  };
+
+  const handleStatusChange = async (
+    invoiceId: string,
+    newStatus: "pending" | "paid" | "void"
+  ) => {
+    setUpdatingStatus(invoiceId);
+    try {
+      const updatedInvoice = await updateInvoiceStatus(invoiceId, newStatus);
+      onStatusChange?.(updatedInvoice);
+    } catch (error) {
+      console.error("Failed to update invoice status:", error);
+    } finally {
+      setUpdatingStatus(null);
+    }
   };
 
   const columns: GridColDef[] = [
@@ -90,6 +118,43 @@ export default function InvoicesDataGrid({
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         })}`;
+      },
+    },
+    {
+      field: "status",
+      headerName: "Status",
+      width: 150,
+      renderCell: (params) => {
+        const isUpdating = updatingStatus === params.row.id;
+        return (
+          <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
+            {isUpdating ? (
+              <CircularProgress size={20} />
+            ) : (
+              <Select
+                value={params.row.status}
+                onChange={(e) =>
+                  handleStatusChange(
+                    params.row.id,
+                    e.target.value as "pending" | "paid" | "void"
+                  )
+                }
+                size="small"
+                sx={{ width: "100%" }}
+              >
+                <MenuItem value="pending">
+                  <Chip label="Pending" color="warning" size="small" />
+                </MenuItem>
+                <MenuItem value="paid">
+                  <Chip label="Paid" color="success" size="small" />
+                </MenuItem>
+                <MenuItem value="void">
+                  <Chip label="Void" color="error" size="small" />
+                </MenuItem>
+              </Select>
+            )}
+          </Box>
+        );
       },
     },
     {

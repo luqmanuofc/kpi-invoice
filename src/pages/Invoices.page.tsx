@@ -35,6 +35,14 @@ export default function InvoicesPage() {
     navigate("/");
   };
 
+  const handleStatusChange = (updatedInvoice: Invoice) => {
+    setInvoices((prevInvoices) =>
+      prevInvoices.map((invoice) =>
+        invoice.id === updatedInvoice.id ? updatedInvoice : invoice
+      )
+    );
+  };
+
   return (
     <div style={{ margin: "2rem" }}>
       <Box
@@ -67,6 +75,7 @@ export default function InvoicesPage() {
           setPageSize(newPageSize);
           setPage(1);
         }}
+        onStatusChange={handleStatusChange}
       />
     </div>
   );

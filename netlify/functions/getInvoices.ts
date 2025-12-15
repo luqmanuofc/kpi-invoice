@@ -48,9 +48,15 @@ export default async function handler(request: Request) {
 
     const totalPages = Math.ceil(totalCount / pageSize);
 
+    // Map status to lowercase for frontend
+    const invoicesWithLowercaseStatus = invoices.map((invoice) => ({
+      ...invoice,
+      status: invoice.status.toLowerCase(),
+    }));
+
     return new Response(
       JSON.stringify({
-        invoices,
+        invoices: invoicesWithLowercaseStatus,
         pagination: {
           page,
           pageSize,

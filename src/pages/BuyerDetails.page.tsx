@@ -90,6 +90,14 @@ export default function BuyerDetailsPage() {
     navigate(`/buyer/edit/${id}`);
   };
 
+  const handleStatusChange = (updatedInvoice: Invoice) => {
+    setInvoices((prevInvoices) =>
+      prevInvoices.map((invoice) =>
+        invoice.id === updatedInvoice.id ? updatedInvoice : invoice
+      )
+    );
+  };
+
   if (isFetching) {
     return (
       <Box
@@ -219,6 +227,7 @@ export default function BuyerDetailsPage() {
           setInvoicesPageSize(newPageSize);
           setInvoicesPage(1);
         }}
+        onStatusChange={handleStatusChange}
       />
     </Box>
   );
