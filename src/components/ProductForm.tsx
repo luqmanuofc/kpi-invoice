@@ -1,5 +1,5 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import {
   Box,
   TextField,
@@ -49,8 +49,14 @@ export default function ProductForm({
     handleSubmit,
     formState: { errors },
     reset,
+    control,
   } = useForm<ProductFormData>({
-    defaultValues: initialData,
+    defaultValues: initialData || {
+      name: "",
+      category: "" as ProductCategory,
+      hsn: "",
+      defaultPrice: 0,
+    },
   });
 
   useEffect(() => {
@@ -135,20 +141,42 @@ export default function ProductForm({
             fullWidth
           />
 
-          <TextField
-            label="Category"
-            select
-            {...register("category", { required: "Category is required" })}
-            error={!!errors.category}
-            helperText={errors.category?.message}
-            fullWidth
-          >
-            {PRODUCT_CATEGORIES.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
-              </MenuItem>
-            ))}
-          </TextField>
+          <Controller
+            name="category"
+            control={control}
+            rules={{ required: "Category is required" }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Category"
+                select
+                error={!!errors.category}
+                helperText={errors.category?.message}
+                fullWidth
+                SelectProps={{
+                  MenuProps: {
+                    anchorOrigin: {
+                      vertical: "bottom",
+                      horizontal: "left",
+                    },
+                    transformOrigin: {
+                      vertical: "top",
+                      horizontal: "left",
+                    },
+                  },
+                }}
+                inputProps={{
+                  sx: { textAlign: "left" },
+                }}
+              >
+                {PRODUCT_CATEGORIES.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </TextField>
+            )}
+          />
 
           <TextField
             label="HSN Code"
