@@ -1,19 +1,26 @@
 import {
   Box,
-  Button,
   CircularProgress,
   Alert,
   Select,
   MenuItem,
   Chip,
+  IconButton,
+  Menu,
+  ListItemIcon,
+  ListItemText,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import type { GridColDef } from "@mui/x-data-grid";
 import { useNavigate, useLocation } from "react-router-dom";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import HistoryIcon from "@mui/icons-material/History";
 import type { Invoice } from "../api/invoices";
 import { updateInvoiceStatus } from "../api/invoices";
 import { useState } from "react";
+import StatusLogsModal from "./StatusLogsModal";
 
 interface InvoicesDataGridProps {
   invoices: Invoice[];
@@ -45,6 +52,13 @@ export default function InvoicesDataGrid({
   const navigate = useNavigate();
   const location = useLocation();
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
+  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(
+    null
+  );
+  const [logsModalOpen, setLogsModalOpen] = useState(false);
+  const [logsInvoiceId, setLogsInvoiceId] = useState<string>("");
+  const [logsInvoiceNumber, setLogsInvoiceNumber] = useState<string>("");
 
   const handleViewClick = (id: string) => {
     const returnUrl = encodeURIComponent(location.pathname);
@@ -68,6 +82,43 @@ export default function InvoicesDataGrid({
     } finally {
       setUpdatingStatus(null);
     }
+  };
+
+  const handleMenuOpen = (
+    event: React.MouseEvent<HTMLElement>,
+    invoiceId: string
+  ) => {
+    setMenuAnchorEl(event.currentTarget);
+    setSelectedInvoiceId(invoiceId);
+  };
+
+  const handleMenuClose = () => {
+    setMenuAnchorEl(null);
+    setSelectedInvoiceId(null);
+  };
+
+  const handleMenuAction = (action: "view" | "duplicate" | "logs") => {
+    if (!selectedInvoiceId) return;
+
+    switch (action) {
+      case "view":
+        handleViewClick(selectedInvoiceId);
+        break;
+      case "duplicate":
+        // TODO: Implement duplicate functionality
+        console.log("Duplicate invoice:", selectedInvoiceId);
+        break;
+      case "logs":
+        const invoice = invoices.find((inv) => inv.id === selectedInvoiceId);
+        if (invoice) {
+          setLogsInvoiceId(selectedInvoiceId);
+          setLogsInvoiceNumber(invoice.invoiceNumber);
+          setLogsModalOpen(true);
+        }
+        break;
+    }
+
+    handleMenuClose();
   };
 
   const columns: GridColDef[] = [
@@ -160,19 +211,16 @@ export default function InvoicesDataGrid({
     {
       field: "actions",
       headerName: "Actions",
-      width: 100,
+      width: 80,
       sortable: false,
       disableColumnMenu: true,
       renderCell: (params) => (
-        <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
-          <Button
-            startIcon={<VisibilityIcon />}
-            variant="outlined"
-            onClick={() => handleViewClick(params.row.id)}
-          >
-            View
-          </Button>
-        </Box>
+        <IconButton
+          onClick={(e) => handleMenuOpen(e, params.row.id)}
+          size="small"
+        >
+          <MoreVertIcon />
+        </IconButton>
       ),
     },
   ];
@@ -220,6 +268,46 @@ export default function InvoicesDataGrid({
           checkboxSelection={showCheckboxes}
         />
       </Box>
+
+      <Menu
+        anchorEl={menuAnchorEl}
+        open={Boolean(menuAnchorEl)}
+        onClose={handleMenuClose}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "right",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
+      >
+        <MenuItem onClick={() => handleMenuAction("view")}>
+          <ListItemIcon>
+            <VisibilityIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>View Invoice</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={() => handleMenuAction("duplicate")}>
+          <ListItemIcon>
+            <ContentCopyIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Duplicate Invoice</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={() => handleMenuAction("logs")}>
+          <ListItemIcon>
+            <HistoryIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>View Logs</ListItemText>
+        </MenuItem>
+      </Menu>
+
+      <StatusLogsModal
+        open={logsModalOpen}
+        onClose={() => setLogsModalOpen(false)}
+        invoiceId={logsInvoiceId}
+        invoiceNumber={logsInvoiceNumber}
+      />
     </Box>
   );
 }

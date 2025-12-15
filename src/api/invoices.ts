@@ -188,3 +188,32 @@ export async function updateInvoiceStatus(
 
   return response.json();
 }
+
+export interface InvoiceStatusLog {
+  id: string;
+  invoiceId: string;
+  oldStatus: "pending" | "paid" | "void";
+  newStatus: "pending" | "paid" | "void";
+  changedAt: string;
+}
+
+export async function getInvoiceStatusLogs(
+  invoiceId: string
+): Promise<InvoiceStatusLog[]> {
+  const response = await fetch(
+    `/.netlify/functions/getInvoiceStatusLogs?invoiceId=${invoiceId}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`Get invoice status logs failed: ${text}`);
+  }
+
+  return response.json();
+}
