@@ -1,8 +1,4 @@
-import {
-  Typography,
-  Box,
-  Button,
-} from "@mui/material";
+import { Typography, Box, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getInvoices, type Invoice } from "../api/invoices";
@@ -61,7 +57,7 @@ export default function InvoicesPage() {
         invoices={invoices}
         isLoading={isLoading}
         error={error}
-        showCheckboxes={true}
+        showCheckboxes={false}
         paginationMode="server"
         rowCount={totalCount}
         page={page - 1}

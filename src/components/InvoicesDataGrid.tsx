@@ -1,10 +1,4 @@
-import {
-  Box,
-  Button,
-  Chip,
-  CircularProgress,
-  Alert,
-} from "@mui/material";
+import { Box, Button, CircularProgress, Alert } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import type { GridColDef } from "@mui/x-data-grid";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -28,7 +22,7 @@ export default function InvoicesDataGrid({
   invoices,
   isLoading = false,
   error = null,
-  showCheckboxes = true,
+  showCheckboxes = false,
   paginationMode = "client",
   rowCount,
   page = 0,
@@ -62,7 +56,7 @@ export default function InvoicesDataGrid({
       field: "buyerNameSnapshot",
       headerName: "Buyer",
       flex: 1,
-      minWidth: 200,
+      minWidth: 150,
       renderCell: (params) => (
         <Box
           sx={{
@@ -79,11 +73,6 @@ export default function InvoicesDataGrid({
       ),
     },
     {
-      field: "vehicleNumber",
-      headerName: "Vehicle",
-      width: 130,
-    },
-    {
       field: "items",
       headerName: "Total Items",
       width: 110,
@@ -91,25 +80,6 @@ export default function InvoicesDataGrid({
       valueGetter: (value: Invoice["items"]) => {
         return value?.length || 0;
       },
-    },
-    {
-      field: "itemDescriptions",
-      headerName: "Items",
-      flex: 1,
-      minWidth: 300,
-      sortable: false,
-      renderCell: (params) => (
-        <Box sx={{ display: "flex", gap: 0.5, flexWrap: "wrap", py: 0.5 }}>
-          {params.row.items?.map((item: any, index: number) => (
-            <Chip
-              key={index}
-              label={item.description}
-              size="small"
-              variant="outlined"
-            />
-          )) || null}
-        </Box>
-      ),
     },
     {
       field: "total",
