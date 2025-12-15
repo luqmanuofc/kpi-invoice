@@ -5,6 +5,7 @@ import "./index.css";
 import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
 import { InvoiceProvider } from "./contexts/InvoiceProvider.tsx";
 import { BrowserRouter } from "react-router-dom";
+import { registerSW } from "virtual:pwa-register";
 
 const theme = createTheme({
   palette: {
@@ -12,6 +13,17 @@ const theme = createTheme({
     primary: {
       main: "#373b75",
     },
+  },
+});
+
+const updateSW = registerSW({
+  onNeedRefresh() {
+    if (confirm("New content available. Reload?")) {
+      updateSW(true);
+    }
+  },
+  onOfflineReady() {
+    console.log("App ready to work offline");
   },
 });
 

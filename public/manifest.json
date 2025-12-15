@@ -1,0 +1,23 @@
+{
+  "name": "KPI Invoice",
+  "short_name": "KPI",
+  "description": "KPI Invoice Management Application",
+  "theme_color": "#373b75",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "scope": "/",
+  "start_url": "/",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
