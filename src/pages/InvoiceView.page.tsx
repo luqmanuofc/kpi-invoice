@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo, useRef } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { Box, CircularProgress, Alert, Button } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import PrintIcon from "@mui/icons-material/Print";
 import InvoiceDocument, {
   type InvoiceDocumentHandle,
 } from "../invoice-document/InvoiceDocument";
@@ -145,6 +146,73 @@ export default function InvoiceViewPage() {
     }
   };
 
+  const printPDF = async () => {
+    if (!invoiceRef.current) return;
+
+    const pageElements = invoiceRef.current.getPageElements();
+    if (!pageElements.length) return;
+
+    const invoicePages = pageElements;
+    const originalStyles = pageElements.map((el) => el.style.display);
+
+    try {
+      // Show all pages and remove zoom for PDF generation
+      pageElements.forEach((el, idx) => {
+        el.style.display = "block";
+        invoicePages[idx]?.classList.add("no-zoom");
+      });
+
+      // Wait for layout to update
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      });
+
+      let isFirstPage = true;
+
+      for (const pageEl of pageElements) {
+        const canvas = await html2canvas(pageEl, {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+        });
+
+        const imgData = canvas.toDataURL("image/png");
+        const imgWidth = 210; // A4 width in mm
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+        if (!isFirstPage) {
+          pdf.addPage();
+        }
+        pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+        isFirstPage = false;
+      }
+
+      // Create a blob URL and open it for printing
+      const pdfBlob = pdf.output("blob");
+      const blobUrl = URL.createObjectURL(pdfBlob);
+
+      // Open in new window and trigger print
+      const printWindow = window.open(blobUrl);
+      if (printWindow) {
+        printWindow.onload = () => {
+          printWindow.print();
+          // Clean up the blob URL after a delay
+          setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+        };
+      }
+    } finally {
+      // Restore original display styles and remove no-zoom class
+      pageElements.forEach((el, idx) => {
+        el.style.display = originalStyles[idx];
+        invoicePages[idx]?.classList.remove("no-zoom");
+      });
+    }
+  };
+
   const handleBack = () => {
     const returnUrl = searchParams.get("returnUrl") || "/invoices";
     navigate(returnUrl);
@@ -195,14 +263,24 @@ export default function InvoiceViewPage() {
         >
           Back
         </Button>
-        <Button
-          variant="contained"
-          size="small"
-          startIcon={<GridDownloadIcon />}
-          onClick={downloadPDF}
-        >
-          Download
-        </Button>
+        <Box sx={{ display: "flex", gap: 1 }}>
+          <Button
+            variant="contained"
+            size="small"
+            startIcon={<GridDownloadIcon />}
+            onClick={downloadPDF}
+          >
+            Download
+          </Button>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<PrintIcon />}
+            onClick={printPDF}
+          >
+            Print
+          </Button>
+        </Box>
       </Box>
 
       <InvoiceDocument
