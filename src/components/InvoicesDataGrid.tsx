@@ -136,20 +136,10 @@ export default function InvoicesDataGrid({
       headerName: "Buyer",
       flex: 1,
       minWidth: 150,
-      renderCell: (params) => (
-        <Box
-          sx={{
-            cursor: "pointer",
-            color: "primary.main",
-            "&:hover": {
-              textDecoration: "underline",
-            },
-          }}
-          onClick={() => handleBuyerClick(params.row.buyerId)}
-        >
-          {params.value}
-        </Box>
-      ),
+      valueFormatter: (value) => {
+        return new Date(value).toLocaleDateString();
+      },
+      renderCell: (params) => <>{params.value}</>,
     },
     {
       field: "items",
