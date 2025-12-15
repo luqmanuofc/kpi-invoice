@@ -8,8 +8,10 @@ import {
   CardContent,
   CardActionArea,
   Divider,
+  IconButton,
+  Collapse,
 } from "@mui/material";
-import { Add } from "@mui/icons-material";
+import { Add, ExpandMore } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useMemo } from "react";
 import {
@@ -39,6 +41,13 @@ export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [expandedCategories, setExpandedCategories] = useState<Record<ProductCategory, boolean>>({
+    PVC_PIPE: false,
+    PVC_BEND: false,
+    PVC_CHANNEL: false,
+    WIRE: false,
+    ELECTRICAL_ACCESSORY: false,
+  });
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -78,6 +87,13 @@ export default function ProductsPage() {
 
   const handleProductClick = (productId: string) => {
     navigate(`/products/${productId}`);
+  };
+
+  const toggleCategory = (category: ProductCategory) => {
+    setExpandedCategories((prev) => ({
+      ...prev,
+      [category]: !prev[category],
+    }));
   };
 
   if (isLoading) {
@@ -124,33 +140,47 @@ export default function ProductsPage() {
       )}
 
       {CATEGORIES.map((category) => (
-        <Box key={category} sx={{ mb: 5 }}>
-          <Typography
-            variant="h6"
-            fontWeight={400}
-            align="left"
-            sx={{
-              mb: 3,
-              pb: 1,
-              width: "100%",
-              borderColor: "primary.main",
-              display: "inline-block",
-            }}
-          >
-            {CATEGORY_LABELS[category]}
-          </Typography>
-
+        <Box key={category} sx={{ mb: 3 }}>
           <Box
             sx={{
-              display: "grid",
-              gridTemplateColumns: {
-                xs: "1fr",
-                sm: "repeat(auto-fill, minmax(250px, 1fr))",
-              },
-              gap: 3,
-              justifyItems: "start",
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              mb: 2,
+              cursor: "pointer",
             }}
+            onClick={() => toggleCategory(category)}
           >
+            <IconButton
+              sx={{
+                transform: expandedCategories[category] ? "rotate(180deg)" : "rotate(0deg)",
+                transition: "transform 0.3s ease",
+              }}
+              size="small"
+            >
+              <ExpandMore />
+            </IconButton>
+            <Typography variant="h6" fontWeight={400}>
+              {CATEGORY_LABELS[category]}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
+              ({productsByCategory[category]?.length || 0})
+            </Typography>
+          </Box>
+
+          <Collapse in={expandedCategories[category]} timeout="auto">
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: {
+                  xs: "1fr",
+                  sm: "repeat(auto-fill, minmax(250px, 1fr))",
+                },
+                gap: 3,
+                justifyItems: "start",
+                ml: 6,
+              }}
+            >
             {productsByCategory[category]?.map((product) => (
               <Card
                 key={product.id}
@@ -262,6 +292,7 @@ export default function ProductsPage() {
               </Box>
             )}
           </Box>
+          </Collapse>
         </Box>
       ))}
     </Box>
