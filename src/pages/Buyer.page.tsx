@@ -4,50 +4,79 @@ import {
   Button,
   CircularProgress,
   Alert,
+  Card,
+  CardContent,
+  CardActions,
 } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
-import type { GridColDef } from "@mui/x-data-grid";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getBuyers, type Buyer } from "../api/buyers";
+import BuyerDrawer from "../components/BuyerDrawer";
 
 export default function BuyerPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [buyers, setBuyers] = useState<Buyer[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerMode, setDrawerMode] = useState<"create" | "edit">("create");
+  const [selectedBuyerId, setSelectedBuyerId] = useState<string | undefined>();
+
+  const fetchBuyers = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const data = await getBuyers();
+      setBuyers(data);
+    } catch (err: any) {
+      setError(err.message || "Failed to load buyers");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchBuyers = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const data = await getBuyers();
-        setBuyers(data);
-      } catch (err: any) {
-        setError(err.message || "Failed to load buyers");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchBuyers();
   }, []);
+
+  // Handle URL-based drawer state
+  useEffect(() => {
+    const path = location.pathname;
+
+    if (path === "/buyer/create") {
+      setDrawerMode("create");
+      setSelectedBuyerId(undefined);
+      setDrawerOpen(true);
+    } else if (path.match(/^\/buyer\/([^/]+)\/edit$/)) {
+      const buyerId = path.split("/")[2];
+      setDrawerMode("edit");
+      setSelectedBuyerId(buyerId);
+      setDrawerOpen(true);
+    } else if (path === "/buyer" || path === "/buyer/") {
+      setDrawerOpen(false);
+    }
+  }, [location.pathname]);
 
   const handleCreateClick = () => {
     navigate("/buyer/create");
   };
 
-  const handleRowClick = (params: any) => {
-    navigate(`/buyer/${params.id}`);
+  const handleEditClick = (buyerId: string) => {
+    navigate(`/buyer/${buyerId}/edit`);
   };
 
-  const columns: GridColDef[] = [
-    { field: "name", headerName: "Name", width: 200 },
-    { field: "address", headerName: "Address", flex: 1, minWidth: 300 },
-    { field: "gstin", headerName: "GSTIN", width: 150 },
-    { field: "phone", headerName: "Phone", width: 150 },
-  ];
+  const handleDrawerClose = () => {
+    navigate("/buyer");
+  };
+
+  const handleDrawerSuccess = () => {
+    fetchBuyers();
+  };
+
+  const handleViewInvoicesClick = (buyerId: string) => {
+    navigate(`/invoices?buyerId=${buyerId}`);
+  };
 
   if (isLoading) {
     return (
@@ -69,10 +98,15 @@ export default function BuyerPage() {
       <Box
         display={"flex"}
         justifyContent={"space-between"}
-        alignContent={"center"}
+        alignContent={"left"}
         p={1}
       >
-        <Typography variant="h6" sx={{ mb: 3 }}>
+        <Typography
+          variant="h6"
+          textAlign={"left"}
+          fontWeight={400}
+          sx={{ mb: 3 }}
+        >
           Buyers
         </Typography>
         <div>
@@ -89,28 +123,86 @@ export default function BuyerPage() {
         </Alert>
       )}
 
-      <Box sx={{ height: 600, width: "100%" }}>
-        <DataGrid
-          rows={buyers}
-          columns={columns}
-          initialState={{
-            pagination: {
-              paginationModel: { page: 0, pageSize: 10 },
-            },
-            columns: {
-              columnVisibilityModel: {},
-            },
-          }}
-          pageSizeOptions={[5, 10, 25]}
-          checkboxSelection
-          onRowClick={handleRowClick}
-          sx={{
-            "& .MuiDataGrid-row": {
-              cursor: "pointer",
-            },
-          }}
-        />
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: {
+            xs: "1fr",
+            sm: "repeat(2, 1fr)",
+            md: "repeat(3, 1fr)",
+          },
+          gap: 3,
+        }}
+      >
+        {buyers.map((buyer) => (
+          <Card
+            key={buyer.id}
+            sx={{
+              width: "100%",
+              borderRadius: 2,
+              transition: "all 0.3s ease",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+              bgcolor: "grey.50",
+              border: "1px solid",
+              borderColor: "grey.200",
+              "&:hover": {
+                boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
+                transform: "translateY(-4px)",
+                bgcolor: "background.paper",
+              },
+            }}
+          >
+            <CardContent sx={{ flexGrow: 1 }}>
+              <Typography variant="h6" component="div" gutterBottom>
+                {buyer.name}
+              </Typography>
+              <Typography
+                variant="body2"
+                align="left"
+                color="text.secondary"
+                sx={{ mb: 1 }}
+              >
+                <strong>Address:</strong> {buyer.address}
+              </Typography>
+              <Typography
+                variant="body2"
+                align="left"
+                color="text.secondary"
+                sx={{ mb: 1 }}
+              >
+                <strong>GSTIN:</strong> {buyer.gstin || "N/A"}
+              </Typography>
+              <Typography variant="body2" align="left" color="text.secondary">
+                <strong>Phone:</strong> {buyer.phone || "N/A"}
+              </Typography>
+            </CardContent>
+            <CardActions sx={{ justifyContent: "flex-end", p: 2, pt: 0 }}>
+              <Button
+                size="small"
+                variant="outlined"
+                onClick={() => handleEditClick(buyer.id)}
+              >
+                Edit
+              </Button>
+              <Button
+                size="small"
+                variant="contained"
+                onClick={() => handleViewInvoicesClick(buyer.id)}
+              >
+                View Invoices
+              </Button>
+            </CardActions>
+          </Card>
+        ))}
       </Box>
+
+      <BuyerDrawer
+        open={drawerOpen}
+        onClose={handleDrawerClose}
+        mode={drawerMode}
+        buyerId={selectedBuyerId}
+        onSuccess={handleDrawerSuccess}
+      />
     </div>
   );
 }
