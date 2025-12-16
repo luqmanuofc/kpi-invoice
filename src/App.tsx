@@ -7,9 +7,6 @@ import InvoicesPage from "./pages/Invoices.page";
 import InvoiceViewPage from "./pages/InvoiceView.page";
 import BuyerPage from "./pages/Buyer.page";
 import ProductsPage from "./pages/Products.page";
-import ProductCreatePage from "./pages/ProductCreate.page";
-import ProductDetailsPage from "./pages/ProductDetails.page";
-import ProductEditPage from "./pages/ProductEdit.page";
 
 function App() {
   return (
@@ -20,10 +17,7 @@ function App() {
         <Route path="/invoices" element={<InvoicesPage />} />
         <Route path="/invoice/:id" element={<InvoiceViewPage />} />
         <Route path="/buyer/*" element={<BuyerPage />} />
-        <Route path="/products" element={<ProductsPage />} />
-        <Route path="/products/create" element={<ProductCreatePage />} />
-        <Route path="/products/:id" element={<ProductDetailsPage />} />
-        <Route path="/products/edit/:id" element={<ProductEditPage />} />
+        <Route path="/products/*" element={<ProductsPage />} />
       </Routes>
     </div>
   );

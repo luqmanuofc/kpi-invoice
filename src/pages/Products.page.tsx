@@ -12,13 +12,14 @@ import {
   Collapse,
 } from "@mui/material";
 import { Add, ExpandMore } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState, useMemo } from "react";
 import {
   getProducts,
   type Product,
   type ProductCategory,
 } from "../api/products";
+import ProductDrawer from "../components/ProductDrawer";
 
 const CATEGORY_LABELS: Record<ProductCategory, string> = {
   PVC_PIPE: "PVC Pipe",
@@ -38,9 +39,13 @@ const CATEGORIES: ProductCategory[] = [
 
 export default function ProductsPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerMode, setDrawerMode] = useState<"create" | "edit">("create");
+  const [selectedProductId, setSelectedProductId] = useState<string | undefined>();
   const [expandedCategories, setExpandedCategories] = useState<Record<ProductCategory, boolean>>({
     PVC_PIPE: false,
     PVC_BEND: false,
@@ -49,22 +54,40 @@ export default function ProductsPage() {
     ELECTRICAL_ACCESSORY: false,
   });
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const data = await getProducts();
-        setProducts(data);
-      } catch (err: any) {
-        setError(err.message || "Failed to load products");
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const fetchProducts = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const data = await getProducts();
+      setProducts(data);
+    } catch (err: any) {
+      setError(err.message || "Failed to load products");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchProducts();
   }, []);
+
+  // Handle URL-based drawer state
+  useEffect(() => {
+    const path = location.pathname;
+
+    if (path === "/products/create") {
+      setDrawerMode("create");
+      setSelectedProductId(undefined);
+      setDrawerOpen(true);
+    } else if (path.match(/^\/products\/([^/]+)\/edit$/)) {
+      const productId = path.split("/")[2];
+      setDrawerMode("edit");
+      setSelectedProductId(productId);
+      setDrawerOpen(true);
+    } else if (path === "/products" || path === "/products/") {
+      setDrawerOpen(false);
+    }
+  }, [location.pathname]);
 
   const productsByCategory = useMemo(() => {
     const categorized = products.reduce((acc, product) => {
@@ -86,7 +109,19 @@ export default function ProductsPage() {
   }, [products]);
 
   const handleProductClick = (productId: string) => {
-    navigate(`/products/${productId}`);
+    navigate(`/products/${productId}/edit`);
+  };
+
+  const handleCreateClick = () => {
+    navigate("/products/create");
+  };
+
+  const handleDrawerClose = () => {
+    navigate("/products");
+  };
+
+  const handleDrawerSuccess = () => {
+    fetchProducts();
   };
 
   const toggleCategory = (category: ProductCategory) => {
@@ -127,7 +162,7 @@ export default function ProductsPage() {
         <Button
           variant="contained"
           startIcon={<Add />}
-          onClick={() => navigate("/products/create")}
+          onClick={handleCreateClick}
         >
           Add Product
         </Button>
@@ -295,6 +330,14 @@ export default function ProductsPage() {
           </Collapse>
         </Box>
       ))}
+
+      <ProductDrawer
+        open={drawerOpen}
+        onClose={handleDrawerClose}
+        mode={drawerMode}
+        productId={selectedProductId}
+        onSuccess={handleDrawerSuccess}
+      />
     </Box>
   );
 }

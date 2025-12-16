@@ -1,17 +1,12 @@
-import { useNavigate, useSearchParams } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 import {
   Box,
   TextField,
   Button,
-  Typography,
-  Breadcrumbs,
-  Link,
   CircularProgress,
   Alert,
   MenuItem,
 } from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useEffect } from "react";
 import type { ProductFormData, ProductCategory } from "../api/products";
 
@@ -40,10 +35,6 @@ export default function ProductForm({
   isFetching = false,
   error = null,
 }: ProductFormProps) {
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const returnUrl = searchParams.get("returnUrl");
-
   const {
     register,
     handleSubmit,
@@ -65,16 +56,6 @@ export default function ProductForm({
     }
   }, [initialData, reset]);
 
-  const handleBack = () => {
-    if (returnUrl) {
-      navigate(returnUrl);
-    } else {
-      navigate("/products");
-    }
-  };
-
-  const title = mode === "create" ? "New Product" : "Edit Product";
-  const breadcrumbText = mode === "create" ? "New" : "Edit";
   const submitButtonText = mode === "create" ? "Create" : "Update";
   const loadingButtonText = mode === "create" ? "Creating..." : "Updating...";
 
@@ -94,30 +75,7 @@ export default function ProductForm({
   }
 
   return (
-    <Box sx={{ margin: "2rem" }}>
-      <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 3 }}>
-        <Link
-          underline="hover"
-          color="inherit"
-          href={returnUrl || "/products"}
-          onClick={(e) => {
-            e.preventDefault();
-            if (returnUrl) {
-              navigate(returnUrl);
-            } else {
-              navigate("/products");
-            }
-          }}
-        >
-          {returnUrl ? "Back" : "Products"}
-        </Link>
-        <Typography>{breadcrumbText}</Typography>
-      </Breadcrumbs>
-
-      <Typography variant="h4" sx={{ mb: 4 }}>
-        {title}
-      </Typography>
-
+    <Box>
       {error && (
         <Alert severity="error" sx={{ mb: 3 }}>
           {error}
@@ -204,19 +162,10 @@ export default function ProductForm({
         <Box
           sx={{
             display: "flex",
-            justifyContent: "space-between",
+            justifyContent: "flex-end",
             mt: 4,
           }}
         >
-          <Button
-            variant="contained"
-            startIcon={<ArrowBackIcon />}
-            onClick={handleBack}
-            disabled={isLoading}
-          >
-            Back
-          </Button>
-
           <Button
             type="submit"
             variant="contained"
