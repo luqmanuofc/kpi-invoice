@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getInvoices, type Invoice } from "../api/invoices";
 import InvoicesDataGrid from "../components/InvoicesDataGrid";
+import InvoiceFilterToolbar, {
+  type InvoiceFilters,
+} from "../components/InvoiceFilterToolbar";
 
 export default function InvoicesPage() {
   const navigate = useNavigate();
@@ -12,13 +15,35 @@ export default function InvoicesPage() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
+  const [filters, setFilters] = useState<InvoiceFilters>({
+    invoiceNumber: "",
+    buyerId: "",
+    status: "",
+    startDate: "",
+    endDate: "",
+  });
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [filters]);
 
   useEffect(() => {
     const fetchInvoices = async () => {
       try {
         setIsLoading(true);
         setError(null);
-        const data = await getInvoices({ page, pageSize });
+
+        // Build params object, excluding empty string values
+        const params: any = { page, pageSize };
+
+        if (filters.invoiceNumber) params.invoiceNumber = filters.invoiceNumber;
+        if (filters.buyerId) params.buyerId = filters.buyerId;
+        if (filters.status) params.status = filters.status;
+        if (filters.startDate) params.startDate = filters.startDate;
+        if (filters.endDate) params.endDate = filters.endDate;
+
+        const data = await getInvoices(params);
         setInvoices(data.invoices);
         setTotalCount(data.pagination.totalCount);
       } catch (err: any) {
@@ -29,7 +54,7 @@ export default function InvoicesPage() {
     };
 
     fetchInvoices();
-  }, [page, pageSize]);
+  }, [page, pageSize, filters]);
 
   const handleCreateClick = () => {
     navigate("/");
@@ -60,6 +85,8 @@ export default function InvoicesPage() {
           </Button>
         </div>
       </Box>
+
+      <InvoiceFilterToolbar filters={filters} onFiltersChange={setFilters} />
 
       <InvoicesDataGrid
         invoices={invoices}

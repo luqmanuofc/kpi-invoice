@@ -12,6 +12,12 @@ export default async function handler(request: Request) {
     const page = parseInt(url.searchParams.get("page") || "1");
     const pageSize = parseInt(url.searchParams.get("pageSize") || "10");
 
+    // New filter parameters
+    const invoiceNumber = url.searchParams.get("invoiceNumber");
+    const status = url.searchParams.get("status");
+    const startDate = url.searchParams.get("startDate");
+    const endDate = url.searchParams.get("endDate");
+
     // Build the where clause
     const where: any = {};
     if (buyerId) {
@@ -23,6 +29,33 @@ export default async function handler(request: Request) {
           productId: productId,
         },
       };
+    }
+
+    // Filter by invoice number (partial match, case-insensitive)
+    if (invoiceNumber) {
+      where.invoiceNumber = {
+        contains: invoiceNumber,
+        mode: "insensitive",
+      };
+    }
+
+    // Filter by status
+    if (status) {
+      where.status = status.toUpperCase();
+    }
+
+    // Filter by date range
+    if (startDate || endDate) {
+      where.date = {};
+      if (startDate) {
+        where.date.gte = new Date(startDate);
+      }
+      if (endDate) {
+        // Add one day to include the end date
+        const endDateObj = new Date(endDate);
+        endDateObj.setDate(endDateObj.getDate() + 1);
+        where.date.lt = endDateObj;
+      }
     }
 
     // Calculate pagination

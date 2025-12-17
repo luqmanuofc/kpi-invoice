@@ -65,6 +65,10 @@ export interface GetInvoicesParams {
   productId?: string;
   page?: number;
   pageSize?: number;
+  invoiceNumber?: string;
+  status?: "pending" | "paid" | "void";
+  startDate?: string;
+  endDate?: string;
 }
 
 export async function createInvoice(data: InvoiceForm): Promise<Invoice> {
@@ -100,6 +104,18 @@ export async function getInvoices(
   }
   if (params?.pageSize) {
     searchParams.append("pageSize", params.pageSize.toString());
+  }
+  if (params?.invoiceNumber) {
+    searchParams.append("invoiceNumber", params.invoiceNumber);
+  }
+  if (params?.status) {
+    searchParams.append("status", params.status);
+  }
+  if (params?.startDate) {
+    searchParams.append("startDate", params.startDate);
+  }
+  if (params?.endDate) {
+    searchParams.append("endDate", params.endDate);
   }
 
   const url = `/.netlify/functions/getInvoices${
