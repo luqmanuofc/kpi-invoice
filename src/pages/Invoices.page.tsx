@@ -1,5 +1,5 @@
 import { Typography, Box, Button } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getInvoices, type Invoice } from "../api/invoices";
 import InvoicesDataGrid from "../components/InvoicesDataGrid";
@@ -9,18 +9,24 @@ import InvoiceFilterToolbar, {
 
 export default function InvoicesPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
-  const [filters, setFilters] = useState<InvoiceFilters>({
-    invoiceNumber: "",
-    buyerId: "",
-    status: "",
-    startDate: "",
-    endDate: "",
+
+  // Initialize filters from URL params
+  const [filters, setFilters] = useState<InvoiceFilters>(() => {
+    const buyerIdFromUrl = searchParams.get("buyerId");
+    return {
+      invoiceNumber: "",
+      buyerId: buyerIdFromUrl || "",
+      status: "",
+      startDate: "",
+      endDate: "",
+    };
   });
 
   // Reset to page 1 when filters change
@@ -86,7 +92,11 @@ export default function InvoicesPage() {
         </div>
       </Box>
 
-      <InvoiceFilterToolbar filters={filters} onFiltersChange={setFilters} />
+      <InvoiceFilterToolbar
+        filters={filters}
+        onFiltersChange={setFilters}
+        initialFilterType={filters.buyerId ? "buyer" : "search"}
+      />
 
       <InvoicesDataGrid
         invoices={invoices}

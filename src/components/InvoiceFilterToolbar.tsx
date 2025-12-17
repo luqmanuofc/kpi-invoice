@@ -25,13 +25,17 @@ export interface InvoiceFilters {
 interface InvoiceFilterToolbarProps {
   filters: InvoiceFilters;
   onFiltersChange: (filters: InvoiceFilters) => void;
+  initialFilterType?: "search" | "buyer";
 }
 
 export default function InvoiceFilterToolbar({
   filters,
   onFiltersChange,
+  initialFilterType = "search",
 }: InvoiceFilterToolbarProps) {
-  const [filterType, setFilterType] = useState<"search" | "buyer">("search");
+  const [filterType, setFilterType] = useState<"search" | "buyer">(
+    initialFilterType
+  );
   const [buyers, setBuyers] = useState<Buyer[]>([]);
   const [loadingBuyers, setLoadingBuyers] = useState(true);
   const [localInvoiceNumber, setLocalInvoiceNumber] = useState(
