@@ -22,6 +22,7 @@ type InvoiceContextType = {
   setInvoiceNumberExists: (exists: boolean) => void;
   isCheckingInvoiceNumber: boolean;
   setIsCheckingInvoiceNumber: (isChecking: boolean) => void;
+  isCreatingInvoice: boolean;
 };
 
 const InvoiceContext = createContext<InvoiceContextType | undefined>(undefined);
@@ -30,6 +31,7 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
   const [activeStep, setActiveStep] = useState<number>(0);
   const [invoiceNumberExists, setInvoiceNumberExists] = useState(false);
   const [isCheckingInvoiceNumber, setIsCheckingInvoiceNumber] = useState(false);
+  const [isCreatingInvoice, setIsCreatingInvoice] = useState(false);
   const navigate = useNavigate();
 
   const form = useForm<InvoiceForm>({
@@ -99,6 +101,7 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
   }, [formData]);
 
   const handleCreateInvoice = async () => {
+    setIsCreatingInvoice(true);
     try {
       const result = await createInvoice(computedData);
       console.log("Invoice created:", result);
@@ -108,6 +111,8 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
     } catch (err) {
       console.error(err);
       alert("Failed to create invoice.");
+    } finally {
+      setIsCreatingInvoice(false);
     }
   };
 
@@ -123,6 +128,7 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
         setInvoiceNumberExists,
         isCheckingInvoiceNumber,
         setIsCheckingInvoiceNumber,
+        isCreatingInvoice,
       }}
     >
       {children}

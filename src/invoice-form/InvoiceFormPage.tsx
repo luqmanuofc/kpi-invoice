@@ -4,6 +4,7 @@ import {
   Typography,
   IconButton,
   StepButton,
+  CircularProgress,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
@@ -29,6 +30,7 @@ export default function InvoiceFormPage() {
     setActiveStep,
     invoiceNumberExists,
     isCheckingInvoiceNumber,
+    isCreatingInvoice,
     form,
   } = useInvoice();
 
@@ -139,8 +141,10 @@ export default function InvoiceFormPage() {
                 fullWidth
                 variant="contained"
                 onClick={onCreateInvoice}
+                disabled={isCreatingInvoice}
+                startIcon={isCreatingInvoice ? <CircularProgress size={20} /> : null}
               >
-                Create Invoice
+                {isCreatingInvoice ? "Creating..." : "Create Invoice"}
               </Button>
             </div>
           </>
