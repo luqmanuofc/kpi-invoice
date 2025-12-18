@@ -4,6 +4,7 @@ import { Box, CircularProgress, Alert, Button, IconButton } from "@mui/material"
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PrintIcon from "@mui/icons-material/Print";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
+import ShareIcon from "@mui/icons-material/Share";
 import InvoiceDocument, {
   type InvoiceDocumentHandle,
 } from "../invoice-document/InvoiceDocument";
@@ -184,14 +185,14 @@ export default function InvoiceViewPage() {
     }
   };
 
-  const shareWhatsApp = async () => {
+  const genericShare = async () => {
     // Check if Web Share API is available
     if (!navigator.share) {
       alert("Sharing is not supported on this browser");
       return;
     }
 
-    const pdf = await generatePDF(0.85); // Same quality as print
+    const pdf = await generatePDF(0.85);
     if (!pdf) return;
 
     try {
@@ -212,7 +213,7 @@ export default function InvoiceViewPage() {
         return;
       }
 
-      // Share the PDF
+      // Share the PDF - opens native share sheet
       await navigator.share({
         title: `Invoice ${invoiceData?.invoiceNumber || ""}`,
         text: `Invoice for ${invoiceData?.buyer?.name || ""}`,
@@ -220,6 +221,50 @@ export default function InvoiceViewPage() {
       });
     } catch (error: any) {
       // User cancelled the share or sharing failed
+      if (error.name !== "AbortError") {
+        console.error("Error sharing:", error);
+        alert(`Failed to share: ${error.message || "Unknown error"}`);
+      }
+    }
+  };
+
+  const shareWhatsApp = async () => {
+    const pdf = await generatePDF(0.85);
+    if (!pdf) return;
+
+    try {
+      // Generate PDF as blob
+      const pdfBlob = pdf.output("blob");
+      const fileName = `Invoice_${
+        invoiceData?.invoiceNumber || "draft"
+      }_${dayjs().format("YYYYMMDD")}.pdf`;
+
+      // Create file object
+      const file = new File([pdfBlob], fileName, {
+        type: "application/pdf",
+      });
+
+      // For iOS/Mobile: Use Web Share API with WhatsApp hint
+      if (navigator.share && navigator.canShare?.({ files: [file] })) {
+        await navigator.share({
+          title: `Invoice ${invoiceData?.invoiceNumber || ""}`,
+          text: `Invoice for ${invoiceData?.buyer?.name || ""}`,
+          files: [file],
+        });
+      } else {
+        // Fallback: Try to open WhatsApp with a message
+        const message = encodeURIComponent(
+          `Invoice ${invoiceData?.invoiceNumber || ""} for ${
+            invoiceData?.buyer?.name || ""
+          }`
+        );
+        const whatsappUrl = `https://wa.me/?text=${message}`;
+        window.open(whatsappUrl, "_blank");
+        alert(
+          "PDF cannot be shared directly. Please use the generic share button or download and share manually."
+        );
+      }
+    } catch (error: any) {
       if (error.name !== "AbortError") {
         console.error("Error sharing:", error);
         alert(`Failed to share: ${error.message || "Unknown error"}`);
@@ -295,20 +340,35 @@ export default function InvoiceViewPage() {
             Print
           </Button>
           {isMobile && (
-            <IconButton
-              onClick={shareWhatsApp}
-              sx={{
-                color: "#25D366",
-                border: "1px solid #25D366",
-                borderRadius: "4px",
-                "&:hover": {
-                  borderColor: "#128C7E",
-                  backgroundColor: "rgba(37, 211, 102, 0.04)",
-                },
-              }}
-            >
-              <WhatsAppIcon />
-            </IconButton>
+            <>
+              <IconButton
+                onClick={genericShare}
+                sx={{
+                  border: "1px solid",
+                  borderColor: "primary.main",
+                  borderRadius: "4px",
+                  "&:hover": {
+                    backgroundColor: "rgba(25, 118, 210, 0.04)",
+                  },
+                }}
+              >
+                <ShareIcon />
+              </IconButton>
+              <IconButton
+                onClick={shareWhatsApp}
+                sx={{
+                  color: "#25D366",
+                  border: "1px solid #25D366",
+                  borderRadius: "4px",
+                  "&:hover": {
+                    borderColor: "#128C7E",
+                    backgroundColor: "rgba(37, 211, 102, 0.04)",
+                  },
+                }}
+              >
+                <WhatsAppIcon />
+              </IconButton>
+            </>
           )}
         </Box>
       </Box>
