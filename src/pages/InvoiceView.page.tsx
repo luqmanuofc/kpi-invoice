@@ -1,8 +1,9 @@
 import { useEffect, useState, useMemo, useRef } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
-import { Box, CircularProgress, Alert, Button } from "@mui/material";
+import { Box, CircularProgress, Alert, Button, IconButton } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PrintIcon from "@mui/icons-material/Print";
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import InvoiceDocument, {
   type InvoiceDocumentHandle,
 } from "../invoice-document/InvoiceDocument";
@@ -13,6 +14,13 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { GridDownloadIcon } from "@mui/x-data-grid";
 
+// Detect if user is on a mobile device
+const isMobileDevice = () => {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    navigator.userAgent
+  );
+};
+
 export default function InvoiceViewPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -22,6 +30,11 @@ export default function InvoiceViewPage() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    setIsMobile(isMobileDevice());
+  }, []);
 
   useEffect(() => {
     const fetchInvoice = async () => {
@@ -86,15 +99,14 @@ export default function InvoiceViewPage() {
     };
   }, [invoice]);
 
-  const downloadPDF = async () => {
-    if (!invoiceRef.current) return;
+  // Shared PDF generation function
+  const generatePDF = async (quality: number = 1): Promise<jsPDF | null> => {
+    if (!invoiceRef.current) return null;
 
     const pageElements = invoiceRef.current.getPageElements();
-    if (!pageElements.length) return;
+    if (!pageElements.length) return null;
 
-    // pageElements are already the .invoice-page divs
     const invoicePages = pageElements;
-    // Store original display styles
     const originalStyles = pageElements.map((el) => el.style.display);
 
     try {
@@ -122,7 +134,7 @@ export default function InvoiceViewPage() {
           logging: false,
         });
 
-        const imgData = canvas.toDataURL("image/jpeg", 1);
+        const imgData = canvas.toDataURL("image/jpeg", quality);
         const imgWidth = 210; // A4 width in mm
         const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
@@ -133,10 +145,7 @@ export default function InvoiceViewPage() {
         isFirstPage = false;
       }
 
-      const fileName = `Invoice_${
-        invoiceData?.invoiceNumber || "draft"
-      }_${dayjs().format("YYYYMMDD")}.pdf`;
-      pdf.save(fileName);
+      return pdf;
     } finally {
       // Restore original display styles and remove no-zoom class
       pageElements.forEach((el, idx) => {
@@ -146,70 +155,75 @@ export default function InvoiceViewPage() {
     }
   };
 
+  const downloadPDF = async () => {
+    const pdf = await generatePDF(1); // High quality for download
+    if (!pdf) return;
+
+    const fileName = `Invoice_${
+      invoiceData?.invoiceNumber || "draft"
+    }_${dayjs().format("YYYYMMDD")}.pdf`;
+    pdf.save(fileName);
+  };
+
   const printPDF = async () => {
-    if (!invoiceRef.current) return;
+    const pdf = await generatePDF(1); // Slightly lower quality for print
+    if (!pdf) return;
 
-    const pageElements = invoiceRef.current.getPageElements();
-    if (!pageElements.length) return;
+    // Create a blob URL and open it for printing
+    const pdfBlob = pdf.output("blob");
+    const blobUrl = URL.createObjectURL(pdfBlob);
 
-    const invoicePages = pageElements;
-    const originalStyles = pageElements.map((el) => el.style.display);
+    // Open in new window and trigger print
+    const printWindow = window.open(blobUrl);
+    if (printWindow) {
+      printWindow.onload = () => {
+        printWindow.print();
+        // Clean up the blob URL after a delay
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+      };
+    }
+  };
+
+  const shareWhatsApp = async () => {
+    // Check if Web Share API is available
+    if (!navigator.share) {
+      alert("Sharing is not supported on this browser");
+      return;
+    }
+
+    const pdf = await generatePDF(0.85); // Same quality as print
+    if (!pdf) return;
 
     try {
-      // Show all pages and remove zoom for PDF generation
-      pageElements.forEach((el, idx) => {
-        el.style.display = "block";
-        invoicePages[idx]?.classList.add("no-zoom");
-      });
-
-      // Wait for layout to update
-      await new Promise((resolve) => setTimeout(resolve, 100));
-
-      const pdf = new jsPDF({
-        orientation: "portrait",
-        unit: "mm",
-        format: "a4",
-      });
-
-      let isFirstPage = true;
-
-      for (const pageEl of pageElements) {
-        const canvas = await html2canvas(pageEl, {
-          scale: 2,
-          useCORS: true,
-          logging: false,
-        });
-
-        const imgData = canvas.toDataURL("image/jpeg", 0.85);
-        const imgWidth = 210; // A4 width in mm
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-        if (!isFirstPage) {
-          pdf.addPage();
-        }
-        pdf.addImage(imgData, "JPEG", 0, 0, imgWidth, imgHeight);
-        isFirstPage = false;
-      }
-
-      // Create a blob URL and open it for printing
+      // Generate PDF as blob
       const pdfBlob = pdf.output("blob");
-      const blobUrl = URL.createObjectURL(pdfBlob);
+      const fileName = `Invoice_${
+        invoiceData?.invoiceNumber || "draft"
+      }_${dayjs().format("YYYYMMDD")}.pdf`;
 
-      // Open in new window and trigger print
-      const printWindow = window.open(blobUrl);
-      if (printWindow) {
-        printWindow.onload = () => {
-          printWindow.print();
-          // Clean up the blob URL after a delay
-          setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
-        };
-      }
-    } finally {
-      // Restore original display styles and remove no-zoom class
-      pageElements.forEach((el, idx) => {
-        el.style.display = originalStyles[idx];
-        invoicePages[idx]?.classList.remove("no-zoom");
+      // Create file object
+      const file = new File([pdfBlob], fileName, {
+        type: "application/pdf",
       });
+
+      // Check if the browser can share files
+      if (navigator.canShare && !navigator.canShare({ files: [file] })) {
+        alert("This browser doesn't support sharing PDF files");
+        return;
+      }
+
+      // Share the PDF
+      await navigator.share({
+        title: `Invoice ${invoiceData?.invoiceNumber || ""}`,
+        text: `Invoice for ${invoiceData?.buyer?.name || ""}`,
+        files: [file],
+      });
+    } catch (error: any) {
+      // User cancelled the share or sharing failed
+      if (error.name !== "AbortError") {
+        console.error("Error sharing:", error);
+        alert(`Failed to share: ${error.message || "Unknown error"}`);
+      }
     }
   };
 
@@ -280,6 +294,22 @@ export default function InvoiceViewPage() {
           >
             Print
           </Button>
+          {isMobile && (
+            <IconButton
+              onClick={shareWhatsApp}
+              sx={{
+                color: "#25D366",
+                border: "1px solid #25D366",
+                borderRadius: "4px",
+                "&:hover": {
+                  borderColor: "#128C7E",
+                  backgroundColor: "rgba(37, 211, 102, 0.04)",
+                },
+              }}
+            >
+              <WhatsAppIcon />
+            </IconButton>
+          )}
         </Box>
       </Box>
 
