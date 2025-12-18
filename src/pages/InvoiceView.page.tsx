@@ -122,14 +122,14 @@ export default function InvoiceViewPage() {
           logging: false,
         });
 
-        const imgData = canvas.toDataURL("image/png");
+        const imgData = canvas.toDataURL("image/jpeg", 1);
         const imgWidth = 210; // A4 width in mm
         const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
         if (!isFirstPage) {
           pdf.addPage();
         }
-        pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+        pdf.addImage(imgData, "JPEG", 0, 0, imgWidth, imgHeight);
         isFirstPage = false;
       }
 
@@ -180,14 +180,14 @@ export default function InvoiceViewPage() {
           logging: false,
         });
 
-        const imgData = canvas.toDataURL("image/png");
+        const imgData = canvas.toDataURL("image/jpeg", 0.85);
         const imgWidth = 210; // A4 width in mm
         const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
         if (!isFirstPage) {
           pdf.addPage();
         }
-        pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+        pdf.addImage(imgData, "JPEG", 0, 0, imgWidth, imgHeight);
         isFirstPage = false;
       }
 
