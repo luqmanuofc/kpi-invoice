@@ -15,8 +15,8 @@ import {
 } from "@mui/material";
 import { ExpandMore, ExpandLess } from "@mui/icons-material";
 import { useState, useEffect } from "react";
-import { getProducts } from "../api/products";
 import type { ProductCategory, Product } from "../api/products";
+import { useProducts } from "../hooks/useProducts";
 
 interface AddProductsModalProps {
   open: boolean;
@@ -37,8 +37,7 @@ export default function AddProductsModal({
   onClose,
   onAddProducts,
 }: AddProductsModalProps) {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(false);
+  const { data: products = [], isLoading: loading } = useProducts();
   const [selectedProductIds, setSelectedProductIds] = useState<Set<string>>(
     new Set()
   );
@@ -48,22 +47,9 @@ export default function AddProductsModal({
 
   useEffect(() => {
     if (open) {
-      loadProducts();
       setSelectedProductIds(new Set());
     }
   }, [open]);
-
-  const loadProducts = async () => {
-    setLoading(true);
-    try {
-      const data = await getProducts();
-      setProducts(data);
-    } catch (error) {
-      console.error("Failed to load products:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleToggleProduct = (productId: string) => {
     setSelectedProductIds((prev) => {

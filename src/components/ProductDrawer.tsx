@@ -1,12 +1,12 @@
 import { Drawer, Box, IconButton, Typography } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { type ProductFormData } from "../api/products";
 import {
-  createProduct,
-  updateProduct,
-  getProductById,
-  type ProductFormData,
-} from "../api/products";
+  useProduct,
+  useCreateProduct,
+  useUpdateProduct,
+} from "../hooks/useProducts";
 import ProductForm from "./ProductForm";
 
 interface ProductDrawerProps {
@@ -14,7 +14,6 @@ interface ProductDrawerProps {
   onClose: () => void;
   mode: "create" | "edit";
   productId?: string;
-  onSuccess?: () => void;
 }
 
 export default function ProductDrawer({
@@ -22,56 +21,36 @@ export default function ProductDrawer({
   onClose,
   mode,
   productId,
-  onSuccess,
 }: ProductDrawerProps) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [isFetching, setIsFetching] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [initialData, setInitialData] = useState<ProductFormData | undefined>();
 
-  useEffect(() => {
-    if (mode === "edit" && productId && open) {
-      const fetchProduct = async () => {
-        try {
-          setIsFetching(true);
-          setError(null);
-          const product = await getProductById(productId);
-          setInitialData({
-            name: product.name,
-            hsn: product.hsn,
-            defaultPrice: product.defaultPrice,
-            defaultUnit: product.defaultUnit,
-            category: product.category,
-          });
-        } catch (err: any) {
-          setError(err.message || "Failed to load product");
-        } finally {
-          setIsFetching(false);
+  const { data: product, isLoading: isFetching } = useProduct(
+    mode === "edit" ? productId : undefined
+  );
+  const createProductMutation = useCreateProduct();
+  const updateProductMutation = useUpdateProduct();
+
+  const isLoading = createProductMutation.isPending || updateProductMutation.isPending;
+
+  const initialData: ProductFormData | undefined =
+    mode === "edit" && product
+      ? {
+          name: product.name,
+          hsn: product.hsn,
+          defaultPrice: product.defaultPrice,
+          defaultUnit: product.defaultUnit,
+          category: product.category,
         }
-      };
-
-      fetchProduct();
-    } else if (mode === "create" && open) {
-      // Reset form data when opening in create mode
-      setInitialData(undefined);
-      setError(null);
-    }
-  }, [mode, productId, open]);
+      : undefined;
 
   const handleSubmit = async (data: ProductFormData) => {
-    setIsLoading(true);
     setError(null);
 
     try {
       if (mode === "create") {
-        await createProduct(data);
+        await createProductMutation.mutateAsync(data);
       } else if (mode === "edit" && productId) {
-        await updateProduct(productId, data);
-      }
-
-      // Call success callback to refresh product list
-      if (onSuccess) {
-        onSuccess();
+        await updateProductMutation.mutateAsync({ id: productId, data });
       }
 
       // Close drawer on success
@@ -81,8 +60,6 @@ export default function ProductDrawer({
         err.message ||
           `An error occurred while ${mode === "create" ? "creating" : "updating"} the product`
       );
-    } finally {
-      setIsLoading(false);
     }
   };
 

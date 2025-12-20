@@ -14,11 +14,8 @@ import {
 import { Add, ExpandMore } from "@mui/icons-material";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState, useMemo } from "react";
-import {
-  getProducts,
-  type Product,
-  type ProductCategory,
-} from "../api/products";
+import { type Product, type ProductCategory } from "../api/products";
+import { useProducts } from "../hooks/useProducts";
 import ProductDrawer from "../components/ProductDrawer";
 
 const CATEGORY_LABELS: Record<ProductCategory, string> = {
@@ -40,9 +37,7 @@ const CATEGORIES: ProductCategory[] = [
 export default function ProductsPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: products = [], isLoading, error } = useProducts();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerMode, setDrawerMode] = useState<"create" | "edit">("create");
   const [selectedProductId, setSelectedProductId] = useState<string | undefined>();
@@ -53,23 +48,6 @@ export default function ProductsPage() {
     WIRE: false,
     ELECTRICAL_ACCESSORY: false,
   });
-
-  const fetchProducts = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const data = await getProducts();
-      setProducts(data);
-    } catch (err: any) {
-      setError(err.message || "Failed to load products");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchProducts();
-  }, []);
 
   // Handle URL-based drawer state
   useEffect(() => {
@@ -120,10 +98,6 @@ export default function ProductsPage() {
     navigate("/products");
   };
 
-  const handleDrawerSuccess = () => {
-    fetchProducts();
-  };
-
   const toggleCategory = (category: ProductCategory) => {
     setExpandedCategories((prev) => ({
       ...prev,
@@ -170,7 +144,7 @@ export default function ProductsPage() {
 
       {error && (
         <Alert severity="error" sx={{ mb: 3 }}>
-          {error}
+          {error.message || "Failed to load products"}
         </Alert>
       )}
 
@@ -336,7 +310,6 @@ export default function ProductsPage() {
         onClose={handleDrawerClose}
         mode={drawerMode}
         productId={selectedProductId}
-        onSuccess={handleDrawerSuccess}
       />
     </Box>
   );
