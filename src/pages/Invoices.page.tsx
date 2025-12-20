@@ -1,14 +1,17 @@
-import { Typography, Box, Button } from "@mui/material";
+import { Typography, Box, Button, useMediaQuery, useTheme } from "@mui/material";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getInvoices, type Invoice } from "../api/invoices";
 import InvoicesDataGrid from "../components/InvoicesDataGrid";
+import InvoicesCardView from "../components/InvoicesCardView";
 import InvoiceFilterToolbar, {
   type InvoiceFilters,
 } from "../components/InvoiceFilterToolbar";
 
 export default function InvoicesPage() {
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [searchParams] = useSearchParams();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -98,22 +101,34 @@ export default function InvoicesPage() {
         initialFilterType={filters.buyerId ? "buyer" : "search"}
       />
 
-      <InvoicesDataGrid
-        invoices={invoices}
-        isLoading={isLoading}
-        error={error}
-        showCheckboxes={false}
-        paginationMode="server"
-        rowCount={totalCount}
-        page={page - 1}
-        pageSize={pageSize}
-        onPageChange={(newPage) => setPage(newPage + 1)}
-        onPageSizeChange={(newPageSize) => {
-          setPageSize(newPageSize);
-          setPage(1);
-        }}
-        onStatusChange={handleStatusChange}
-      />
+      {isMobile ? (
+        <InvoicesCardView
+          invoices={invoices}
+          error={error}
+          page={page - 1}
+          pageSize={pageSize}
+          rowCount={totalCount}
+          onPageChange={(newPage) => setPage(newPage + 1)}
+          onStatusChange={handleStatusChange}
+        />
+      ) : (
+        <InvoicesDataGrid
+          invoices={invoices}
+          isLoading={isLoading}
+          error={error}
+          showCheckboxes={false}
+          paginationMode="server"
+          rowCount={totalCount}
+          page={page - 1}
+          pageSize={pageSize}
+          onPageChange={(newPage) => setPage(newPage + 1)}
+          onPageSizeChange={(newPageSize) => {
+            setPageSize(newPageSize);
+            setPage(1);
+          }}
+          onStatusChange={handleStatusChange}
+        />
+      )}
     </div>
   );
 }
