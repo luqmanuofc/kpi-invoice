@@ -11,40 +11,30 @@ import {
   InputAdornment,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-
-const LOGIN_PASSWORD = import.meta.env.VITE_APP_PASSWORD;
-
-if (!LOGIN_PASSWORD) {
-  throw new Error("VITE_APP_PASSWORD environment variable is required but not set");
-}
-
-// Hash function using Web Crypto API
-async function hashToken(token: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(token);
-  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
-  return hashHex;
-}
+import { login } from "../api/auth";
 
 export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
+    setError("");
 
-    if (password === LOGIN_PASSWORD) {
-      // Hash the password and store the hash instead of the raw token
-      const tokenHash = await hashToken(password);
-      localStorage.setItem("authToken", tokenHash);
+    try {
+      const data = await login(password);
+
+      // Store the JWT token
+      localStorage.setItem("authToken", data.token);
       navigate("/");
-    } else {
-      setError("Incorrect password");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Network error. Please try again.");
       setPassword("");
+      setLoading(false);
     }
   };
 
@@ -109,9 +99,10 @@ export default function LoginPage() {
             type="submit"
             variant="contained"
             fullWidth
+            disabled={loading}
             sx={{ mt: 3 }}
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </Button>
         </form>
       </Paper>

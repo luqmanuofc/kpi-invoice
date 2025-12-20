@@ -1,25 +1,28 @@
-import { createHash } from "crypto";
+import jwt from "jsonwebtoken";
 
-const APP_PASSWORD = process.env.APP_PASSWORD;
+const JWT_SECRET = process.env.JWT_SECRET;
 
-if (!APP_PASSWORD) {
-  throw new Error("APP_PASSWORD environment variable is required but not set");
+if (!JWT_SECRET) {
+  throw new Error("JWT_SECRET environment variable is required but not set");
 }
-
-// Hash the APP_PASSWORD to compare with client-side hash
-const APP_PASSWORD_HASH = createHash("sha256")
-  .update(APP_PASSWORD)
-  .digest("hex");
 
 export function validateAuth(request: Request): boolean {
   const authHeader = request.headers.get("Authorization");
 
-  if (!authHeader) {
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return false;
   }
 
-  const tokenHash = authHeader.replace("Bearer ", "");
-  return tokenHash === APP_PASSWORD_HASH;
+  const token = authHeader.replace("Bearer ", "");
+
+  try {
+    // Verify and decode the JWT token
+    jwt.verify(token, JWT_SECRET);
+    return true;
+  } catch (error) {
+    // Token is invalid or expired
+    return false;
+  }
 }
 
 export function unauthorizedResponse(): Response {
