@@ -10,35 +10,16 @@ import {
 } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { getBuyers, type Buyer } from "../api/buyers";
 import BuyerDrawer from "../components/BuyerDrawer";
+import { useBuyers } from "../hooks/useBuyers";
 
 export default function BuyerPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [buyers, setBuyers] = useState<Buyer[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: buyers = [], isLoading, error, refetch } = useBuyers();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerMode, setDrawerMode] = useState<"create" | "edit">("create");
   const [selectedBuyerId, setSelectedBuyerId] = useState<string | undefined>();
-
-  const fetchBuyers = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const data = await getBuyers();
-      setBuyers(data);
-    } catch (err: any) {
-      setError(err.message || "Failed to load buyers");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchBuyers();
-  }, []);
 
   // Handle URL-based drawer state
   useEffect(() => {
@@ -71,7 +52,7 @@ export default function BuyerPage() {
   };
 
   const handleDrawerSuccess = () => {
-    fetchBuyers();
+    refetch();
   };
 
   const handleViewInvoicesClick = (buyerId: string) => {
@@ -119,7 +100,7 @@ export default function BuyerPage() {
 
       {error && (
         <Alert severity="error" sx={{ mb: 3 }}>
-          {error}
+          {error instanceof Error ? error.message : "Failed to load buyers"}
         </Alert>
       )}
 

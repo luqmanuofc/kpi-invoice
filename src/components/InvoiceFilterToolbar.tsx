@@ -12,7 +12,7 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import ClearIcon from "@mui/icons-material/Clear";
 import { useState, useEffect } from "react";
-import { getBuyers, type Buyer } from "../api/buyers";
+import { useBuyers } from "../hooks/useBuyers";
 
 export interface InvoiceFilters {
   invoiceNumber?: string;
@@ -36,26 +36,10 @@ export default function InvoiceFilterToolbar({
   const [filterType, setFilterType] = useState<"search" | "buyer">(
     initialFilterType
   );
-  const [buyers, setBuyers] = useState<Buyer[]>([]);
-  const [loadingBuyers, setLoadingBuyers] = useState(true);
+  const { data: buyers = [], isLoading: loadingBuyers } = useBuyers();
   const [localInvoiceNumber, setLocalInvoiceNumber] = useState(
     filters.invoiceNumber || ""
   );
-
-  useEffect(() => {
-    const fetchBuyers = async () => {
-      try {
-        const buyersData = await getBuyers();
-        setBuyers(buyersData);
-      } catch (error) {
-        console.error("Failed to fetch buyers:", error);
-      } finally {
-        setLoadingBuyers(false);
-      }
-    };
-
-    fetchBuyers();
-  }, []);
 
   // Debounce invoice number search
   useEffect(() => {

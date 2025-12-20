@@ -16,11 +16,11 @@ import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
 import { Controller } from "react-hook-form";
 import dayjs from "dayjs";
 import { useInvoice } from "../contexts/InvoiceProvider";
-import { useEffect, useState, useCallback } from "react";
-import { getBuyers, type Buyer } from "../api/buyers";
+import { useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { checkInvoiceNumber } from "../api/invoices";
 import { debounce } from "lodash";
+import { useBuyers } from "../hooks/useBuyers";
 
 export default function InvoiceFormDetailsPage() {
   const {
@@ -32,26 +32,9 @@ export default function InvoiceFormDetailsPage() {
   } = useInvoice();
   const { control, watch } = form;
   const navigate = useNavigate();
-  const [buyers, setBuyers] = useState<Buyer[]>([]);
-  const [isLoadingBuyers, setIsLoadingBuyers] = useState(true);
+  const { data: buyers = [], isLoading: isLoadingBuyers } = useBuyers();
   const selectedBuyer = form.getValues("buyer");
   const invoiceNumber = watch("invoiceNumber");
-
-  useEffect(() => {
-    const fetchBuyers = async () => {
-      try {
-        setIsLoadingBuyers(true);
-        const data = await getBuyers();
-        setBuyers(data);
-      } catch (err) {
-        console.error("Failed to load buyers:", err);
-      } finally {
-        setIsLoadingBuyers(false);
-      }
-    };
-
-    fetchBuyers();
-  }, []);
 
   // Debounced invoice number validation
   const debouncedCheckInvoiceNumber = useCallback(
