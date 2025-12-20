@@ -47,6 +47,7 @@ export default function ProductForm({
       category: "" as ProductCategory,
       hsn: "",
       defaultPrice: 0,
+      defaultUnit: "",
     },
   });
 
@@ -155,6 +156,14 @@ export default function ProductForm({
             })}
             error={!!errors.defaultPrice}
             helperText={errors.defaultPrice?.message}
+            fullWidth
+          />
+
+          <TextField
+            label="Default Unit"
+            {...register("defaultUnit", { required: "Default unit is required" })}
+            error={!!errors.defaultUnit}
+            helperText={errors.defaultUnit?.message}
             fullWidth
           />
         </Box>

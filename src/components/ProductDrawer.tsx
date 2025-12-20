@@ -40,6 +40,7 @@ export default function ProductDrawer({
             name: product.name,
             hsn: product.hsn,
             defaultPrice: product.defaultPrice,
+            defaultUnit: product.defaultUnit,
             category: product.category,
           });
         } catch (err: any) {

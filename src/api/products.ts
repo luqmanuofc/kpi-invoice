@@ -22,6 +22,7 @@ export interface ProductFormData {
   name: string;
   hsn: string;
   defaultPrice: number;
+  defaultUnit: string;
   category: ProductCategory;
 }
 

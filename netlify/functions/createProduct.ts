@@ -18,6 +18,7 @@ export default async function handler(request: Request) {
         name: data.name,
         hsn: data.hsn,
         defaultPrice: data.defaultPrice,
+        defaultUnit: data.defaultUnit,
         category: data.category,
       },
     });
