@@ -1,10 +1,15 @@
 import { useEffect, useState, useMemo, useRef } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
-import { Box, CircularProgress, Alert, Button, IconButton } from "@mui/material";
+import {
+  Box,
+  CircularProgress,
+  Alert,
+  Button,
+  IconButton,
+} from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PrintIcon from "@mui/icons-material/Print";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
-import ShareIcon from "@mui/icons-material/Share";
 import InvoiceDocument, {
   type InvoiceDocumentHandle,
 } from "../invoice-document/InvoiceDocument";
@@ -185,49 +190,6 @@ export default function InvoiceViewPage() {
     }
   };
 
-  const genericShare = async () => {
-    // Check if Web Share API is available
-    if (!navigator.share) {
-      alert("Sharing is not supported on this browser");
-      return;
-    }
-
-    const pdf = await generatePDF(0.85);
-    if (!pdf) return;
-
-    try {
-      // Generate PDF as blob
-      const pdfBlob = pdf.output("blob");
-      const fileName = `Invoice_${
-        invoiceData?.invoiceNumber || "draft"
-      }_${dayjs().format("YYYYMMDD")}.pdf`;
-
-      // Create file object
-      const file = new File([pdfBlob], fileName, {
-        type: "application/pdf",
-      });
-
-      // Check if the browser can share files
-      if (navigator.canShare && !navigator.canShare({ files: [file] })) {
-        alert("This browser doesn't support sharing PDF files");
-        return;
-      }
-
-      // Share the PDF - opens native share sheet
-      await navigator.share({
-        title: `Invoice ${invoiceData?.invoiceNumber || ""}`,
-        text: `Invoice for ${invoiceData?.buyer?.name || ""}`,
-        files: [file],
-      });
-    } catch (error: any) {
-      // User cancelled the share or sharing failed
-      if (error.name !== "AbortError") {
-        console.error("Error sharing:", error);
-        alert(`Failed to share: ${error.message || "Unknown error"}`);
-      }
-    }
-  };
-
   const shareWhatsApp = async () => {
     const pdf = await generatePDF(0.85);
     if (!pdf) return;
@@ -341,19 +303,6 @@ export default function InvoiceViewPage() {
           </Button>
           {isMobile && (
             <>
-              <IconButton
-                onClick={genericShare}
-                sx={{
-                  border: "1px solid",
-                  borderColor: "primary.main",
-                  borderRadius: "4px",
-                  "&:hover": {
-                    backgroundColor: "rgba(25, 118, 210, 0.04)",
-                  },
-                }}
-              >
-                <ShareIcon />
-              </IconButton>
               <IconButton
                 onClick={shareWhatsApp}
                 sx={{
