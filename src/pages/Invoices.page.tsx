@@ -104,6 +104,7 @@ export default function InvoicesPage() {
       {isMobile ? (
         <InvoicesCardView
           invoices={invoices}
+          isLoading={isLoading}
           error={error}
           page={page - 1}
           pageSize={pageSize}

@@ -26,6 +26,7 @@ import StatusLogsModal from "./StatusLogsModal";
 
 interface InvoicesCardViewProps {
   invoices: Invoice[];
+  isLoading?: boolean;
   error?: string | null;
   page?: number;
   pageSize?: number;
@@ -36,6 +37,7 @@ interface InvoicesCardViewProps {
 
 export default function InvoicesCardView({
   invoices,
+  isLoading = false,
   error = null,
   page = 0,
   pageSize = 10,
@@ -58,6 +60,21 @@ export default function InvoicesCardView({
   } = useInvoiceActions(onStatusChange);
 
   const totalPages = Math.ceil((rowCount || invoices.length) / pageSize);
+
+  if (isLoading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "400px",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Box>
