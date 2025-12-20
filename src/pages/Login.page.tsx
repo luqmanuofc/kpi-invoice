@@ -13,14 +13,19 @@ import {
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 const LOGIN_PASSWORD = import.meta.env.VITE_APP_PASSWORD;
-const AUTH_TOKEN = import.meta.env.VITE_AUTH_TOKEN;
 
 if (!LOGIN_PASSWORD) {
   throw new Error("VITE_APP_PASSWORD environment variable is required but not set");
 }
 
-if (!AUTH_TOKEN) {
-  throw new Error("VITE_AUTH_TOKEN environment variable is required but not set");
+// Hash function using Web Crypto API
+async function hashToken(token: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(token);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+  return hashHex;
 }
 
 export default function LoginPage() {
@@ -29,11 +34,13 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (password === LOGIN_PASSWORD) {
-      localStorage.setItem("authToken", AUTH_TOKEN);
+      // Hash the password and store the hash instead of the raw token
+      const tokenHash = await hashToken(password);
+      localStorage.setItem("authToken", tokenHash);
       navigate("/");
     } else {
       setError("Incorrect password");
