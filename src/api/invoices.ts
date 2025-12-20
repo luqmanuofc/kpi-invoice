@@ -1,4 +1,5 @@
 import type { InvoiceForm } from "../invoice-form/types";
+import { getAuthHeaders } from "../utils/auth";
 
 export interface Invoice {
   id: string;
@@ -74,9 +75,7 @@ export interface GetInvoicesParams {
 export async function createInvoice(data: InvoiceForm): Promise<Invoice> {
   const response = await fetch("/.netlify/functions/createInvoice", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: getAuthHeaders(),
     body: JSON.stringify(data),
   });
 
@@ -124,9 +123,7 @@ export async function getInvoices(
 
   const response = await fetch(url, {
     method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: getAuthHeaders(),
   });
 
   if (!response.ok) {
@@ -140,9 +137,7 @@ export async function getInvoices(
 export async function getInvoiceById(id: string): Promise<Invoice> {
   const response = await fetch(`/.netlify/functions/getInvoice?id=${id}`, {
     method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: getAuthHeaders(),
   });
 
   if (!response.ok) {
@@ -162,9 +157,7 @@ export async function checkInvoiceNumber(
     )}`,
     {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: getAuthHeaders(),
     }
   );
 
@@ -188,9 +181,7 @@ export async function updateInvoiceStatus(
 
   const response = await fetch("/.netlify/functions/updateInvoiceStatus", {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: getAuthHeaders(),
     body: JSON.stringify({
       id,
       status: statusMap[status],
@@ -220,9 +211,7 @@ export async function getInvoiceStatusLogs(
     `/.netlify/functions/getInvoiceStatusLogs?invoiceId=${invoiceId}`,
     {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: getAuthHeaders(),
     }
   );
 

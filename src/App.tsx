@@ -2,6 +2,8 @@
 import "./App.css";
 import { Routes, Route } from "react-router-dom";
 import NavigationAppBar from "./components/AppBar";
+import ProtectedRoute from "./components/ProtectedRoute";
+import LoginPage from "./pages/Login.page";
 import InvoicePage from "./pages/Invoice.page";
 import InvoicesPage from "./pages/Invoices.page";
 import InvoiceViewPage from "./pages/InvoiceView.page";
@@ -13,11 +15,47 @@ function App() {
     <div>
       <NavigationAppBar />
       <Routes>
-        <Route path="/" element={<InvoicePage />} />
-        <Route path="/invoices" element={<InvoicesPage />} />
-        <Route path="/invoice/:id" element={<InvoiceViewPage />} />
-        <Route path="/buyer/*" element={<BuyerPage />} />
-        <Route path="/products/*" element={<ProductsPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <InvoicePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/invoices"
+          element={
+            <ProtectedRoute>
+              <InvoicesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/invoice/:id"
+          element={
+            <ProtectedRoute>
+              <InvoiceViewPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/buyer/*"
+          element={
+            <ProtectedRoute>
+              <BuyerPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/products/*"
+          element={
+            <ProtectedRoute>
+              <ProductsPage />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </div>
   );

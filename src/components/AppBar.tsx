@@ -14,14 +14,18 @@ import {
   useTheme,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import { useNavigate } from "react-router-dom";
+import LogoutIcon from "@mui/icons-material/Logout";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
 
 export default function NavigationAppBar() {
   const navigate = useNavigate();
+  const location = useLocation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const isLoginPage = location.pathname === "/login";
 
   const menuItems = [
     { label: "Create Invoice", path: "/" },
@@ -38,6 +42,16 @@ export default function NavigationAppBar() {
     navigate(path);
     setDrawerOpen(false);
   };
+
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    navigate("/login");
+    setDrawerOpen(false);
+  };
+
+  if (isLoginPage) {
+    return null;
+  }
 
   return (
     <>
@@ -72,6 +86,14 @@ export default function NavigationAppBar() {
                   {item.label}
                 </Button>
               ))}
+              <Button
+                color="inherit"
+                onClick={handleLogout}
+                startIcon={<LogoutIcon />}
+                sx={{ textTransform: "none" }}
+              >
+                Logout
+              </Button>
             </Box>
           )}
         </Toolbar>
@@ -92,6 +114,12 @@ export default function NavigationAppBar() {
                 </ListItemButton>
               </ListItem>
             ))}
+            <ListItem disablePadding>
+              <ListItemButton onClick={handleLogout}>
+                <LogoutIcon sx={{ mr: 2 }} />
+                <ListItemText primary="Logout" />
+              </ListItemButton>
+            </ListItem>
           </List>
         </Box>
       </Drawer>

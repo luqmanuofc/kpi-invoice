@@ -1,3 +1,5 @@
+import { getAuthHeaders } from "../utils/auth";
+
 export type ProductCategory =
   | "PVC_PIPE"
   | "PVC_BEND"
@@ -26,9 +28,7 @@ export interface ProductFormData {
 export async function createProduct(data: ProductFormData) {
   const response = await fetch("/.netlify/functions/createProduct", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: getAuthHeaders(),
     body: JSON.stringify(data),
   });
 
@@ -43,9 +43,7 @@ export async function createProduct(data: ProductFormData) {
 export async function getProducts(): Promise<Product[]> {
   const response = await fetch("/.netlify/functions/getProducts", {
     method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: getAuthHeaders(),
   });
 
   if (!response.ok) {
@@ -59,9 +57,7 @@ export async function getProducts(): Promise<Product[]> {
 export async function getProductById(id: string): Promise<Product> {
   const response = await fetch(`/.netlify/functions/getProduct?id=${id}`, {
     method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: getAuthHeaders(),
   });
 
   if (!response.ok) {
@@ -75,9 +71,7 @@ export async function getProductById(id: string): Promise<Product> {
 export async function updateProduct(id: string, data: ProductFormData) {
   const response = await fetch("/.netlify/functions/updateProduct", {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: getAuthHeaders(),
     body: JSON.stringify({ id, ...data }),
   });
 

@@ -1,6 +1,11 @@
 import prisma from "../lib/prisma";
+import { validateAuth, unauthorizedResponse } from "../lib/auth";
 
 export default async function handler(request: Request) {
+  if (!validateAuth(request)) {
+    return unauthorizedResponse();
+  }
+
   if (request.method !== "PUT") {
     return new Response("Method not allowed", { status: 405 });
   }
