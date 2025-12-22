@@ -11,15 +11,9 @@ export function useInvoiceActions(
   const location = useLocation();
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
-  const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(
-    null
-  );
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [logsModalOpen, setLogsModalOpen] = useState(false);
-  const [logsInvoiceId, setLogsInvoiceId] = useState<string>("");
-  const [logsInvoiceNumber, setLogsInvoiceNumber] = useState<string>("");
   const [archiveDialogOpen, setArchiveDialogOpen] = useState(false);
-  const [archiveInvoiceId, setArchiveInvoiceId] = useState<string>("");
-  const [archiveInvoiceNumber, setArchiveInvoiceNumber] = useState<string>("");
   const [archiving, setArchiving] = useState(false);
 
   const handleViewClick = (id: string) => {
@@ -44,88 +38,69 @@ export function useInvoiceActions(
 
   const handleMenuOpen = (
     event: React.MouseEvent<HTMLElement>,
-    invoiceId: string
+    invoice: Invoice
   ) => {
     setMenuAnchorEl(event.currentTarget);
-    setSelectedInvoiceId(invoiceId);
+    setSelectedInvoice(invoice);
   };
 
   const handleMenuClose = () => {
     setMenuAnchorEl(null);
-    setSelectedInvoiceId(null);
+    setSelectedInvoice(null);
   };
 
   const handleMenuAction = (
-    action: "view" | "duplicate" | "logs" | "archive",
-    invoices: Invoice[]
+    action: "view" | "duplicate" | "logs" | "archive"
   ) => {
-    if (!selectedInvoiceId) return;
+    if (!selectedInvoice) return;
 
     switch (action) {
       case "view":
-        handleViewClick(selectedInvoiceId);
+        handleViewClick(selectedInvoice.id);
         break;
       case "duplicate":
         // TODO: Implement duplicate functionality
-        console.log("Duplicate invoice:", selectedInvoiceId);
+        console.log("Duplicate invoice:", selectedInvoice.id);
+        handleMenuClose();
         break;
       case "logs":
-        const invoice = invoices.find((inv) => inv.id === selectedInvoiceId);
-        if (invoice) {
-          setLogsInvoiceId(selectedInvoiceId);
-          setLogsInvoiceNumber(invoice.invoiceNumber);
-          setLogsModalOpen(true);
-        }
+        setLogsModalOpen(true);
+        handleMenuClose();
         break;
       case "archive":
-        const invoiceToArchive = invoices.find(
-          (inv) => inv.id === selectedInvoiceId
-        );
-        if (invoiceToArchive) {
-          setArchiveInvoiceId(selectedInvoiceId);
-          setArchiveInvoiceNumber(invoiceToArchive.invoiceNumber);
-          setArchiveDialogOpen(true);
-        }
+        setArchiveDialogOpen(true);
         break;
     }
-
-    handleMenuClose();
   };
 
   const handleArchiveConfirm = async () => {
-    if (!archiveInvoiceId) return;
+    if (!selectedInvoice) return;
 
     setArchiving(true);
     try {
-      const archivedInvoice = await archiveInvoice(archiveInvoiceId);
+      const archivedInvoice = await archiveInvoice(selectedInvoice.id);
       onInvoiceArchived?.(archivedInvoice);
       setArchiveDialogOpen(false);
-      setArchiveInvoiceId("");
-      setArchiveInvoiceNumber("");
     } catch (error) {
       console.error("Failed to archive invoice:", error);
     } finally {
       setArchiving(false);
+      handleMenuClose();
     }
   };
 
   const handleArchiveDialogClose = () => {
     if (!archiving) {
       setArchiveDialogOpen(false);
-      setArchiveInvoiceId("");
-      setArchiveInvoiceNumber("");
     }
   };
 
   return {
     updatingStatus,
     menuAnchorEl,
-    selectedInvoiceId,
+    selectedInvoice,
     logsModalOpen,
-    logsInvoiceId,
-    logsInvoiceNumber,
     archiveDialogOpen,
-    archiveInvoiceNumber,
     archiving,
     handleViewClick,
     handleStatusChange,

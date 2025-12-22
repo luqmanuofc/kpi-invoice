@@ -67,7 +67,7 @@ export interface GetInvoicesParams {
   page?: number;
   pageSize?: number;
   invoiceNumber?: string;
-  status?: "pending" | "paid" | "void" | "archived";
+  status?: Array<"pending" | "paid" | "void" | "archived">;
   startDate?: string;
   endDate?: string;
 }
@@ -107,8 +107,8 @@ export async function getInvoices(
   if (params?.invoiceNumber) {
     searchParams.append("invoiceNumber", params.invoiceNumber);
   }
-  if (params?.status) {
-    searchParams.append("status", params.status);
+  if (params?.status && params.status.length > 0) {
+    searchParams.append("status", params.status.join(","));
   }
   if (params?.startDate) {
     searchParams.append("startDate", params.startDate);

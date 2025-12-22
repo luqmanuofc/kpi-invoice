@@ -47,10 +47,8 @@ export default function InvoicesCardView({
     updatingStatus,
     menuAnchorEl,
     logsModalOpen,
-    logsInvoiceId,
-    logsInvoiceNumber,
+    selectedInvoice,
     archiveDialogOpen,
-    archiveInvoiceNumber,
     archiving,
     handleViewClick,
     handleStatusChange,
@@ -165,6 +163,11 @@ export default function InvoicesCardView({
                 </Typography>
                 {updatingStatus === invoice.id ? (
                   <CircularProgress size={20} />
+                ) : invoice.status === "archived" ? (
+                  <>
+                    {" "}
+                    <Chip label="Archived" color="default" size="small" />
+                  </>
                 ) : (
                   <Select
                     value={invoice.status}
@@ -199,7 +202,7 @@ export default function InvoicesCardView({
                 View
               </Button>
               <IconButton
-                onClick={(e) => handleMenuOpen(e, invoice.id)}
+                onClick={(e) => handleMenuOpen(e, invoice)}
                 size="small"
               >
                 <MoreVertIcon />
@@ -226,20 +229,21 @@ export default function InvoicesCardView({
         onClose={handleMenuClose}
         onMenuAction={handleMenuAction}
         invoices={invoices}
+        selectedInvoiceId={selectedInvoice?.id ?? ""}
       />
 
       <StatusLogsModal
         open={logsModalOpen}
         onClose={() => setLogsModalOpen(false)}
-        invoiceId={logsInvoiceId}
-        invoiceNumber={logsInvoiceNumber}
+        invoiceId={selectedInvoice?.id ?? ""}
+        invoiceNumber={selectedInvoice?.invoiceNumber ?? ""}
       />
 
       <ArchiveInvoiceDialog
         open={archiveDialogOpen}
         onClose={handleArchiveDialogClose}
         onConfirm={handleArchiveConfirm}
-        invoiceNumber={archiveInvoiceNumber}
+        invoiceNumber={selectedInvoice?.invoiceNumber ?? ""}
         isArchiving={archiving}
       />
     </Box>

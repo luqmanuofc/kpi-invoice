@@ -284,42 +284,49 @@ export default function InvoiceViewPage() {
         >
           Back
         </Button>
-        <Box sx={{ display: "flex", gap: 1 }}>
-          <Button
-            variant="contained"
-            size="small"
-            startIcon={<GridDownloadIcon />}
-            onClick={downloadPDF}
-          >
-            Download
-          </Button>
-          <Button
-            variant="outlined"
-            size="small"
-            startIcon={<PrintIcon />}
-            onClick={printPDF}
-          >
-            Print
-          </Button>
-          {isMobile && (
-            <>
-              <IconButton
-                onClick={shareWhatsApp}
-                sx={{
-                  color: "#25D366",
-                  border: "1px solid #25D366",
-                  borderRadius: "4px",
-                  "&:hover": {
-                    borderColor: "#128C7E",
-                    backgroundColor: "rgba(37, 211, 102, 0.04)",
-                  },
-                }}
+        {invoice?.status === "archived" ? (
+          <>Download and other actions are disabled on achived invoices.</>
+        ) : (
+          <>
+            {" "}
+            <Box sx={{ display: "flex", gap: 1 }}>
+              <Button
+                variant="contained"
+                size="small"
+                startIcon={<GridDownloadIcon />}
+                onClick={downloadPDF}
               >
-                <WhatsAppIcon />
-              </IconButton>
-            </>
-          )}
-        </Box>
+                Download
+              </Button>
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<PrintIcon />}
+                onClick={printPDF}
+              >
+                Print
+              </Button>
+              {isMobile && (
+                <>
+                  <IconButton
+                    onClick={shareWhatsApp}
+                    sx={{
+                      color: "#25D366",
+                      border: "1px solid #25D366",
+                      borderRadius: "4px",
+                      "&:hover": {
+                        borderColor: "#128C7E",
+                        backgroundColor: "rgba(37, 211, 102, 0.04)",
+                      },
+                    }}
+                  >
+                    <WhatsAppIcon />
+                  </IconButton>
+                </>
+              )}
+            </Box>
+          </>
+        )}
       </Box>
 
       <InvoiceDocument

@@ -8,6 +8,8 @@ import {
   CircularProgress,
   InputAdornment,
   IconButton,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import ClearIcon from "@mui/icons-material/Clear";
@@ -20,6 +22,7 @@ export interface InvoiceFilters {
   status?: "pending" | "paid" | "void" | "";
   startDate?: string;
   endDate?: string;
+  showArchived?: boolean;
 }
 
 interface InvoiceFilterToolbarProps {
@@ -120,74 +123,91 @@ export default function InvoiceFilterToolbar({
             Buyer
           </Button>
         </ButtonGroup>
-        <Box>
-          {filterType === "search" && (
-            <Box width={"100%"}>
-              <TextField
-                size="small"
-                label="Enter Invoice Number"
-                value={localInvoiceNumber}
-                onChange={(e) => setLocalInvoiceNumber(e.target.value)}
-                placeholder="Search..."
-                sx={{ minWidth: 300 }}
-                slotProps={{
-                  input: {
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <SearchIcon />
-                      </InputAdornment>
-                    ),
-                    endAdornment: localInvoiceNumber ? (
-                      <InputAdornment position="end">
-                        <IconButton
-                          size="small"
-                          onClick={() => setLocalInvoiceNumber("")}
-                          edge="end"
-                        >
-                          <ClearIcon />
-                        </IconButton>
-                      </InputAdornment>
-                    ) : null,
-                  },
-                }}
-              />
-            </Box>
-          )}
-          {filterType === "buyer" && (
-            <Autocomplete
-              options={buyers}
-              getOptionLabel={(option) => option.name}
-              getOptionKey={(option) => option.id}
-              isOptionEqualToValue={(option, value) => option.id === value.id}
-              loading={loadingBuyers}
-              value={buyers.find((b) => b.id === filters.buyerId) || null}
-              onChange={(_, value) => {
-                handleFilterChange("buyerId", value?.id || "");
-              }}
-              renderInput={(params) => (
+        <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
+          <Box>
+            {filterType === "search" && (
+              <Box width={"100%"}>
                 <TextField
-                  {...params}
-                  label="Select Buyer"
                   size="small"
-                  placeholder="All Buyers"
+                  label="Enter Invoice Number"
+                  value={localInvoiceNumber}
+                  onChange={(e) => setLocalInvoiceNumber(e.target.value)}
+                  placeholder="Search..."
+                  sx={{ minWidth: 300 }}
                   slotProps={{
                     input: {
-                      ...params.InputProps,
-                      endAdornment: (
-                        <>
-                          {loadingBuyers ? (
-                            <CircularProgress color="inherit" size={20} />
-                          ) : null}
-                          {params.InputProps.endAdornment}
-                        </>
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <SearchIcon />
+                        </InputAdornment>
                       ),
+                      endAdornment: localInvoiceNumber ? (
+                        <InputAdornment position="end">
+                          <IconButton
+                            size="small"
+                            onClick={() => setLocalInvoiceNumber("")}
+                            edge="end"
+                          >
+                            <ClearIcon />
+                          </IconButton>
+                        </InputAdornment>
+                      ) : null,
                     },
                   }}
                 />
-              )}
-              sx={{ minWidth: 300 }}
-            />
-          )}
+              </Box>
+            )}
+            {filterType === "buyer" && (
+              <Autocomplete
+                options={buyers}
+                getOptionLabel={(option) => option.name}
+                getOptionKey={(option) => option.id}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+                loading={loadingBuyers}
+                value={buyers.find((b) => b.id === filters.buyerId) || null}
+                onChange={(_, value) => {
+                  handleFilterChange("buyerId", value?.id || "");
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Select Buyer"
+                    size="small"
+                    placeholder="All Buyers"
+                    slotProps={{
+                      input: {
+                        ...params.InputProps,
+                        endAdornment: (
+                          <>
+                            {loadingBuyers ? (
+                              <CircularProgress color="inherit" size={20} />
+                            ) : null}
+                            {params.InputProps.endAdornment}
+                          </>
+                        ),
+                      },
+                    }}
+                  />
+                )}
+                sx={{ minWidth: 300 }}
+              />
+            )}
+          </Box>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={filters.showArchived || false}
+                onChange={(e) =>
+                  onFiltersChange({
+                    ...filters,
+                    showArchived: e.target.checked,
+                  })
+                }
+                size="small"
+              />
+            }
+            label="Show Archived"
+          />
         </Box>
       </Box>
     </Paper>

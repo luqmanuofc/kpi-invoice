@@ -49,10 +49,8 @@ export default function InvoicesDataGrid({
     updatingStatus,
     menuAnchorEl,
     logsModalOpen,
-    logsInvoiceId,
-    logsInvoiceNumber,
     archiveDialogOpen,
-    archiveInvoiceNumber,
+    selectedInvoice,
     archiving,
     handleViewClick,
     handleStatusChange,
@@ -128,9 +126,18 @@ export default function InvoicesDataGrid({
       renderCell: (params) => {
         const isUpdating = updatingStatus === params.row.id;
         return (
-          <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              width: "100%",
+              height: "100%",
+            }}
+          >
             {isUpdating ? (
               <CircularProgress size={20} />
+            ) : params.row.status === "archived" ? (
+              <Chip label="Archived" color="default" size="small" />
             ) : (
               <Select
                 value={params.row.status}
@@ -230,20 +237,21 @@ export default function InvoicesDataGrid({
         onClose={handleMenuClose}
         onMenuAction={handleMenuAction}
         invoices={invoices}
+        selectedInvoiceId={selectedInvoice?.id ?? ""}
       />
 
       <StatusLogsModal
         open={logsModalOpen}
         onClose={() => setLogsModalOpen(false)}
-        invoiceId={logsInvoiceId}
-        invoiceNumber={logsInvoiceNumber}
+        invoiceId={selectedInvoice?.id ?? ""}
+        invoiceNumber={selectedInvoice?.invoiceNumber}
       />
 
       <ArchiveInvoiceDialog
         open={archiveDialogOpen}
         onClose={handleArchiveDialogClose}
         onConfirm={handleArchiveConfirm}
-        invoiceNumber={archiveInvoiceNumber}
+        invoiceNumber={selectedInvoice?.id ?? ""}
         isArchiving={archiving}
       />
     </Box>

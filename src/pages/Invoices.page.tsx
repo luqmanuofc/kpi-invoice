@@ -29,6 +29,7 @@ export default function InvoicesPage() {
       status: "",
       startDate: "",
       endDate: "",
+      showArchived: false,
     };
   });
 
@@ -48,9 +49,21 @@ export default function InvoicesPage() {
 
         if (filters.invoiceNumber) params.invoiceNumber = filters.invoiceNumber;
         if (filters.buyerId) params.buyerId = filters.buyerId;
-        if (filters.status) params.status = filters.status;
         if (filters.startDate) params.startDate = filters.startDate;
         if (filters.endDate) params.endDate = filters.endDate;
+
+        // Build status array based on showArchived checkbox
+        // By default: show pending, paid, void
+        // If showArchived is true: also include archived
+        const statusArray: Array<"pending" | "paid" | "void" | "archived"> = [
+          "pending",
+          "paid",
+          "void",
+        ];
+        if (filters.showArchived) {
+          statusArray.push("archived");
+        }
+        params.status = statusArray;
 
         const data = await getInvoices(params);
         setInvoices(data.invoices);

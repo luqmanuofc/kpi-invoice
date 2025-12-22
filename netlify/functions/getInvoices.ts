@@ -43,13 +43,17 @@ export default async function handler(request: Request) {
         mode: "insensitive",
       };
     }
-    // Filter by status
+
+    // Filter by status (comma-separated list)
     if (status) {
-      where.status = status.toUpperCase();
+      const statusArray = status.split(",").map((s) => s.trim().toUpperCase());
+      where.status = {
+        in: statusArray,
+      };
     } else {
       // By default, exclude archived invoices
       where.status = {
-        not: "ARCHIVED",
+        in: ["PENDING", "PAID", "VOID"],
       };
     }
 
