@@ -174,7 +174,7 @@ export default function InvoicesCardView({
                     onChange={(e) =>
                       handleStatusChange(
                         invoice.id,
-                        e.target.value as "pending" | "paid" | "void"
+                        e.target.value as "pending" | "paid"
                       )
                     }
                     size="small"
@@ -185,9 +185,6 @@ export default function InvoicesCardView({
                     </MenuItem>
                     <MenuItem value="paid">
                       <Chip label="Paid" color="success" size="small" />
-                    </MenuItem>
-                    <MenuItem value="void">
-                      <Chip label="Void" color="error" size="small" />
                     </MenuItem>
                   </Select>
                 )}

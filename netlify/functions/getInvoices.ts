@@ -53,7 +53,7 @@ export default async function handler(request: Request) {
     } else {
       // By default, exclude archived invoices
       where.status = {
-        in: ["PENDING", "PAID", "VOID"],
+        in: ["PENDING", "PAID"],
       };
     }
 

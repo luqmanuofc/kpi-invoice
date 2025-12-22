@@ -473,10 +473,10 @@ export type InvoiceOrderByWithRelationInput = {
 
 export type InvoiceWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  invoiceNumber?: string
   AND?: Prisma.InvoiceWhereInput | Prisma.InvoiceWhereInput[]
   OR?: Prisma.InvoiceWhereInput[]
   NOT?: Prisma.InvoiceWhereInput | Prisma.InvoiceWhereInput[]
+  invoiceNumber?: Prisma.StringFilter<"Invoice"> | string
   date?: Prisma.DateTimeFilter<"Invoice"> | Date | string
   vehicleNumber?: Prisma.StringNullableFilter<"Invoice"> | string | null
   buyerId?: Prisma.StringFilter<"Invoice"> | string
@@ -506,7 +506,7 @@ export type InvoiceWhereUniqueInput = Prisma.AtLeast<{
   buyer?: Prisma.XOR<Prisma.BuyerScalarRelationFilter, Prisma.BuyerWhereInput>
   items?: Prisma.InvoiceItemListRelationFilter
   statusChangeEvents?: Prisma.InvoiceStatusLogListRelationFilter
-}, "id" | "invoiceNumber">
+}, "id">
 
 export type InvoiceOrderByWithAggregationInput = {
   id?: Prisma.SortOrder

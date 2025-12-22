@@ -32,7 +32,7 @@ export interface Invoice {
   total: number;
   amountInWords: string;
 
-  status: "pending" | "paid" | "void" | "archived";
+  status: "pending" | "paid" | "archived";
   internalNote: string | null;
 
   createdAt: string;
@@ -67,7 +67,7 @@ export interface GetInvoicesParams {
   page?: number;
   pageSize?: number;
   invoiceNumber?: string;
-  status?: Array<"pending" | "paid" | "void" | "archived">;
+  status?: Array<"pending" | "paid" | "archived">;
   startDate?: string;
   endDate?: string;
 }
@@ -171,12 +171,11 @@ export async function checkInvoiceNumber(
 
 export async function updateInvoiceStatus(
   id: string,
-  status: "pending" | "paid" | "void"
+  status: "pending" | "paid"
 ): Promise<Invoice> {
   const statusMap = {
     pending: "PENDING",
     paid: "PAID",
-    void: "VOID",
   };
 
   const response = await fetch("/.netlify/functions/updateInvoiceStatus", {
@@ -199,8 +198,8 @@ export async function updateInvoiceStatus(
 export interface InvoiceStatusLog {
   id: string;
   invoiceId: string;
-  oldStatus: "pending" | "paid" | "void" | "archived";
-  newStatus: "pending" | "paid" | "void" | "archived";
+  oldStatus: "pending" | "paid" | "archived";
+  newStatus: "pending" | "paid" | "archived";
   changedAt: string;
 }
 

@@ -1,4 +1,10 @@
-import { Typography, Box, Button, useMediaQuery, useTheme } from "@mui/material";
+import {
+  Typography,
+  Box,
+  Button,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getInvoices, type Invoice } from "../api/invoices";
@@ -53,12 +59,11 @@ export default function InvoicesPage() {
         if (filters.endDate) params.endDate = filters.endDate;
 
         // Build status array based on showArchived checkbox
-        // By default: show pending, paid, void
+        // By default: show pending, paid
         // If showArchived is true: also include archived
-        const statusArray: Array<"pending" | "paid" | "void" | "archived"> = [
+        const statusArray: Array<"pending" | "paid" | "archived"> = [
           "pending",
           "paid",
-          "void",
         ];
         if (filters.showArchived) {
           statusArray.push("archived");

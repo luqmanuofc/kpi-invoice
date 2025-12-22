@@ -23,7 +23,7 @@ export function useInvoiceActions(
 
   const handleStatusChange = async (
     invoiceId: string,
-    newStatus: "pending" | "paid" | "void"
+    newStatus: "pending" | "paid"
   ) => {
     setUpdatingStatus(invoiceId);
     try {

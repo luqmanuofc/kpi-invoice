@@ -144,7 +144,7 @@ export default function InvoicesDataGrid({
                 onChange={(e) =>
                   handleStatusChange(
                     params.row.id,
-                    e.target.value as "pending" | "paid" | "void"
+                    e.target.value as "pending" | "paid"
                   )
                 }
                 size="small"
@@ -155,9 +155,6 @@ export default function InvoicesDataGrid({
                 </MenuItem>
                 <MenuItem value="paid">
                   <Chip label="Paid" color="success" size="small" />
-                </MenuItem>
-                <MenuItem value="void">
-                  <Chip label="Void" color="error" size="small" />
                 </MenuItem>
               </Select>
             )}
@@ -172,10 +169,7 @@ export default function InvoicesDataGrid({
       sortable: false,
       disableColumnMenu: true,
       renderCell: (params) => (
-        <IconButton
-          onClick={(e) => handleMenuOpen(e, params.row)}
-          size="small"
-        >
+        <IconButton onClick={(e) => handleMenuOpen(e, params.row)} size="small">
           <MoreVertIcon />
         </IconButton>
       ),

@@ -58,8 +58,6 @@ export default function StatusLogsModal({
     switch (status) {
       case "paid":
         return "success";
-      case "void":
-        return "error";
       case "pending":
         return "warning";
       default:

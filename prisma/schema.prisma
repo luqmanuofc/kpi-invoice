@@ -56,7 +56,7 @@ enum ProductCategory {
 //
 model Invoice {
   id            String   @id @default(cuid())
-  invoiceNumber String   @unique
+  invoiceNumber String
   date          DateTime
   vehicleNumber String?
 
@@ -113,7 +113,6 @@ model Invoice {
 enum InvoiceStatus {
   PENDING
   PAID
-  VOID
   ARCHIVED
 }
 

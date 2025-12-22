@@ -14,34 +14,28 @@ export default async function handler(request: Request) {
     const data = await request.json();
 
     if (!data.id) {
-      return new Response(
-        JSON.stringify({ error: "Invoice ID is required" }),
-        {
-          status: 400,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      return new Response(JSON.stringify({ error: "Invoice ID is required" }), {
+        status: 400,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
     }
 
     if (!data.status) {
-      return new Response(
-        JSON.stringify({ error: "Status is required" }),
-        {
-          status: 400,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      return new Response(JSON.stringify({ error: "Status is required" }), {
+        status: 400,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
     }
 
-    const validStatuses = ["PENDING", "PAID", "VOID"];
+    const validStatuses = ["PENDING", "PAID"];
     if (!validStatuses.includes(data.status)) {
       return new Response(
         JSON.stringify({
-          error: "Invalid status. Must be one of: PENDING, PAID, VOID",
+          error: "Invalid status. Must be one of: PENDING, PAID",
         }),
         {
           status: 400,
