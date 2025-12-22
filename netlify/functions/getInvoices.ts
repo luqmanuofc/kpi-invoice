@@ -43,10 +43,14 @@ export default async function handler(request: Request) {
         mode: "insensitive",
       };
     }
-
     // Filter by status
     if (status) {
       where.status = status.toUpperCase();
+    } else {
+      // By default, exclude archived invoices
+      where.status = {
+        not: "ARCHIVED",
+      };
     }
 
     // Filter by date range

@@ -6,9 +6,6 @@ import {
   MenuItem,
   Chip,
   IconButton,
-  Menu,
-  ListItemIcon,
-  ListItemText,
   Card,
   CardContent,
   CardActions,
@@ -16,13 +13,12 @@ import {
   Button,
   Pagination,
 } from "@mui/material";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import HistoryIcon from "@mui/icons-material/History";
 import type { Invoice } from "../api/invoices";
 import { useInvoiceActions } from "../hooks/useInvoiceActions";
 import StatusLogsModal from "./StatusLogsModal";
+import InvoiceActionsMenu from "./InvoiceActionsMenu";
+import ArchiveInvoiceDialog from "./ArchiveInvoiceDialog";
 
 interface InvoicesCardViewProps {
   invoices: Invoice[];
@@ -33,6 +29,7 @@ interface InvoicesCardViewProps {
   rowCount?: number;
   onPageChange?: (page: number) => void;
   onStatusChange?: (updatedInvoice: Invoice) => void;
+  onInvoiceArchived?: (archivedInvoice: Invoice) => void;
 }
 
 export default function InvoicesCardView({
@@ -44,6 +41,7 @@ export default function InvoicesCardView({
   rowCount,
   onPageChange,
   onStatusChange,
+  onInvoiceArchived,
 }: InvoicesCardViewProps) {
   const {
     updatingStatus,
@@ -51,13 +49,18 @@ export default function InvoicesCardView({
     logsModalOpen,
     logsInvoiceId,
     logsInvoiceNumber,
+    archiveDialogOpen,
+    archiveInvoiceNumber,
+    archiving,
     handleViewClick,
     handleStatusChange,
     handleMenuOpen,
     handleMenuClose,
     handleMenuAction,
     setLogsModalOpen,
-  } = useInvoiceActions(onStatusChange);
+    handleArchiveConfirm,
+    handleArchiveDialogClose,
+  } = useInvoiceActions(onStatusChange, onInvoiceArchived);
 
   const totalPages = Math.ceil((rowCount || invoices.length) / pageSize);
 
@@ -218,44 +221,26 @@ export default function InvoicesCardView({
         />
       </Box>
 
-      <Menu
+      <InvoiceActionsMenu
         anchorEl={menuAnchorEl}
-        open={Boolean(menuAnchorEl)}
         onClose={handleMenuClose}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "right",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "right",
-        }}
-      >
-        <MenuItem onClick={() => handleMenuAction("view", invoices)}>
-          <ListItemIcon>
-            <VisibilityIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>View Invoice</ListItemText>
-        </MenuItem>
-        <MenuItem onClick={() => handleMenuAction("duplicate", invoices)}>
-          <ListItemIcon>
-            <ContentCopyIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>Duplicate Invoice</ListItemText>
-        </MenuItem>
-        <MenuItem onClick={() => handleMenuAction("logs", invoices)}>
-          <ListItemIcon>
-            <HistoryIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>View Logs</ListItemText>
-        </MenuItem>
-      </Menu>
+        onMenuAction={handleMenuAction}
+        invoices={invoices}
+      />
 
       <StatusLogsModal
         open={logsModalOpen}
         onClose={() => setLogsModalOpen(false)}
         invoiceId={logsInvoiceId}
         invoiceNumber={logsInvoiceNumber}
+      />
+
+      <ArchiveInvoiceDialog
+        open={archiveDialogOpen}
+        onClose={handleArchiveDialogClose}
+        onConfirm={handleArchiveConfirm}
+        invoiceNumber={archiveInvoiceNumber}
+        isArchiving={archiving}
       />
     </Box>
   );

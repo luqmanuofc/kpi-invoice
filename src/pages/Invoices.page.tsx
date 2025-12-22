@@ -77,6 +77,15 @@ export default function InvoicesPage() {
     );
   };
 
+  const handleInvoiceArchived = (archivedInvoice: Invoice) => {
+    // Remove the archived invoice from the list
+    setInvoices((prevInvoices) =>
+      prevInvoices.filter((invoice) => invoice.id !== archivedInvoice.id)
+    );
+    // Update total count
+    setTotalCount((prevCount) => prevCount - 1);
+  };
+
   return (
     <div style={{ margin: "2rem" }}>
       <Box
@@ -111,6 +120,7 @@ export default function InvoicesPage() {
           rowCount={totalCount}
           onPageChange={(newPage) => setPage(newPage + 1)}
           onStatusChange={handleStatusChange}
+          onInvoiceArchived={handleInvoiceArchived}
         />
       ) : (
         <InvoicesDataGrid
@@ -128,6 +138,7 @@ export default function InvoicesPage() {
             setPage(1);
           }}
           onStatusChange={handleStatusChange}
+          onInvoiceArchived={handleInvoiceArchived}
         />
       )}
     </div>

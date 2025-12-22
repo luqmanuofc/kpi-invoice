@@ -114,6 +114,7 @@ enum InvoiceStatus {
   PENDING
   PAID
   VOID
+  ARCHIVED
 }
 
 //

@@ -32,7 +32,7 @@ export interface Invoice {
   total: number;
   amountInWords: string;
 
-  status: "pending" | "paid" | "void";
+  status: "pending" | "paid" | "void" | "archived";
   internalNote: string | null;
 
   createdAt: string;
@@ -67,7 +67,7 @@ export interface GetInvoicesParams {
   page?: number;
   pageSize?: number;
   invoiceNumber?: string;
-  status?: "pending" | "paid" | "void";
+  status?: "pending" | "paid" | "void" | "archived";
   startDate?: string;
   endDate?: string;
 }
@@ -199,8 +199,8 @@ export async function updateInvoiceStatus(
 export interface InvoiceStatusLog {
   id: string;
   invoiceId: string;
-  oldStatus: "pending" | "paid" | "void";
-  newStatus: "pending" | "paid" | "void";
+  oldStatus: "pending" | "paid" | "void" | "archived";
+  newStatus: "pending" | "paid" | "void" | "archived";
   changedAt: string;
 }
 
@@ -218,6 +218,21 @@ export async function getInvoiceStatusLogs(
   if (!response.ok) {
     const text = await response.text();
     throw new Error(`Get invoice status logs failed: ${text}`);
+  }
+
+  return response.json();
+}
+
+export async function archiveInvoice(id: string): Promise<Invoice> {
+  const response = await fetch("/.netlify/functions/archiveInvoice", {
+    method: "PUT",
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ id }),
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`Archive invoice failed: ${text}`);
   }
 
   return response.json();
