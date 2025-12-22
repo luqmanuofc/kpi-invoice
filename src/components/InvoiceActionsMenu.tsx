@@ -21,7 +21,6 @@ export default function InvoiceActionsMenu({
   invoices,
 }: InvoiceActionsMenuProps) {
   const selectedInvoice = invoices.find((inv) => inv.id === selectedInvoiceId);
-  console.log("seledctdInvoice:>>", selectedInvoice);
   const isArchived = selectedInvoice?.status === "archived";
 
   return (

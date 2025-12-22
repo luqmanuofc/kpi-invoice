@@ -173,7 +173,7 @@ export default function InvoicesDataGrid({
       disableColumnMenu: true,
       renderCell: (params) => (
         <IconButton
-          onClick={(e) => handleMenuOpen(e, params.row.id)}
+          onClick={(e) => handleMenuOpen(e, params.row)}
           size="small"
         >
           <MoreVertIcon />
@@ -251,7 +251,7 @@ export default function InvoicesDataGrid({
         open={archiveDialogOpen}
         onClose={handleArchiveDialogClose}
         onConfirm={handleArchiveConfirm}
-        invoiceNumber={selectedInvoice?.id ?? ""}
+        invoiceNumber={selectedInvoice?.invoiceNumber ?? ""}
         isArchiving={archiving}
       />
     </Box>
