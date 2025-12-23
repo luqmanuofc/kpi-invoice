@@ -26,10 +26,13 @@ export default async function handler(request: Request) {
       );
     }
 
-    // Check if invoice number exists
+    // Check if invoice number exists (excluding archived invoices)
     const existingInvoice = await prisma.invoice.findFirst({
       where: {
         invoiceNumber: invoiceNumber,
+        status: {
+          not: "ARCHIVED",
+        },
       },
       select: {
         id: true,
