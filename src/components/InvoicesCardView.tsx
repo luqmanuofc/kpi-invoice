@@ -2,9 +2,6 @@ import {
   Box,
   CircularProgress,
   Alert,
-  Select,
-  MenuItem,
-  Chip,
   IconButton,
   Card,
   CardContent,
@@ -19,6 +16,7 @@ import { useInvoiceActions } from "../hooks/useInvoiceActions";
 import StatusLogsModal from "./StatusLogsModal";
 import InvoiceActionsMenu from "./InvoiceActionsMenu";
 import ArchiveInvoiceDialog from "./ArchiveInvoiceDialog";
+import InvoiceStatusChip from "./InvoiceStatusChip";
 
 interface InvoicesCardViewProps {
   invoices: Invoice[];
@@ -170,30 +168,12 @@ export default function InvoicesCardView({
                 </Typography>
                 {updatingStatus === invoice.id ? (
                   <CircularProgress size={20} />
-                ) : invoice.status === "archived" ? (
-                  <>
-                    {" "}
-                    <Chip label="Archived" color="default" size="small" />
-                  </>
                 ) : (
-                  <Select
-                    value={invoice.status}
-                    onChange={(e) =>
-                      handleStatusChange(
-                        invoice.id,
-                        e.target.value as "pending" | "paid"
-                      )
-                    }
-                    size="small"
-                    sx={{ minWidth: 120 }}
-                  >
-                    <MenuItem value="pending">
-                      <Chip label="Pending" color="warning" size="small" />
-                    </MenuItem>
-                    <MenuItem value="paid">
-                      <Chip label="Paid" color="success" size="small" />
-                    </MenuItem>
-                  </Select>
+                  <InvoiceStatusChip
+                    status={invoice.status}
+                    invoiceId={invoice.id}
+                    onStatusChange={handleStatusChange}
+                  />
                 )}
               </Box>
             </CardContent>

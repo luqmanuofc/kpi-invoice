@@ -2,9 +2,6 @@ import {
   Box,
   CircularProgress,
   Alert,
-  Select,
-  MenuItem,
-  Chip,
   IconButton,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
@@ -15,6 +12,7 @@ import { useInvoiceActions } from "../hooks/useInvoiceActions";
 import StatusLogsModal from "./StatusLogsModal";
 import InvoiceActionsMenu from "./InvoiceActionsMenu";
 import ArchiveInvoiceDialog from "./ArchiveInvoiceDialog";
+import InvoiceStatusChip from "./InvoiceStatusChip";
 
 interface InvoicesDataGridProps {
   invoices: Invoice[];
@@ -66,7 +64,8 @@ export default function InvoicesDataGrid({
     // Don't navigate if clicking on status or actions column
     const target = event.target as HTMLElement;
     const isStatusClick =
-      target.closest(".MuiSelect-root") ||
+      target.closest(".MuiChip-root") ||
+      target.closest(".MuiMenu-root") ||
       target.closest(".MuiMenuItem-root") ||
       target.closest('[role="button"]');
     const isActionsClick =
@@ -147,27 +146,12 @@ export default function InvoicesDataGrid({
           >
             {isUpdating ? (
               <CircularProgress size={20} />
-            ) : params.row.status === "archived" ? (
-              <Chip label="Archived" color="default" size="small" />
             ) : (
-              <Select
-                value={params.row.status}
-                onChange={(e) =>
-                  handleStatusChange(
-                    params.row.id,
-                    e.target.value as "pending" | "paid"
-                  )
-                }
-                size="small"
-                sx={{ width: "100%" }}
-              >
-                <MenuItem value="pending">
-                  <Chip label="Pending" color="warning" size="small" />
-                </MenuItem>
-                <MenuItem value="paid">
-                  <Chip label="Paid" color="success" size="small" />
-                </MenuItem>
-              </Select>
+              <InvoiceStatusChip
+                status={params.row.status}
+                invoiceId={params.row.id}
+                onStatusChange={handleStatusChange}
+              />
             )}
           </Box>
         );
