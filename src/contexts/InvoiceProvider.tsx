@@ -133,6 +133,7 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
       console.log("Invoice created:", result);
       setActiveStep(0);
       form.reset();
+      fetchAndSetNextInvoiceNumber();
       navigate(`/invoice/${result.id}`);
     } catch (err) {
       console.error(err);
