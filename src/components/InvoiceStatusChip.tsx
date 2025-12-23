@@ -27,7 +27,9 @@ export default function InvoiceStatusChip({
   };
 
   const handleStatusSelect = (newStatus: "pending" | "paid") => {
-    onStatusChange(invoiceId, newStatus);
+    if (newStatus !== status) {
+      onStatusChange(invoiceId, newStatus);
+    }
     handleMenuClose();
   };
 
