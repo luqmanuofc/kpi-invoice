@@ -112,7 +112,14 @@ export default function InvoicesCardView({
             }}
           >
             <CardContent sx={{ flexGrow: 1 }}>
-              <Typography variant="h6" component="div" gutterBottom>
+              <Typography
+                variant="h6"
+                component="div"
+                gutterBottom
+                sx={{
+                  textDecoration: invoice.status === "archived" ? "line-through" : "none"
+                }}
+              >
                 {invoice.invoiceNumber}
               </Typography>
               <Typography

@@ -80,7 +80,18 @@ export default function InvoicesDataGrid({
   };
 
   const columns: GridColDef[] = [
-    { field: "invoiceNumber", headerName: "Invoice #", width: 130 },
+    {
+      field: "invoiceNumber",
+      headerName: "Invoice #",
+      width: 130,
+      renderCell: (params) => (
+        <span style={{
+          textDecoration: params.row.status === "archived" ? "line-through" : "none"
+        }}>
+          {params.value}
+        </span>
+      ),
+    },
     {
       field: "date",
       headerName: "Date",
