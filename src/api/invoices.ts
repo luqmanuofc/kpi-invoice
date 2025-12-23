@@ -72,6 +72,28 @@ export interface GetInvoicesParams {
   endDate?: string;
 }
 
+function normalizeInvoice(invoice: any): Invoice {
+  return {
+    ...invoice,
+    cgstRate: Number(invoice.cgstRate),
+    sgstRate: Number(invoice.sgstRate),
+    igstRate: Number(invoice.igstRate),
+    cgstAmount: Number(invoice.cgstAmount),
+    sgstAmount: Number(invoice.sgstAmount),
+    igstAmount: Number(invoice.igstAmount),
+    discount: Number(invoice.discount),
+    subtotal: Number(invoice.subtotal),
+    total: Number(invoice.total),
+    items: invoice.items?.map((item: any) => ({
+      ...item,
+      qty: Number(item.qty),
+      rate: Number(item.rate),
+      lineTotal: Number(item.lineTotal),
+      position: Number(item.position),
+    })),
+  };
+}
+
 export async function createInvoice(data: InvoiceForm): Promise<Invoice> {
   const response = await fetch("/.netlify/functions/createInvoice", {
     method: "POST",
@@ -84,7 +106,8 @@ export async function createInvoice(data: InvoiceForm): Promise<Invoice> {
     throw new Error(`Create invoice failed: ${text}`);
   }
 
-  return response.json();
+  const invoice = await response.json();
+  return normalizeInvoice(invoice);
 }
 
 export async function getInvoices(
@@ -131,7 +154,11 @@ export async function getInvoices(
     throw new Error(`Get invoices failed: ${text}`);
   }
 
-  return response.json();
+  const data = await response.json();
+  return {
+    ...data,
+    invoices: data.invoices.map(normalizeInvoice),
+  };
 }
 
 export async function getInvoiceById(id: string): Promise<Invoice> {
@@ -145,7 +172,8 @@ export async function getInvoiceById(id: string): Promise<Invoice> {
     throw new Error(`Get invoice failed: ${text}`);
   }
 
-  return response.json();
+  const invoice = await response.json();
+  return normalizeInvoice(invoice);
 }
 
 export async function checkInvoiceNumber(
@@ -193,7 +221,8 @@ export async function updateInvoiceStatus(
     throw new Error(`Update invoice status failed: ${text}`);
   }
 
-  return response.json();
+  const invoice = await response.json();
+  return normalizeInvoice(invoice);
 }
 
 export interface InvoiceStatusLog {

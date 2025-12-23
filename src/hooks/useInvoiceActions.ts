@@ -2,11 +2,13 @@ import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { updateInvoiceStatus, archiveInvoice } from "../api/invoices";
 import type { Invoice } from "../api/invoices";
+import { useInvoice } from "../contexts/InvoiceProvider";
 
 export function useInvoiceActions(
   onStatusChange?: (updatedInvoice: Invoice) => void,
   onInvoiceArchived?: (archivedInvoice: Invoice) => void
 ) {
+  const { duplicateInvoice } = useInvoice();
   const navigate = useNavigate();
   const location = useLocation();
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
@@ -59,8 +61,7 @@ export function useInvoiceActions(
         handleViewClick(selectedInvoice.id);
         break;
       case "duplicate":
-        // TODO: Implement duplicate functionality
-        console.log("Duplicate invoice:", selectedInvoice.id);
+        duplicateInvoice(selectedInvoice);
         handleMenuClose();
         break;
       case "logs":

@@ -10,13 +10,18 @@ import { useForm, type UseFormReturn } from "react-hook-form";
 import dayjs from "dayjs";
 import { ToWords } from "to-words";
 import type { InvoiceForm } from "../invoice-form/types";
-import { createInvoice, getNextInvoiceNumber } from "../api/invoices";
+import {
+  createInvoice,
+  getNextInvoiceNumber,
+  type Invoice,
+} from "../api/invoices";
 import { useNavigate } from "react-router-dom";
 
 type InvoiceContextType = {
   form: UseFormReturn<InvoiceForm, any, InvoiceForm>;
   computedData: InvoiceForm;
   handleCreateInvoice: () => void;
+  duplicateInvoice: (invoice: Invoice) => void;
   activeStep: number;
   setActiveStep: (step: number) => void;
   invoiceNumberExists: boolean;
@@ -34,7 +39,8 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
   const [invoiceNumberExists, setInvoiceNumberExists] = useState(false);
   const [isCheckingInvoiceNumber, setIsCheckingInvoiceNumber] = useState(false);
   const [isCreatingInvoice, setIsCreatingInvoice] = useState(false);
-  const [isFetchingNextInvoiceNumber, setIsFetchingNextInvoiceNumber] = useState(false);
+  const [isFetchingNextInvoiceNumber, setIsFetchingNextInvoiceNumber] =
+    useState(false);
   const navigate = useNavigate();
 
   const form = useForm<InvoiceForm>({
@@ -68,21 +74,21 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
     },
   });
 
+  const fetchAndSetNextInvoiceNumber = async () => {
+    setIsFetchingNextInvoiceNumber(true);
+    try {
+      const result = await getNextInvoiceNumber("2025-26/");
+      form.setValue("invoiceNumber", result.nextInvoiceNumber);
+    } catch (err) {
+      console.error("Failed to fetch next invoice number:", err);
+    } finally {
+      setIsFetchingNextInvoiceNumber(false);
+    }
+  };
+
   // Fetch and populate next invoice number on mount
   useEffect(() => {
-    const fetchNextInvoiceNumber = async () => {
-      setIsFetchingNextInvoiceNumber(true);
-      try {
-        const result = await getNextInvoiceNumber("2025-26/");
-        form.setValue("invoiceNumber", result.nextInvoiceNumber);
-      } catch (err) {
-        console.error("Failed to fetch next invoice number:", err);
-      } finally {
-        setIsFetchingNextInvoiceNumber(false);
-      }
-    };
-
-    fetchNextInvoiceNumber();
+    fetchAndSetNextInvoiceNumber();
   }, [form]);
 
   const formData = form.watch();
@@ -136,12 +142,80 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const duplicateInvoice = (invoice: Invoice) => {
+    console.log("duplicating Invoice:>>", invoice);
+    // Convert Invoice to InvoiceForm
+    const invoiceFormData: InvoiceForm = {
+      // Let invoiceNumber auto-generate (will be set by the useEffect)
+      invoiceNumber: "",
+      vehicleNumber: invoice.vehicleNumber,
+      date: dayjs().format("YYYY-MM-DD"), // Use today's date for the duplicate
+
+      // Reconstruct buyer object from snapshot data
+      buyer: {
+        id: invoice.buyerId,
+        name: invoice.buyerNameSnapshot,
+        address: invoice.buyerAddressSnapshot,
+        gstin: invoice.buyerGstinSnapshot,
+        phone: invoice.buyerPhontSnapshot,
+        createdAt: "", // Not needed for form
+        updatedAt: "", // Not needed for form
+      },
+
+      // Copy items (without id and position as they're DB-specific)
+      items:
+        invoice.items?.map((item) => ({
+          productId: item.productId,
+          description: item.description,
+          hsn: item.hsn,
+          qty: item.qty,
+          unit: item.unit,
+          rate: item.rate,
+          lineTotal: item.lineTotal,
+        })) || [],
+
+      // Copy discount and tax rates (amounts will be auto-calculated)
+      discount: invoice.discount,
+      cgstRate: invoice.cgstRate,
+      sgstRate: invoice.sgstRate,
+      igstRate: invoice.igstRate,
+
+      // These will be auto-calculated by computedData
+      subtotal: 0,
+      cgstAmount: 0,
+      sgstAmount: 0,
+      igstAmount: 0,
+      total: 0,
+      amountInWords: "",
+
+      // Copy seller info from snapshot
+      sellerName: invoice.sellerNameSnapshot,
+      sellerAddress: invoice.sellerAddressSnapshot,
+      sellerEmail: invoice.sellerEmailSnapshot,
+      sellerPhone: invoice.sellerPhoneSnapshot,
+      sellerGstin: invoice.sellerGstinSnapshot,
+    };
+
+    // Reset the form with the duplicated data
+    form.reset(invoiceFormData);
+
+    // Fetch and set the next invoice number
+    fetchAndSetNextInvoiceNumber();
+
+    // Reset to first step
+    setActiveStep(0);
+
+    // Navigate to create invoice page
+    navigate("/");
+  };
+
   return (
     <InvoiceContext.Provider
       value={{
         form,
         computedData,
         handleCreateInvoice,
+        duplicateInvoice,
         activeStep,
         setActiveStep,
         invoiceNumberExists,
