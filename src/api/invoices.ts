@@ -171,11 +171,12 @@ export async function checkInvoiceNumber(
 
 export async function updateInvoiceStatus(
   id: string,
-  status: "pending" | "paid"
+  status: "pending" | "paid" | "archived"
 ): Promise<Invoice> {
   const statusMap = {
     pending: "PENDING",
     paid: "PAID",
+    archived: "ARCHIVED",
   };
 
   const response = await fetch("/.netlify/functions/updateInvoiceStatus", {
@@ -223,18 +224,7 @@ export async function getInvoiceStatusLogs(
 }
 
 export async function archiveInvoice(id: string): Promise<Invoice> {
-  const response = await fetch("/.netlify/functions/archiveInvoice", {
-    method: "PUT",
-    headers: getAuthHeaders(),
-    body: JSON.stringify({ id }),
-  });
-
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(`Archive invoice failed: ${text}`);
-  }
-
-  return response.json();
+  return updateInvoiceStatus(id, "archived");
 }
 
 export async function getNextInvoiceNumber(

@@ -31,11 +31,11 @@ export default async function handler(request: Request) {
       });
     }
 
-    const validStatuses = ["PENDING", "PAID"];
+    const validStatuses = ["PENDING", "PAID", "ARCHIVED"];
     if (!validStatuses.includes(data.status)) {
       return new Response(
         JSON.stringify({
-          error: "Invalid status. Must be one of: PENDING, PAID",
+          error: "Invalid status. Must be one of: PENDING, PAID, ARCHIVED",
         }),
         {
           status: 400,
@@ -58,6 +58,21 @@ export default async function handler(request: Request) {
           "Content-Type": "application/json",
         },
       });
+    }
+
+    // Prevent changing status of archived invoices
+    if (currentInvoice.status === "ARCHIVED") {
+      return new Response(
+        JSON.stringify({
+          error: "Cannot change status of archived invoice",
+        }),
+        {
+          status: 400,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
     }
 
     // Update invoice and create status log in a transaction
