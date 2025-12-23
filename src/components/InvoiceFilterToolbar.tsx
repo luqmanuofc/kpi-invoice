@@ -27,15 +27,15 @@ export interface InvoiceFilters {
 interface InvoiceFilterToolbarProps {
   filters: InvoiceFilters;
   onFiltersChange: (filters: InvoiceFilters) => void;
-  initialFilterType?: "search" | "buyer";
+  initialFilterType?: "invoiceNumber" | "buyer";
 }
 
 export default function InvoiceFilterToolbar({
   filters,
   onFiltersChange,
-  initialFilterType = "search",
+  initialFilterType = "invoiceNumber",
 }: InvoiceFilterToolbarProps) {
-  const [filterType, setFilterType] = useState<"search" | "buyer">(
+  const [filterType, setFilterType] = useState<"invoiceNumber" | "buyer">(
     initialFilterType
   );
   const { data: buyers = [], isLoading: loadingBuyers } = useBuyers();
@@ -65,11 +65,11 @@ export default function InvoiceFilterToolbar({
     });
   };
 
-  const handleFilterTypeChange = (type: "search" | "buyer") => {
+  const handleFilterTypeChange = (type: "invoiceNumber" | "buyer") => {
     setFilterType(type);
 
     // Clear the opposite filter when switching types
-    if (type === "search" && filters.buyerId) {
+    if (type === "invoiceNumber" && filters.buyerId) {
       onFiltersChange({
         ...filters,
         buyerId: "",
@@ -92,7 +92,9 @@ export default function InvoiceFilterToolbar({
             size="small"
             value={filterType}
             onChange={(e) =>
-              handleFilterTypeChange(e.target.value as "search" | "buyer")
+              handleFilterTypeChange(
+                e.target.value as "invoiceNumber" | "buyer"
+              )
             }
             sx={{ minWidth: 120, textAlign: "left" }}
             label="Search by"
@@ -110,11 +112,11 @@ export default function InvoiceFilterToolbar({
               },
             }}
           >
-            <MenuItem value="search">Invoice #</MenuItem>
+            <MenuItem value="invoiceNumber">Invoice #</MenuItem>
             <MenuItem value="buyer">Buyer</MenuItem>
           </TextField>
 
-          {filterType === "search" && (
+          {filterType === "invoiceNumber" && (
             <TextField
               size="small"
               label="Invoice Number"

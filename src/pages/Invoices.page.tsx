@@ -125,7 +125,7 @@ export default function InvoicesPage() {
       <InvoiceFilterToolbar
         filters={filters}
         onFiltersChange={setFilters}
-        initialFilterType={filters.buyerId ? "buyer" : "search"}
+        initialFilterType={filters.buyerId ? "buyer" : "invoiceNumber"}
       />
 
       {isMobile ? (
