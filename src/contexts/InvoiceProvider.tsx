@@ -1,6 +1,7 @@
 import {
   createContext,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -9,7 +10,7 @@ import { useForm, type UseFormReturn } from "react-hook-form";
 import dayjs from "dayjs";
 import { ToWords } from "to-words";
 import type { InvoiceForm } from "../invoice-form/types";
-import { createInvoice } from "../api/invoices";
+import { createInvoice, getNextInvoiceNumber } from "../api/invoices";
 import { useNavigate } from "react-router-dom";
 
 type InvoiceContextType = {
@@ -23,6 +24,7 @@ type InvoiceContextType = {
   isCheckingInvoiceNumber: boolean;
   setIsCheckingInvoiceNumber: (isChecking: boolean) => void;
   isCreatingInvoice: boolean;
+  isFetchingNextInvoiceNumber: boolean;
 };
 
 const InvoiceContext = createContext<InvoiceContextType | undefined>(undefined);
@@ -32,6 +34,7 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
   const [invoiceNumberExists, setInvoiceNumberExists] = useState(false);
   const [isCheckingInvoiceNumber, setIsCheckingInvoiceNumber] = useState(false);
   const [isCreatingInvoice, setIsCreatingInvoice] = useState(false);
+  const [isFetchingNextInvoiceNumber, setIsFetchingNextInvoiceNumber] = useState(false);
   const navigate = useNavigate();
 
   const form = useForm<InvoiceForm>({
@@ -64,6 +67,23 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
       items: [],
     },
   });
+
+  // Fetch and populate next invoice number on mount
+  useEffect(() => {
+    const fetchNextInvoiceNumber = async () => {
+      setIsFetchingNextInvoiceNumber(true);
+      try {
+        const result = await getNextInvoiceNumber("2025-26/");
+        form.setValue("invoiceNumber", result.nextInvoiceNumber);
+      } catch (err) {
+        console.error("Failed to fetch next invoice number:", err);
+      } finally {
+        setIsFetchingNextInvoiceNumber(false);
+      }
+    };
+
+    fetchNextInvoiceNumber();
+  }, [form]);
 
   const formData = form.watch();
 
@@ -129,6 +149,7 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
         isCheckingInvoiceNumber,
         setIsCheckingInvoiceNumber,
         isCreatingInvoice,
+        isFetchingNextInvoiceNumber,
       }}
     >
       {children}

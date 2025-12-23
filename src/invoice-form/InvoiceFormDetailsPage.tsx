@@ -29,6 +29,7 @@ export default function InvoiceFormDetailsPage() {
     setInvoiceNumberExists,
     isCheckingInvoiceNumber,
     setIsCheckingInvoiceNumber,
+    isFetchingNextInvoiceNumber,
   } = useInvoice();
   const { control, watch } = form;
   const navigate = useNavigate();
@@ -82,6 +83,7 @@ export default function InvoiceFormDetailsPage() {
               label="Invoice Number"
               fullWidth
               {...field}
+              disabled={isFetchingNextInvoiceNumber}
               onChange={(e) => {
                 field.onChange(e);
                 if (error) {
@@ -97,7 +99,7 @@ export default function InvoiceFormDetailsPage() {
               }
               slotProps={{
                 input: {
-                  endAdornment: isCheckingInvoiceNumber ? (
+                  endAdornment: (isCheckingInvoiceNumber || isFetchingNextInvoiceNumber) ? (
                     <CircularProgress size={20} />
                   ) : null,
                 },

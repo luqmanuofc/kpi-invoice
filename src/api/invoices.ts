@@ -236,3 +236,24 @@ export async function archiveInvoice(id: string): Promise<Invoice> {
 
   return response.json();
 }
+
+export async function getNextInvoiceNumber(
+  prefix: string = "2025-26/"
+): Promise<{ nextInvoiceNumber: string; prefix: string; nextNumber: number }> {
+  const response = await fetch(
+    `/.netlify/functions/getNextInvoiceNumber?prefix=${encodeURIComponent(
+      prefix
+    )}`,
+    {
+      method: "GET",
+      headers: getAuthHeaders(),
+    }
+  );
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`Get next invoice number failed: ${text}`);
+  }
+
+  return response.json();
+}
