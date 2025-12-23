@@ -143,7 +143,6 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
   };
 
   const duplicateInvoice = (invoice: Invoice) => {
-    console.log("duplicating Invoice:>>", invoice);
     // Convert Invoice to InvoiceForm
     const invoiceFormData: InvoiceForm = {
       // Let invoiceNumber auto-generate (will be set by the useEffect)
