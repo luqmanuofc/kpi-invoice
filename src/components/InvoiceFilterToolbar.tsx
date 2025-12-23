@@ -86,7 +86,15 @@ export default function InvoiceFilterToolbar({
   return (
     <Paper elevation={1} sx={{ mb: 2, p: 2 }}>
       <Box display="flex" gap={2} alignItems="flex-start" flexWrap="wrap">
-        <Box display="flex" gap={1} alignItems="flex-start">
+        <Box
+          display="flex"
+          gap={1}
+          alignItems="flex-start"
+          sx={{
+            flexDirection: { xs: "column", sm: "row" },
+            width: { xs: "100%", sm: "auto" },
+          }}
+        >
           <TextField
             select
             size="small"
@@ -96,7 +104,10 @@ export default function InvoiceFilterToolbar({
                 e.target.value as "invoiceNumber" | "buyer"
               )
             }
-            sx={{ minWidth: 120, textAlign: "left" }}
+            sx={{
+              minWidth: { xs: "100%", sm: 120 },
+              textAlign: "left",
+            }}
             label="Search by"
             slotProps={{
               select: {
@@ -123,7 +134,7 @@ export default function InvoiceFilterToolbar({
               value={localInvoiceNumber}
               onChange={(e) => setLocalInvoiceNumber(e.target.value)}
               placeholder="Search..."
-              sx={{ minWidth: 250 }}
+              sx={{ minWidth: { xs: "100%", sm: 250 } }}
               slotProps={{
                 input: {
                   startAdornment: (
@@ -187,7 +198,7 @@ export default function InvoiceFilterToolbar({
                   }}
                 />
               )}
-              sx={{ minWidth: 250 }}
+              sx={{ minWidth: { xs: "100%", sm: 250 } }}
             />
           )}
         </Box>
