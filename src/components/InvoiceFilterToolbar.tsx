@@ -94,7 +94,7 @@ export default function InvoiceFilterToolbar({
             onChange={(e) =>
               handleFilterTypeChange(e.target.value as "search" | "buyer")
             }
-            sx={{ minWidth: 140 }}
+            sx={{ minWidth: 120, textAlign: "left" }}
             label="Search by"
             slotProps={{
               select: {
