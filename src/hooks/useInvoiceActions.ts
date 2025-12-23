@@ -65,7 +65,6 @@ export function useInvoiceActions(
         break;
       case "logs":
         setLogsModalOpen(true);
-        handleMenuClose();
         break;
       case "archive":
         setArchiveDialogOpen(true);
