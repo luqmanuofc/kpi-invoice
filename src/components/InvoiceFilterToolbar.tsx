@@ -1,15 +1,14 @@
 import {
   Box,
   TextField,
-  Button,
   Paper,
-  ButtonGroup,
   Autocomplete,
   CircularProgress,
   InputAdornment,
   IconButton,
   FormControlLabel,
   Checkbox,
+  MenuItem,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import ClearIcon from "@mui/icons-material/Clear";
@@ -86,129 +85,127 @@ export default function InvoiceFilterToolbar({
 
   return (
     <Paper elevation={1} sx={{ mb: 2, p: 2 }}>
-      <Box
-        display={"flex"}
-        gap={2}
-        flexDirection={"column"}
-        alignItems={"center"}
-        width="100%"
-      >
-        <ButtonGroup
-          sx={{
-            mb: 2,
-            "& .MuiButton-root:first-of-type": {
-              borderTopLeftRadius: 20,
-              borderBottomLeftRadius: 20,
-            },
-            "& .MuiButton-root:last-of-type": {
-              borderTopRightRadius: 20,
-              borderBottomRightRadius: 20,
-            },
-          }}
-          variant="outlined"
-          aria-label="Filter type selector"
-        >
-          <Button
-            sx={{ width: "125px" }}
-            variant={filterType === "search" ? "contained" : "outlined"}
-            onClick={() => handleFilterTypeChange("search")}
+      <Box display="flex" gap={2} alignItems="flex-start" flexWrap="wrap">
+        <Box display="flex" gap={1} alignItems="flex-start">
+          <TextField
+            select
+            size="small"
+            value={filterType}
+            onChange={(e) =>
+              handleFilterTypeChange(e.target.value as "search" | "buyer")
+            }
+            sx={{ minWidth: 140 }}
+            label="Search by"
+            slotProps={{
+              select: {
+                MenuProps: {
+                  PaperProps: {
+                    sx: {
+                      "& .MuiMenuItem-root": {
+                        justifyContent: "flex-start",
+                      },
+                    },
+                  },
+                },
+              },
+            }}
           >
-            Search
-          </Button>
-          <Button
-            sx={{ width: "125px" }}
-            variant={filterType === "buyer" ? "contained" : "outlined"}
-            onClick={() => handleFilterTypeChange("buyer")}
-          >
-            Buyer
-          </Button>
-        </ButtonGroup>
-        <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
-          <Box>
-            {filterType === "search" && (
-              <Box width={"100%"}>
+            <MenuItem value="search">Invoice #</MenuItem>
+            <MenuItem value="buyer">Buyer</MenuItem>
+          </TextField>
+
+          {filterType === "search" && (
+            <TextField
+              size="small"
+              label="Invoice Number"
+              value={localInvoiceNumber}
+              onChange={(e) => setLocalInvoiceNumber(e.target.value)}
+              placeholder="Search..."
+              sx={{ minWidth: 250 }}
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon fontSize="small" />
+                    </InputAdornment>
+                  ),
+                  endAdornment: localInvoiceNumber ? (
+                    <InputAdornment position="end">
+                      <IconButton
+                        size="small"
+                        onClick={() => setLocalInvoiceNumber("")}
+                        edge="end"
+                      >
+                        <ClearIcon fontSize="small" />
+                      </IconButton>
+                    </InputAdornment>
+                  ) : null,
+                },
+              }}
+            />
+          )}
+
+          {filterType === "buyer" && (
+            <Autocomplete
+              options={buyers}
+              getOptionLabel={(option) => option.name}
+              getOptionKey={(option) => option.id}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              loading={loadingBuyers}
+              value={buyers.find((b) => b.id === filters.buyerId) || null}
+              onChange={(_, value) => {
+                handleFilterChange("buyerId", value?.id || "");
+              }}
+              renderInput={(params) => (
                 <TextField
+                  {...params}
+                  label="Buyer"
                   size="small"
-                  label="Enter Invoice Number"
-                  value={localInvoiceNumber}
-                  onChange={(e) => setLocalInvoiceNumber(e.target.value)}
-                  placeholder="Search..."
-                  sx={{ minWidth: 300 }}
+                  placeholder="Select buyer..."
                   slotProps={{
                     input: {
+                      ...params.InputProps,
                       startAdornment: (
-                        <InputAdornment position="start">
-                          <SearchIcon />
-                        </InputAdornment>
+                        <>
+                          <InputAdornment position="start">
+                            <SearchIcon fontSize="small" />
+                          </InputAdornment>
+                          {params.InputProps.startAdornment}
+                        </>
                       ),
-                      endAdornment: localInvoiceNumber ? (
-                        <InputAdornment position="end">
-                          <IconButton
-                            size="small"
-                            onClick={() => setLocalInvoiceNumber("")}
-                            edge="end"
-                          >
-                            <ClearIcon />
-                          </IconButton>
-                        </InputAdornment>
-                      ) : null,
+                      endAdornment: (
+                        <>
+                          {loadingBuyers ? (
+                            <CircularProgress color="inherit" size={20} />
+                          ) : null}
+                          {params.InputProps.endAdornment}
+                        </>
+                      ),
                     },
                   }}
                 />
-              </Box>
-            )}
-            {filterType === "buyer" && (
-              <Autocomplete
-                options={buyers}
-                getOptionLabel={(option) => option.name}
-                getOptionKey={(option) => option.id}
-                isOptionEqualToValue={(option, value) => option.id === value.id}
-                loading={loadingBuyers}
-                value={buyers.find((b) => b.id === filters.buyerId) || null}
-                onChange={(_, value) => {
-                  handleFilterChange("buyerId", value?.id || "");
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Select Buyer"
-                    size="small"
-                    placeholder="All Buyers"
-                    slotProps={{
-                      input: {
-                        ...params.InputProps,
-                        endAdornment: (
-                          <>
-                            {loadingBuyers ? (
-                              <CircularProgress color="inherit" size={20} />
-                            ) : null}
-                            {params.InputProps.endAdornment}
-                          </>
-                        ),
-                      },
-                    }}
-                  />
-                )}
-                sx={{ minWidth: 300 }}
-              />
-            )}
-          </Box>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={filters.showArchived || false}
-                onChange={(e) =>
-                  onFiltersChange({
-                    ...filters,
-                    showArchived: e.target.checked,
-                  })
-                }
-                size="small"
-              />
-            }
-            label="Show Archived"
-          />
+              )}
+              sx={{ minWidth: 250 }}
+            />
+          )}
         </Box>
+
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={filters.showArchived || false}
+              onChange={(e) =>
+                onFiltersChange({
+                  ...filters,
+                  showArchived: e.target.checked,
+                })
+              }
+              size="small"
+            />
+          }
+          label="Include Archived"
+          sx={{ ml: "auto" }}
+        />
       </Box>
     </Paper>
   );
