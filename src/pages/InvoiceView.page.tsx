@@ -79,7 +79,7 @@ export default function InvoiceViewPage() {
         name: invoice.buyerNameSnapshot,
         address: invoice.buyerAddressSnapshot,
         gstin: invoice.buyerGstinSnapshot,
-        phone: invoice.buyerPhontSnapshot,
+        phone: invoice.buyerPhoneSnapshot,
       } as Buyer,
 
       sellerName: invoice.sellerNameSnapshot,

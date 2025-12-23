@@ -11,7 +11,7 @@ export interface Invoice {
   buyerNameSnapshot: string;
   buyerAddressSnapshot: string;
   buyerGstinSnapshot: string | null;
-  buyerPhontSnapshot: string | null;
+  buyerPhoneSnapshot: string | null;
 
   sellerNameSnapshot: string;
   sellerAddressSnapshot: string;

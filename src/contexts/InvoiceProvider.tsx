@@ -156,7 +156,7 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
         name: invoice.buyerNameSnapshot,
         address: invoice.buyerAddressSnapshot,
         gstin: invoice.buyerGstinSnapshot,
-        phone: invoice.buyerPhontSnapshot,
+        phone: invoice.buyerPhoneSnapshot,
         createdAt: "", // Not needed for form
         updatedAt: "", // Not needed for form
       },
