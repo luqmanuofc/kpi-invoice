@@ -27,18 +27,27 @@ export default function CSVExportButton({ month }: CSVExportButtonProps) {
 
     const allRows: any[][] = [];
 
-    // Group invoices by buyer
-    const groupedByBuyer = data.reduce((acc, invoice) => {
-      if (!acc[invoice.buyerId]) {
-        acc[invoice.buyerId] = {
-          buyerName: invoice.buyerName,
-          buyerGstin: invoice.buyerGstin,
-          invoices: [],
-        };
-      }
-      acc[invoice.buyerId].invoices.push(invoice);
-      return acc;
-    }, {} as Record<string, { buyerName: string; buyerGstin: string; invoices: InvoiceExportData[] }>);
+    // Separate invoices into B2C (no GST) and B2B (with GST)
+    const b2cInvoices = data.filter(inv => !inv.buyerGstin || inv.buyerGstin.trim() === "");
+    const b2bInvoices = data.filter(inv => inv.buyerGstin && inv.buyerGstin.trim() !== "");
+
+    // Group each category by buyer
+    const groupByBuyer = (invoices: InvoiceExportData[]) => {
+      return invoices.reduce((acc, invoice) => {
+        if (!acc[invoice.buyerId]) {
+          acc[invoice.buyerId] = {
+            buyerName: invoice.buyerName,
+            buyerGstin: invoice.buyerGstin,
+            invoices: [],
+          };
+        }
+        acc[invoice.buyerId].invoices.push(invoice);
+        return acc;
+      }, {} as Record<string, { buyerName: string; buyerGstin: string; invoices: InvoiceExportData[] }>);
+    };
+
+    const b2cGrouped = groupByBuyer(b2cInvoices);
+    const b2bGrouped = groupByBuyer(b2bInvoices);
 
     // Add headers first
     allRows.push(headers);
@@ -46,35 +55,74 @@ export default function CSVExportButton({ month }: CSVExportButtonProps) {
     // Add empty row after headers
     allRows.push([]);
 
-    // Track buyer header row indices for styling
+    // Track category header and buyer header row indices for styling
+    const categoryHeaderRows: number[] = [];
     const buyerHeaderRows: number[] = [];
 
-    // For each buyer, add buyer header and their invoices
-    Object.values(groupedByBuyer).forEach((buyer) => {
-      // Add buyer header row: Buyer Name, GST Number
-      buyerHeaderRows.push(allRows.length);
-      allRows.push([buyer.buyerName, buyer.buyerGstin]);
+    // Helper function to add buyer groups
+    const addBuyerGroups = (groupedByBuyer: typeof b2cGrouped) => {
+      Object.values(groupedByBuyer).forEach((buyer) => {
+        // Add buyer header row: Buyer Name, GST Number
+        buyerHeaderRows.push(allRows.length);
+        allRows.push([buyer.buyerName, buyer.buyerGstin]);
 
-      // Add invoice rows for this buyer
-      buyer.invoices.forEach((invoice) => {
-        allRows.push([
-          invoice.invoiceNumber,
-          dayjs(invoice.date).format("DD/MM/YYYY"),
-          invoice.buyerName,
-          Number(invoice.subtotal.toFixed(2)),
-          Number(invoice.cgstAmount.toFixed(2)),
-          Number(invoice.sgstAmount.toFixed(2)),
-          Number(invoice.igstAmount.toFixed(2)),
-          Number(invoice.total.toFixed(2)),
-        ]);
+        // Add invoice rows for this buyer
+        buyer.invoices.forEach((invoice) => {
+          allRows.push([
+            invoice.invoiceNumber,
+            dayjs(invoice.date).format("DD/MM/YYYY"),
+            invoice.buyerName,
+            Number(invoice.subtotal.toFixed(2)),
+            Number(invoice.cgstAmount.toFixed(2)),
+            Number(invoice.sgstAmount.toFixed(2)),
+            Number(invoice.igstAmount.toFixed(2)),
+            Number(invoice.total.toFixed(2)),
+          ]);
+        });
+
+        // Add empty row after each buyer's invoices
+        allRows.push([""]);
       });
+    };
 
-      // Add empty row after each buyer's invoices
+    // Add B2C section
+    if (Object.keys(b2cGrouped).length > 0) {
+      categoryHeaderRows.push(allRows.length);
+      allRows.push(["B2C"]);
       allRows.push([""]);
-    });
+      addBuyerGroups(b2cGrouped);
+    }
+
+    // Add B2B section
+    if (Object.keys(b2bGrouped).length > 0) {
+      categoryHeaderRows.push(allRows.length);
+      allRows.push(["B2B"]);
+      allRows.push([""]);
+      addBuyerGroups(b2bGrouped);
+    }
 
     // Create workbook and worksheet
     const ws = XLSX.utils.aoa_to_sheet(allRows);
+
+    // Apply styling to category header rows (B2C/B2B)
+    categoryHeaderRows.forEach((rowIdx) => {
+      const categoryCell = `A${rowIdx + 1}`;
+      if (!ws[categoryCell]) ws[categoryCell] = { t: "s", v: "" };
+      ws[categoryCell].s = {
+        font: {
+          bold: true,
+          sz: 24
+        },
+        fill: {
+          patternType: "solid",
+          fgColor: { rgb: "D1E7DD" }  // Light green background
+        },
+        alignment: {
+          vertical: "center",
+          horizontal: "left"
+        }
+      };
+    });
 
     // Apply styling to buyer header rows
     buyerHeaderRows.forEach((rowIdx) => {
