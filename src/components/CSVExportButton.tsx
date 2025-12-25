@@ -301,8 +301,9 @@ export default function CSVExportButton({ month }: CSVExportButtonProps) {
       // Convert to Excel
       const excelBlob = convertToExcel(invoices);
 
-      // Generate filename with month
-      const filename = `invoices_${month}.xlsx`;
+      // Generate filename with month and year
+      const [year, monthNum] = month.split("-");
+      const filename = `kpi_gstr_details_${monthNum}_${year}.xlsx`;
 
       // Trigger download
       downloadExcel(excelBlob, filename);
