@@ -28,8 +28,12 @@ export default function CSVExportButton({ month }: CSVExportButtonProps) {
     const allRows: any[][] = [];
 
     // Separate invoices into B2C (no GST) and B2B (with GST)
-    const b2cInvoices = data.filter(inv => !inv.buyerGstin || inv.buyerGstin.trim() === "");
-    const b2bInvoices = data.filter(inv => inv.buyerGstin && inv.buyerGstin.trim() !== "");
+    const b2cInvoices = data.filter(
+      (inv) => !inv.buyerGstin || inv.buyerGstin.trim() === ""
+    );
+    const b2bInvoices = data.filter(
+      (inv) => inv.buyerGstin && inv.buyerGstin.trim() !== ""
+    );
 
     // Group each category by buyer
     const groupByBuyer = (invoices: InvoiceExportData[]) => {
@@ -172,16 +176,16 @@ export default function CSVExportButton({ month }: CSVExportButtonProps) {
       ws[categoryCell].s = {
         font: {
           bold: true,
-          sz: 24
+          sz: 24,
         },
         fill: {
           patternType: "solid",
-          fgColor: { rgb: "D1E7DD" }  // Light green background
+          fgColor: { rgb: "D1E7DD" }, // Light green background
         },
         alignment: {
           vertical: "center",
-          horizontal: "left"
-        }
+          horizontal: "left",
+        },
       };
     });
 
@@ -193,16 +197,16 @@ export default function CSVExportButton({ month }: CSVExportButtonProps) {
       ws[buyerNameCell].s = {
         font: {
           bold: true,
-          sz: 12
+          sz: 12,
         },
         fill: {
           patternType: "solid",
-          fgColor: { rgb: "E8F4F8" }
+          fgColor: { rgb: "E8F4F8" },
         },
         alignment: {
           vertical: "center",
-          horizontal: "left"
-        }
+          horizontal: "left",
+        },
       };
 
       // Style GST (column B) - Blue text with background
@@ -211,16 +215,16 @@ export default function CSVExportButton({ month }: CSVExportButtonProps) {
       ws[gstCell].s = {
         font: {
           color: { rgb: "1E3A8A" },
-          sz: 11
+          sz: 11,
         },
         fill: {
           patternType: "solid",
-          fgColor: { rgb: "E8F4F8" }
+          fgColor: { rgb: "E8F4F8" },
         },
         alignment: {
           vertical: "center",
-          horizontal: "left"
-        }
+          horizontal: "left",
+        },
       };
     });
 
@@ -233,16 +237,16 @@ export default function CSVExportButton({ month }: CSVExportButtonProps) {
         ws[cell].s = {
           font: {
             bold: true,
-            sz: 12
+            sz: 12,
           },
           fill: {
             patternType: "solid",
-            fgColor: { rgb: "FFF3CD" }  // Light yellow background
+            fgColor: { rgb: "FFF3CD" }, // Light yellow background
           },
           alignment: {
             vertical: "center",
-            horizontal: col === "C" ? "left" : "right"
-          }
+            horizontal: col === "C" ? "left" : "right",
+          },
         };
       });
     });
@@ -301,9 +305,10 @@ export default function CSVExportButton({ month }: CSVExportButtonProps) {
       // Convert to Excel
       const excelBlob = convertToExcel(invoices);
 
-      // Generate filename with month and year
-      const [year, monthNum] = month.split("-");
-      const filename = `kpi_gstr_details_${monthNum}_${year}.xlsx`;
+      // Generate filename with month name and year
+      const monthName = dayjs(month).format("MMMM").toLocaleLowerCase();
+      const year = dayjs(month).format("YYYY");
+      const filename = `kpi_gstr_details_${monthName}_${year}.xlsx`;
 
       // Trigger download
       downloadExcel(excelBlob, filename);
@@ -318,7 +323,13 @@ export default function CSVExportButton({ month }: CSVExportButtonProps) {
   return (
     <Button
       variant="contained"
-      startIcon={isExporting ? <CircularProgress size={20} color="inherit" /> : <DownloadIcon />}
+      startIcon={
+        isExporting ? (
+          <CircularProgress size={20} color="inherit" />
+        ) : (
+          <DownloadIcon />
+        )
+      }
       onClick={handleExport}
       disabled={isExporting}
       sx={{ textTransform: "none" }}
