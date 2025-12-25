@@ -146,6 +146,22 @@ export default function CSVExportButton({ month }: CSVExportButtonProps) {
       allRows.push([""]);
     }
 
+    // Add grand total row (B2C + B2B)
+    if (data.length > 0) {
+      const grandTotals = calculateTotals(data);
+      totalRows.push(allRows.length);
+      allRows.push([
+        "",
+        "",
+        "Total B2C + B2B Section:",
+        Number(grandTotals.subtotal.toFixed(2)),
+        Number(grandTotals.cgst.toFixed(2)),
+        Number(grandTotals.sgst.toFixed(2)),
+        Number(grandTotals.igst.toFixed(2)),
+        Number(grandTotals.total.toFixed(2)),
+      ]);
+    }
+
     // Create workbook and worksheet
     const ws = XLSX.utils.aoa_to_sheet(allRows);
 
