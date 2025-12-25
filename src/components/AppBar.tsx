@@ -28,6 +28,7 @@ export default function NavigationAppBar() {
   const isLoginPage = location.pathname === "/login";
 
   const menuItems = [
+    { label: "Dashboard", path: "/dashboard" },
     { label: "Create Invoice", path: "/" },
     { label: "Invoices", path: "/invoices" },
     { label: "Buyers", path: "/buyer" },

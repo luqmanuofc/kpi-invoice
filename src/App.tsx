@@ -9,6 +9,7 @@ import InvoicesPage from "./pages/Invoices.page";
 import InvoiceViewPage from "./pages/InvoiceView.page";
 import BuyerPage from "./pages/Buyer.page";
 import ProductsPage from "./pages/Products.page";
+import DashboardPage from "./pages/Dashboard.page";
 
 function App() {
   return (
@@ -21,6 +22,14 @@ function App() {
           element={
             <ProtectedRoute>
               <InvoicePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardPage />
             </ProtectedRoute>
           }
         />
