@@ -84,10 +84,7 @@ export default function DashboardPage() {
           mb={3}
         >
           <Typography variant="h6">Dashboard</Typography>
-          <CSVExportButton
-            data={metrics.monthlyData}
-            month={selectedMonth?.format("YYYY-MM") || ""}
-          />
+          <CSVExportButton month={selectedMonth?.format("YYYY-MM") || ""} />
         </Box>
 
         {error && (
