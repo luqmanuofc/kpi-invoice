@@ -16,7 +16,9 @@ export default async function handler(request: Request) {
 
     if (!month) {
       return new Response(
-        JSON.stringify({ error: "Month parameter is required (format: YYYY-MM)" }),
+        JSON.stringify({
+          error: "Month parameter is required (format: YYYY-MM)",
+        }),
         {
           status: 400,
           headers: {
@@ -64,6 +66,11 @@ export default async function handler(request: Request) {
             gstin: true,
           },
         },
+        items: {
+          select: {
+            hsn: true,
+          },
+        },
         subtotal: true,
         cgstAmount: true,
         sgstAmount: true,
@@ -73,18 +80,24 @@ export default async function handler(request: Request) {
     });
 
     // Transform to simplified format for CSV
-    const exportData = invoices.map((invoice) => ({
-      invoiceNumber: invoice.invoiceNumber,
-      date: invoice.date,
-      buyerId: invoice.buyerId,
-      buyerName: invoice.buyer.name,
-      buyerGstin: invoice.buyer.gstin || "",
-      subtotal: Number(invoice.subtotal),
-      cgstAmount: Number(invoice.cgstAmount),
-      sgstAmount: Number(invoice.sgstAmount),
-      igstAmount: Number(invoice.igstAmount),
-      total: Number(invoice.total),
-    }));
+    const exportData = invoices.map((invoice) => {
+      // Get unique HSN codes from invoice items
+      const uniqueHsns = [...new Set(invoice.items.map((item) => item.hsn))];
+
+      return {
+        invoiceNumber: invoice.invoiceNumber,
+        date: invoice.date,
+        buyerId: invoice.buyerId,
+        buyerName: invoice.buyer.name,
+        buyerGstin: invoice.buyer.gstin || "",
+        hsnCodes: uniqueHsns.join(", "),
+        subtotal: Number(invoice.subtotal),
+        cgstAmount: Number(invoice.cgstAmount),
+        sgstAmount: Number(invoice.sgstAmount),
+        igstAmount: Number(invoice.igstAmount),
+        total: Number(invoice.total),
+      };
+    });
 
     return new Response(JSON.stringify({ invoices: exportData }), {
       status: 200,

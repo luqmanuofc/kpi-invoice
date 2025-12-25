@@ -12,6 +12,7 @@ export interface InvoiceExportData {
   buyerId: string;
   buyerName: string;
   buyerGstin: string;
+  hsnCodes: string;
   subtotal: number;
   cgstAmount: number;
   sgstAmount: number;

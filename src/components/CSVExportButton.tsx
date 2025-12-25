@@ -18,6 +18,7 @@ export default function CSVExportButton({ month }: CSVExportButtonProps) {
       "Invoice Number",
       "Date of Invoice",
       "Buyer Name",
+      "HSN",
       "Subtotal",
       "CGST",
       "SGST",
@@ -83,6 +84,7 @@ export default function CSVExportButton({ month }: CSVExportButtonProps) {
             displayInvoiceNumber,
             dayjs(invoice.date).format("DD/MM/YYYY"),
             invoice.buyerName,
+            invoice.hsnCodes,
             Number(invoice.subtotal.toFixed(2)),
             Number(invoice.cgstAmount.toFixed(2)),
             Number(invoice.sgstAmount.toFixed(2)),
@@ -124,6 +126,7 @@ export default function CSVExportButton({ month }: CSVExportButtonProps) {
         "",
         "",
         "Total B2C Section:",
+        "",
         Math.round(b2cTotals.subtotal),
         Math.round(b2cTotals.cgst),
         Math.round(b2cTotals.sgst),
@@ -147,6 +150,7 @@ export default function CSVExportButton({ month }: CSVExportButtonProps) {
         "",
         "",
         "Total B2B Section:",
+        "",
         Math.round(b2bTotals.subtotal),
         Math.round(b2bTotals.cgst),
         Math.round(b2bTotals.sgst),
@@ -164,6 +168,7 @@ export default function CSVExportButton({ month }: CSVExportButtonProps) {
         "",
         "",
         "Total B2C + B2B Section:",
+        "",
         Math.round(grandTotals.subtotal),
         Math.round(grandTotals.cgst),
         Math.round(grandTotals.sgst),
@@ -236,7 +241,7 @@ export default function CSVExportButton({ month }: CSVExportButtonProps) {
 
     // Apply styling to total rows
     totalRows.forEach((rowIdx) => {
-      const columns = ["C", "D", "E", "F", "G", "H"];
+      const columns = ["C", "D", "E", "F", "G", "H", "I"];
       columns.forEach((col) => {
         const cell = `${col}${rowIdx + 1}`;
         if (!ws[cell]) ws[cell] = { t: "n", v: 0 };
@@ -262,6 +267,7 @@ export default function CSVExportButton({ month }: CSVExportButtonProps) {
       { wch: 15 }, // Invoice Number
       { wch: 15 }, // Date
       { wch: 25 }, // Buyer Name
+      { wch: 20 }, // HSN
       { wch: 12 }, // Subtotal
       { wch: 10 }, // CGST
       { wch: 10 }, // SGST
