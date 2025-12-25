@@ -86,7 +86,13 @@ export default function BuyerForm({
 
           <TextField
             label="Phone"
-            {...register("phone")}
+            {...register("phone", {
+              validate: (value) => {
+                if (!value || value.trim() === "") return true;
+                if (/^\d{10}$/.test(value)) return true;
+                return "Please enter a valid 10 digit phone number or leave empty";
+              },
+            })}
             error={!!errors.phone}
             helperText={errors.phone?.message}
             fullWidth
@@ -104,10 +110,19 @@ export default function BuyerForm({
 
           <TextField
             label="GSTIN"
-            {...register("gstin")}
+            {...register("gstin", {
+              validate: (value) => {
+                if (!value || value.trim() === "") return true;
+                if (value.length === 15) return true;
+                return "Please enter a valid 15 character GSTIN or leave empty";
+              },
+            })}
             error={!!errors.gstin}
             helperText={errors.gstin?.message}
             fullWidth
+            onChange={(e) => {
+              e.target.value = e.target.value.toUpperCase();
+            }}
           />
         </Box>
 

@@ -151,10 +151,10 @@ export default function BuyerPage() {
                 color="text.secondary"
                 sx={{ mb: 1 }}
               >
-                <strong>GSTIN:</strong> {buyer.gstin || "N/A"}
+                <strong>GSTIN:</strong> {buyer.gstin || ""}
               </Typography>
               <Typography variant="body2" align="left" color="text.secondary">
-                <strong>Phone:</strong> {buyer.phone || "N/A"}
+                <strong>Phone:</strong> {buyer.phone || ""}
               </Typography>
             </CardContent>
             <CardActions sx={{ justifyContent: "flex-end", p: 2, pt: 0 }}>
