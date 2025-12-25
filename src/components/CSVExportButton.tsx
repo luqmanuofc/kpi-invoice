@@ -114,11 +114,11 @@ export default function CSVExportButton({ month }: CSVExportButtonProps) {
         "",
         "",
         "Total B2C Section:",
-        Number(b2cTotals.subtotal.toFixed(2)),
-        Number(b2cTotals.cgst.toFixed(2)),
-        Number(b2cTotals.sgst.toFixed(2)),
-        Number(b2cTotals.igst.toFixed(2)),
-        Number(b2cTotals.total.toFixed(2)),
+        Math.round(b2cTotals.subtotal),
+        Math.round(b2cTotals.cgst),
+        Math.round(b2cTotals.sgst),
+        Math.round(b2cTotals.igst),
+        Math.round(b2cTotals.total),
       ]);
       allRows.push([""]);
     }
@@ -137,11 +137,11 @@ export default function CSVExportButton({ month }: CSVExportButtonProps) {
         "",
         "",
         "Total B2B Section:",
-        Number(b2bTotals.subtotal.toFixed(2)),
-        Number(b2bTotals.cgst.toFixed(2)),
-        Number(b2bTotals.sgst.toFixed(2)),
-        Number(b2bTotals.igst.toFixed(2)),
-        Number(b2bTotals.total.toFixed(2)),
+        Math.round(b2bTotals.subtotal),
+        Math.round(b2bTotals.cgst),
+        Math.round(b2bTotals.sgst),
+        Math.round(b2bTotals.igst),
+        Math.round(b2bTotals.total),
       ]);
       allRows.push([""]);
     }
@@ -154,11 +154,11 @@ export default function CSVExportButton({ month }: CSVExportButtonProps) {
         "",
         "",
         "Total B2C + B2B Section:",
-        Number(grandTotals.subtotal.toFixed(2)),
-        Number(grandTotals.cgst.toFixed(2)),
-        Number(grandTotals.sgst.toFixed(2)),
-        Number(grandTotals.igst.toFixed(2)),
-        Number(grandTotals.total.toFixed(2)),
+        Math.round(grandTotals.subtotal),
+        Math.round(grandTotals.cgst),
+        Math.round(grandTotals.sgst),
+        Math.round(grandTotals.igst),
+        Math.round(grandTotals.total),
       ]);
     }
 
