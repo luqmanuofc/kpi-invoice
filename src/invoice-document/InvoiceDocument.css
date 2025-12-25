@@ -269,13 +269,11 @@
 }
 
 .signature-spacer {
-  height: 40pt; /* empty space for handwritten signature */
 }
 
 .signature-labels {
   display: flex;
   justify-content: space-between;
-  margin-top: 10pt;
   font-weight: bold;
 }
 

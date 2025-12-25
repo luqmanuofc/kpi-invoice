@@ -70,6 +70,7 @@ export default function InvoiceViewPage() {
     if (!invoice) return null;
 
     return {
+      id: invoice.id,
       invoiceNumber: invoice.invoiceNumber,
       vehicleNumber: invoice.vehicleNumber,
       date: dayjs(invoice.date).format("YYYY-MM-DD"),

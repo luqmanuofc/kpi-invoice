@@ -19,6 +19,7 @@ export type InvoiceItem = {
 };
 
 export type InvoiceForm = {
+  id: string | null;
   invoiceNumber: string;
   vehicleNumber: string;
   date: string;
