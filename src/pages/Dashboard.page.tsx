@@ -144,14 +144,14 @@ export default function DashboardPage() {
           </Grid>
         </Grid>
 
-        <Card>
+        {/* <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>
               Monthly Revenue Chart
             </Typography>
             <MonthlyRevenueChart data={metrics.monthlyData} />
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
     </LocalizationProvider>
   );
