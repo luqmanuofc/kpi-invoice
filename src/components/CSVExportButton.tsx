@@ -73,8 +73,14 @@ export default function CSVExportButton({ month }: CSVExportButtonProps) {
 
         // Add invoice rows for this buyer
         buyer.invoices.forEach((invoice) => {
+          // Strip prefix from invoice number (e.g., "2025-26/123" -> "123")
+          const invoiceNumberParts = invoice.invoiceNumber.split("/");
+          const displayInvoiceNumber = invoiceNumberParts.length === 2
+            ? invoiceNumberParts[1]
+            : invoice.invoiceNumber;
+
           allRows.push([
-            invoice.invoiceNumber,
+            displayInvoiceNumber,
             dayjs(invoice.date).format("DD/MM/YYYY"),
             invoice.buyerName,
             Number(invoice.subtotal.toFixed(2)),
