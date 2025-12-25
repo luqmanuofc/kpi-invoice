@@ -58,6 +58,7 @@ export default function CSVExportButton({ month }: CSVExportButtonProps) {
     // Track category header and buyer header row indices for styling
     const categoryHeaderRows: number[] = [];
     const buyerHeaderRows: number[] = [];
+    const totalRows: number[] = [];
 
     // Helper function to add buyer groups
     const addBuyerGroups = (groupedByBuyer: typeof b2cGrouped) => {
@@ -85,12 +86,41 @@ export default function CSVExportButton({ month }: CSVExportButtonProps) {
       });
     };
 
+    // Helper function to calculate totals for a category
+    const calculateTotals = (invoices: InvoiceExportData[]) => {
+      return invoices.reduce(
+        (acc, inv) => ({
+          subtotal: acc.subtotal + inv.subtotal,
+          cgst: acc.cgst + inv.cgstAmount,
+          sgst: acc.sgst + inv.sgstAmount,
+          igst: acc.igst + inv.igstAmount,
+          total: acc.total + inv.total,
+        }),
+        { subtotal: 0, cgst: 0, sgst: 0, igst: 0, total: 0 }
+      );
+    };
+
     // Add B2C section
     if (Object.keys(b2cGrouped).length > 0) {
       categoryHeaderRows.push(allRows.length);
       allRows.push(["B2C"]);
       allRows.push([""]);
       addBuyerGroups(b2cGrouped);
+
+      // Add B2C total row
+      const b2cTotals = calculateTotals(b2cInvoices);
+      totalRows.push(allRows.length);
+      allRows.push([
+        "",
+        "",
+        "Total B2C Section:",
+        Number(b2cTotals.subtotal.toFixed(2)),
+        Number(b2cTotals.cgst.toFixed(2)),
+        Number(b2cTotals.sgst.toFixed(2)),
+        Number(b2cTotals.igst.toFixed(2)),
+        Number(b2cTotals.total.toFixed(2)),
+      ]);
+      allRows.push([""]);
     }
 
     // Add B2B section
@@ -99,6 +129,21 @@ export default function CSVExportButton({ month }: CSVExportButtonProps) {
       allRows.push(["B2B"]);
       allRows.push([""]);
       addBuyerGroups(b2bGrouped);
+
+      // Add B2B total row
+      const b2bTotals = calculateTotals(b2bInvoices);
+      totalRows.push(allRows.length);
+      allRows.push([
+        "",
+        "",
+        "Total B2B Section:",
+        Number(b2bTotals.subtotal.toFixed(2)),
+        Number(b2bTotals.cgst.toFixed(2)),
+        Number(b2bTotals.sgst.toFixed(2)),
+        Number(b2bTotals.igst.toFixed(2)),
+        Number(b2bTotals.total.toFixed(2)),
+      ]);
+      allRows.push([""]);
     }
 
     // Create workbook and worksheet
@@ -161,6 +206,29 @@ export default function CSVExportButton({ month }: CSVExportButtonProps) {
           horizontal: "left"
         }
       };
+    });
+
+    // Apply styling to total rows
+    totalRows.forEach((rowIdx) => {
+      const columns = ["C", "D", "E", "F", "G", "H"];
+      columns.forEach((col) => {
+        const cell = `${col}${rowIdx + 1}`;
+        if (!ws[cell]) ws[cell] = { t: "n", v: 0 };
+        ws[cell].s = {
+          font: {
+            bold: true,
+            sz: 12
+          },
+          fill: {
+            patternType: "solid",
+            fgColor: { rgb: "FFF3CD" }  // Light yellow background
+          },
+          alignment: {
+            vertical: "center",
+            horizontal: col === "C" ? "left" : "right"
+          }
+        };
+      });
     });
 
     // Set column widths
