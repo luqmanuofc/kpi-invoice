@@ -153,32 +153,64 @@ export function AmountWordsSection({ data }: { data: InvoiceForm }) {
 
 export function FooterSection({ data }: { data: InvoiceForm }) {
   return (
-    <div className="footer-section">
-      <div className="terms">
-        <strong>Terms & Conditions:</strong>
-        <div>
-          1. E. &amp; O.E.
-          <br />
-          2. Subject to Srinagar Jurisdiction.
-          <br />
-          3. Interest @ 18% p.a. if unpaid within 30 days.
-          <br />
-          4. Goods once sold cannot be taken back.
-          <br />
-          5. Our responsibility ceases once goods leave our premises.
+    <div>
+      <div className="footer-section">
+        <div className="terms">
+          <strong>Terms & Conditions:</strong>
+          <div>
+            1. E. &amp; O.E.
+            <br />
+            2. Subject to Srinagar Jurisdiction.
+            <br />
+            3. Interest @ 18% p.a. if unpaid within 30 days.
+            <br />
+            4. Goods once sold cannot be taken back.
+            <br />
+            5. Our responsibility ceases once goods leave our premises.
+          </div>
+        </div>
+
+        <div className="signature-block">
+          <div className="company-sign">For {data.sellerName}</div>
+          <div className="signature-spacer">
+            Digitally signed by Nasir Bukhari
+            <br />
+            Digital Id: {data.id}
+          </div>
+          <div className="signature-labels">
+            <div />
+            Authorised Signatory
+          </div>
         </div>
       </div>
-
-      <div className="signature-block">
-        <div className="company-sign">For {data.sellerName}</div>
-        <div className="signature-spacer">
-          Digitally signed by Nasir Bukhari
-          <br />
-          Digital Id: {data.id}
-        </div>
-        <div className="signature-labels">
-          <div />
-          Authorised Signatory
+      <div>
+        <div className="payment-info-section">
+          <div className="payment-header">Payment Information</div>
+          <div className="payment-accounts">
+            <div className="payment-account">
+              <div className="payment-line">
+                <span style={{ fontWeight: "bold" }}>Bank:</span> JK Bank LTD,
+                Zainakot
+                <br />
+                <span style={{ fontWeight: "bold" }}> Account no: </span>
+                0258020100000059
+                <br />
+                <span style={{ fontWeight: "bold" }}> IFSC CODE:</span>{" "}
+                JAKA0ZANKOT
+              </div>
+            </div>
+            <div className="payment-account" style={{ marginTop: "10pt" }}>
+              <div className="payment-line">
+                <span style={{ fontWeight: "bold" }}>Bank:</span> HDFC Bank LTD,
+                Malru
+                <br />
+                <span style={{ fontWeight: "bold" }}> Account no: </span>
+                50200098216650
+                <br />
+                <span style={{ fontWeight: "bold" }}> IFSC:</span> HDFC0003580
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

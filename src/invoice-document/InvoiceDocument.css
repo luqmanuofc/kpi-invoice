@@ -239,6 +239,38 @@
 }
 
 /* ===========================================
+   Payment Information Section
+   =========================================== */
+
+.payment-info-section {
+  font-size: 8pt;
+}
+
+.payment-header {
+  font-weight: bold;
+  font-size: 11pt;
+  text-align: left;
+  color: #373b75;
+}
+
+.payment-accounts {
+  display: flex;
+  text-align: left;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.payment-account {
+  flex: 1;
+  text-align: left;
+}
+
+.payment-line {
+  line-height: 1.4;
+  color: #373b75;
+}
+
+/* ===========================================
    Footer Section (T&C + Signature)
    =========================================== */
 .footer-section {
