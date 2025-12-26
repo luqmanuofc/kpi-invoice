@@ -173,9 +173,10 @@ export function FooterSection({ data }: { data: InvoiceForm }) {
         <div className="signature-block">
           <div className="company-sign">For {data.sellerName}</div>
           <div className="signature-spacer">
-            Digitally signed by Nasir Bukhari
+            Digitally signed by{" "}
+            <span style={{ fontWeight: "bold" }}>Nasir Bukhari</span>
             <br />
-            Digital Id: {data.id}
+            {data.id && <>Digital Id: {data.id}</>}
           </div>
           <div className="signature-labels">
             <div />
