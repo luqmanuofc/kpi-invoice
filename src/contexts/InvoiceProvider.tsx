@@ -147,6 +147,7 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
     // Convert Invoice to InvoiceForm
     const invoiceFormData: InvoiceForm = {
       // Let invoiceNumber auto-generate (will be set by the useEffect)
+      id: "",
       invoiceNumber: "",
       vehicleNumber: invoice.vehicleNumber,
       date: dayjs().format("YYYY-MM-DD"), // Use today's date for the duplicate
