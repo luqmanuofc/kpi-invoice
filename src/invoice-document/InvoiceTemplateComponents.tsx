@@ -189,24 +189,19 @@ export function FooterSection({ data }: { data: InvoiceForm }) {
           <div className="payment-accounts">
             <div className="payment-account">
               <div className="payment-line">
-                <span style={{ fontWeight: "bold" }}>Bank:</span> JK Bank LTD,
+                1.<span style={{ fontWeight: "bold" }}> Bank: </span> JK Bank,
                 Zainakot
-                <br />
                 <span style={{ fontWeight: "bold" }}> Account no: </span>
                 0258020100000059
-                <br />
-                <span style={{ fontWeight: "bold" }}> IFSC CODE:</span>{" "}
-                JAKA0ZANKOT
+                <span style={{ fontWeight: "bold" }}> IFSC:</span> JAKA0ZANKOT
               </div>
             </div>
-            <div className="payment-account" style={{ marginTop: "10pt" }}>
+            <div className="payment-account">
               <div className="payment-line">
-                <span style={{ fontWeight: "bold" }}>Bank:</span> HDFC Bank LTD,
+                2.<span style={{ fontWeight: "bold" }}> Bank: </span> HDFC Bank,
                 Malru
-                <br />
                 <span style={{ fontWeight: "bold" }}> Account no: </span>
                 50200098216650
-                <br />
                 <span style={{ fontWeight: "bold" }}> IFSC:</span> HDFC0003580
               </div>
             </div>

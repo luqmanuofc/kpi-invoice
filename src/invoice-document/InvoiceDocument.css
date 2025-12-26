@@ -239,42 +239,10 @@
 }
 
 /* ===========================================
-   Payment Information Section
-   =========================================== */
-
-.payment-info-section {
-  font-size: 8pt;
-}
-
-.payment-header {
-  font-weight: bold;
-  font-size: 11pt;
-  text-align: left;
-  color: #373b75;
-}
-
-.payment-accounts {
-  display: flex;
-  text-align: left;
-  flex-direction: column;
-  justify-content: space-around;
-}
-
-.payment-account {
-  flex: 1;
-  text-align: left;
-}
-
-.payment-line {
-  line-height: 1.4;
-  color: #373b75;
-}
-
-/* ===========================================
    Footer Section (T&C + Signature)
    =========================================== */
 .footer-section {
-  margin-top: 20pt;
+  margin-top:10pt;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -300,13 +268,43 @@
   font-size: 11pt;
 }
 
-.signature-spacer {
-}
-
 .signature-labels {
   display: flex;
   justify-content: space-between;
   font-weight: bold;
+}
+
+
+/* ===========================================
+   Payment Information Section
+   =========================================== */
+
+.payment-info-section {
+  margin-top: 10pt;
+  font-size: 10pt;
+}
+
+.payment-header {
+  font-weight: bold;
+  text-align: left;
+  color: #373b75;
+}
+
+.payment-accounts {
+  display: flex;
+  text-align: left;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.payment-account {
+  flex: 1;
+  text-align: left;
+}
+
+.payment-line {
+  line-height: 1.4;
+  color: #373b75;
 }
 
 
@@ -325,3 +323,5 @@
 .probe {
   position: relative;
 }
+
+
