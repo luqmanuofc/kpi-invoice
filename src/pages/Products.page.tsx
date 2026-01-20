@@ -119,7 +119,7 @@ export default function ProductsPage() {
 
   return (
     <div className="w-full h-full p-4 md:p-8">
-      <div className="flex md:justify-between gap-2 items-center mb-8">
+      <div className="flex md:justify-between gap-2 items-center mb-4">
         <SearchBox
           placeholder="Search Products"
           value={searchQuery}

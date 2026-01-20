@@ -88,8 +88,8 @@ export default function BuyerPage() {
   }
 
   return (
-    <div className="m-8 w-full h-full">
-      <div className="flex md:justify-between gap-2 items-center p-1 mb-8">
+    <div className="w-full h-full p-4 md:p-8">
+      <div className="flex md:justify-between gap-2 items-center mb-8">
         <SearchBox
           placeholder="Search Buyer"
           value={searchQuery}

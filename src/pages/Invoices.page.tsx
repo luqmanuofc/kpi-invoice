@@ -98,7 +98,7 @@ export default function InvoicesPage() {
   const hasPrevPage = page > 1;
 
   return (
-    <div className="p-8 space-y-4 w-full h-full">
+    <div className="p-4 md:p-8 space-y-4 w-full h-full">
       <InvoiceFilterToolbar
         filters={filters}
         onFiltersChange={setFilters}

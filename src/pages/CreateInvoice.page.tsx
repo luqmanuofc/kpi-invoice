@@ -28,7 +28,7 @@ export default function CreateInvoicePage() {
   }, [computedData, updateDebouncedData]);
 
   return (
-    <div className="w-full flex-1 flex">
+    <div className="w-full flex-1 flex p-4 md:p-8">
       <div className="min-w-full md:min-w-125">
         <InvoiceForm />
       </div>

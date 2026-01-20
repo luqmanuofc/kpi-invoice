@@ -72,15 +72,15 @@ export default function DashboardPage() {
 
   if (error) {
     return (
-      <div className="m-8 w-full h-full flex justify-center items-center">
+      <div className="p-4 md:p-8 w-full h-full flex justify-center items-center">
         <p className="text-destructive">Error: {error}</p>
       </div>
     );
   }
 
   return (
-    <div className="m-8 w-full h-full">
-      <div className="flex flex-col md:flex-row md:justify-between w-full gap-4 p-1 mb-8">
+    <div className="p-4 md:p-8 w-full h-full">
+      <div className="flex flex-col md:flex-row md:justify-between w-full gap-4 mb-8">
         <div className="flex justify-center gap-4 items-center">
           <Button
             variant="outline"
