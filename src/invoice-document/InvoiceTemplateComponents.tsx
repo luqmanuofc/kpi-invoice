@@ -100,39 +100,104 @@ export function ItemsTableRow({
       <td>{item.hsn}</td>
       <td>{qty}</td>
       <td>{item.unit}</td>
-      <td>{rate.toFixed(2)}</td>
-      <td>{total.toFixed(2)}</td>
+      <td>
+        ₹
+        {rate.toLocaleString("en-IN", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })}
+      </td>
+      <td>
+        ₹
+        {total.toLocaleString("en-IN", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })}
+      </td>
     </tr>
   );
 }
 
 export function TotalsTable({ data }: { data: InvoiceForm }) {
+  const subtotal = Number(data.subtotal) || 0;
+  const discount = Number(data.discount) || 0;
+  const cgstAmount = Number(data.cgstAmount) || 0;
+  const sgstAmount = Number(data.sgstAmount) || 0;
+  const igstAmount = Number(data.igstAmount) || 0;
+  const roundOffAmount = Number(data.roundOffAmount) || 0;
+  const total = Number(data.total) || 0;
   return (
     <table className="totals-table">
       <tbody>
         <tr>
           <td>Sub Total</td>
-          <td className="amount">₹{data.subtotal.toFixed(2)}</td>
+          <td className="amount">
+            ₹
+            {subtotal.toLocaleString("en-IN", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </td>
         </tr>
         <tr>
           <td>Discount</td>
-          <td className="amount">₹{data.discount.toFixed(2)}</td>
+          <td className="amount">
+            ₹
+            {discount.toLocaleString("en-IN", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </td>
         </tr>
         <tr>
           <td>CGST @ {data.cgstRate}%</td>
-          <td className="amount">₹{data.cgstAmount.toFixed(2)}</td>
+          <td className="amount">
+            ₹
+            {cgstAmount.toLocaleString("en-IN", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </td>
         </tr>
         <tr>
           <td>SGST @ {data.sgstRate}%</td>
-          <td className="amount">₹{data.sgstAmount.toFixed(2)}</td>
+          <td className="amount">
+            ₹
+            {sgstAmount.toLocaleString("en-IN", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </td>
         </tr>
         <tr>
           <td>IGST @ {data.igstRate}%</td>
-          <td className="amount">₹{data.igstAmount.toFixed(2)}</td>
+          <td className="amount">
+            ₹
+            {igstAmount.toLocaleString("en-IN", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </td>
+        </tr>
+        <tr>
+          <td>Round Off</td>
+          <td className="amount">
+            ₹
+            {roundOffAmount.toLocaleString("en-IN", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </td>
         </tr>
         <tr className="grand-total">
           <td>Total Invoice Value</td>
-          <td className="amount">₹{data.total.toFixed(2)}</td>
+          <td className="amount">
+            ₹
+            {total.toLocaleString("en-IN", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </td>
         </tr>
       </tbody>
     </table>

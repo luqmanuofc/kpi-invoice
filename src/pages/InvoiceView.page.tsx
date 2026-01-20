@@ -1,15 +1,9 @@
 import { useEffect, useState, useMemo, useRef } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
-import {
-  Box,
-  CircularProgress,
-  Alert,
-  Button,
-  IconButton,
-} from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import PrintIcon from "@mui/icons-material/Print";
-import WhatsAppIcon from "@mui/icons-material/WhatsApp";
+import { Loader2, ArrowLeft, Printer, Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 import InvoiceDocument, {
   type InvoiceDocumentHandle,
 } from "../invoice-document/InvoiceDocument";
@@ -18,14 +12,14 @@ import type { Buyer, InvoiceForm } from "../invoice-form/types";
 import dayjs from "dayjs";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-import { GridDownloadIcon } from "@mui/x-data-grid";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
-// Detect if user is on a mobile device
-const isMobileDevice = () => {
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-    navigator.userAgent
-  );
-};
+// WhatsApp icon component (since lucide-react doesn't have it)
+const WhatsAppIcon = () => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+  </svg>
+);
 
 export default function InvoiceViewPage() {
   const { id } = useParams<{ id: string }>();
@@ -36,11 +30,8 @@ export default function InvoiceViewPage() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    setIsMobile(isMobileDevice());
-  }, []);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
   useEffect(() => {
     const fetchInvoice = async () => {
@@ -68,6 +59,17 @@ export default function InvoiceViewPage() {
   // Transform Invoice to InvoiceForm format
   const invoiceData = useMemo<InvoiceForm | null>(() => {
     if (!invoice) return null;
+    const total = Number(invoice.total);
+    const subtotal = Number(invoice.subtotal);
+    const discount = Number(invoice.discount);
+    const cgstAmount = Number(invoice.cgstAmount);
+    const sgstAmount = Number(invoice.sgstAmount);
+    const igstAmount = Number(invoice.igstAmount);
+
+    const computedTotal =
+      subtotal - discount + cgstAmount + sgstAmount + igstAmount;
+
+    const roundOffAmount = total - computedTotal;
 
     return {
       id: invoice.id,
@@ -95,13 +97,14 @@ export default function InvoiceViewPage() {
       sgstRate: invoice.sgstRate,
       igstRate: invoice.igstRate,
 
-      cgstAmount: Number(invoice.cgstAmount),
-      sgstAmount: Number(invoice.sgstAmount),
-      igstAmount: Number(invoice.igstAmount),
+      cgstAmount,
+      sgstAmount,
+      igstAmount,
 
-      discount: Number(invoice.discount),
-      subtotal: Number(invoice.subtotal),
-      total: Number(invoice.total),
+      discount,
+      subtotal,
+      total,
+      roundOffAmount,
       amountInWords: invoice.amountInWords,
     };
   }, [invoice]);
@@ -117,6 +120,9 @@ export default function InvoiceViewPage() {
     const originalStyles = pageElements.map((el) => el.style.display);
 
     try {
+      // Show loading modal
+      setIsGeneratingPDF(true);
+
       // Show all pages and remove zoom for PDF generation
       pageElements.forEach((el, idx) => {
         el.style.display = "block";
@@ -135,10 +141,52 @@ export default function InvoiceViewPage() {
       let isFirstPage = true;
 
       for (const pageEl of pageElements) {
+        // Store references to all stylesheets we'll temporarily disable
+        const stylesheets = Array.from(document.styleSheets);
+        const disabledSheets: CSSStyleSheet[] = [];
+
+        // Temporarily disable all stylesheets except invoice-specific ones
+        stylesheets.forEach((sheet) => {
+          try {
+            // Check if this is a Tailwind or other non-invoice stylesheet
+            const ownerNode = sheet.ownerNode as HTMLElement;
+            const href = (ownerNode as HTMLLinkElement)?.href || "";
+            const isInvoiceCSS =
+              href.includes("InvoiceDocument.css") ||
+              sheet.cssRules?.[0]?.cssText?.includes("invoice-page");
+
+            if (!isInvoiceCSS && !sheet.disabled) {
+              sheet.disabled = true;
+              disabledSheets.push(sheet);
+            }
+          } catch (e) {
+            // CORS or other errors - skip
+          }
+        });
+
+        // Force a reflow to apply the style changes
+        pageEl.offsetHeight;
+
         const canvas = await html2canvas(pageEl, {
           scale: 2,
           useCORS: true,
           logging: false,
+          onclone: (clonedDoc) => {
+            // Replace oklch CSS variables with rgb equivalents
+            const style = clonedDoc.createElement("style");
+            style.textContent = `
+              :root {
+                --background: rgb(255, 255, 255);
+                --border: rgb(229, 229, 229);
+              }
+            `;
+            clonedDoc.head.appendChild(style);
+          },
+        });
+
+        // Re-enable the stylesheets we disabled
+        disabledSheets.forEach((sheet) => {
+          sheet.disabled = false;
         });
 
         const imgData = canvas.toDataURL("image/jpeg", quality);
@@ -159,6 +207,9 @@ export default function InvoiceViewPage() {
         el.style.display = originalStyles[idx];
         invoicePages[idx]?.classList.remove("no-zoom");
       });
+      // Hide loading modal after a short delay
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      setIsGeneratingPDF(false);
     }
   };
 
@@ -242,93 +293,71 @@ export default function InvoiceViewPage() {
 
   if (isLoading) {
     return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "400px",
-        }}
-      >
-        <CircularProgress />
-      </Box>
+      <div className="flex flex-col w-full min-h-full justify-center items-center">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
     );
   }
 
   if (error || !invoiceData) {
     return (
-      <Box sx={{ margin: "2rem" }}>
-        <Alert severity="error" sx={{ mb: 3 }}>
-          {error || "Invoice not found"}
+      <div className="p-8 space-y-4">
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error || "Invoice not found"}</AlertDescription>
         </Alert>
-        <Button
-          variant="outlined"
-          startIcon={<ArrowBackIcon />}
-          onClick={handleBack}
-        >
+        <Button variant="outline" onClick={handleBack}>
+          <ArrowLeft className="mr-2 h-4 w-4" />
           Back
         </Button>
-      </Box>
+      </div>
     );
   }
 
   return (
-    <div style={{ padding: "1rem" }}>
-      <Box
-        sx={{ display: "flex", justifyContent: "space-between", mb: 2, gap: 2 }}
-      >
-        <Button
-          variant="outlined"
-          size="small"
-          startIcon={<ArrowBackIcon />}
-          onClick={handleBack}
-        >
+    <div className="p-4 w-full h-full">
+      {/* Loading Modal */}
+      {isGeneratingPDF && (
+        <div className="fixed inset-0 z-50  bg-background rounded-lg p-8 flex flex-col justify-center items-center gap-4 shadow-xl w-full min-h-screen">
+          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+          <p className="text-lg font-medium text-muted-foreground">
+            Generating PDF...
+          </p>
+        </div>
+      )}
+
+      <div className="flex justify-between items-center mb-4 gap-2 flex-wrap">
+        <Button variant="outline" size="sm" onClick={handleBack}>
+          <ArrowLeft className="mr-2 h-4 w-4" />
           Back
         </Button>
         {invoice?.status === "archived" ? (
-          <>Download and other actions are disabled on achived invoices.</>
+          <p className="text-sm text-muted-foreground">
+            Download and other actions are disabled on archived invoices.
+          </p>
         ) : (
-          <>
-            {" "}
-            <Box sx={{ display: "flex", gap: 1 }}>
+          <div className="flex gap-2">
+            <Button size="sm" onClick={downloadPDF}>
+              <Download className="mr-2 h-4 w-4" />
+              Download
+            </Button>
+            <Button variant="outline" size="sm" onClick={printPDF}>
+              <Printer className="mr-2 h-4 w-4" />
+              Print
+            </Button>
+            {isMobile && (
               <Button
-                variant="contained"
-                size="small"
-                startIcon={<GridDownloadIcon />}
-                onClick={downloadPDF}
+                variant="outline"
+                size="sm"
+                onClick={shareWhatsApp}
+                className="text-[#25D366] border-[#25D366] hover:bg-[#25D366]/10 hover:text-[#25D366]"
               >
-                Download
+                <WhatsAppIcon />
               </Button>
-              <Button
-                variant="outlined"
-                size="small"
-                startIcon={<PrintIcon />}
-                onClick={printPDF}
-              >
-                Print
-              </Button>
-              {isMobile && (
-                <>
-                  <IconButton
-                    onClick={shareWhatsApp}
-                    sx={{
-                      color: "#25D366",
-                      border: "1px solid #25D366",
-                      borderRadius: "4px",
-                      "&:hover": {
-                        borderColor: "#128C7E",
-                        backgroundColor: "rgba(37, 211, 102, 0.04)",
-                      },
-                    }}
-                  >
-                    <WhatsAppIcon />
-                  </IconButton>
-                </>
-              )}
-            </Box>
-          </>
+            )}
+          </div>
         )}
-      </Box>
+      </div>
 
       <InvoiceDocument
         data={invoiceData}

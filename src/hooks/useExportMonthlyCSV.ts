@@ -1,15 +1,9 @@
-import { Button, CircularProgress } from "@mui/material";
-import DownloadIcon from "@mui/icons-material/Download";
 import { useState } from "react";
 import { getInvoicesForExport, type InvoiceExportData } from "../api/dashboard";
 import dayjs from "dayjs";
 import * as XLSX from "xlsx-js-style";
 
-interface CSVExportButtonProps {
-  month: string;
-}
-
-export default function CSVExportButton({ month }: CSVExportButtonProps) {
+export function useExportMonthlyCSV() {
   const [isExporting, setIsExporting] = useState(false);
 
   const convertToExcel = (data: InvoiceExportData[]): Blob => {
@@ -76,9 +70,10 @@ export default function CSVExportButton({ month }: CSVExportButtonProps) {
         buyer.invoices.forEach((invoice) => {
           // Strip prefix from invoice number (e.g., "2025-26/123" -> "123")
           const invoiceNumberParts = invoice.invoiceNumber.split("/");
-          const displayInvoiceNumber = invoiceNumberParts.length === 2
-            ? invoiceNumberParts[1]
-            : invoice.invoiceNumber;
+          const displayInvoiceNumber =
+            invoiceNumberParts.length === 2
+              ? invoiceNumberParts[1]
+              : invoice.invoiceNumber;
 
           allRows.push([
             displayInvoiceNumber,
@@ -297,10 +292,9 @@ export default function CSVExportButton({ month }: CSVExportButtonProps) {
     document.body.removeChild(link);
   };
 
-  const handleExport = async () => {
+  const exportToExcel = async (month: string) => {
     if (!month) {
-      alert("Please select a month first");
-      return;
+      throw new Error("Please select a month first");
     }
 
     try {
@@ -310,8 +304,7 @@ export default function CSVExportButton({ month }: CSVExportButtonProps) {
       const invoices = await getInvoicesForExport(month);
 
       if (invoices.length === 0) {
-        alert("No invoices found for the selected month");
-        return;
+        throw new Error("No invoices found for the selected month");
       }
 
       // Convert to Excel
@@ -324,29 +317,16 @@ export default function CSVExportButton({ month }: CSVExportButtonProps) {
 
       // Trigger download
       downloadExcel(excelBlob, filename);
-    } catch (error: any) {
-      console.error("Export failed:", error);
-      alert(`Failed to export Excel: ${error.message}`);
+    } catch (error) {
+      setIsExporting(false);
+      throw error;
     } finally {
       setIsExporting(false);
     }
   };
 
-  return (
-    <Button
-      variant="contained"
-      startIcon={
-        isExporting ? (
-          <CircularProgress size={20} color="inherit" />
-        ) : (
-          <DownloadIcon />
-        )
-      }
-      onClick={handleExport}
-      disabled={isExporting}
-      sx={{ textTransform: "none" }}
-    >
-      {isExporting ? "Exporting..." : "Export Excel"}
-    </Button>
-  );
+  return {
+    exportToExcel,
+    isExporting,
+  };
 }

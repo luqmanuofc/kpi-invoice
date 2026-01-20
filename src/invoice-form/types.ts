@@ -37,6 +37,7 @@ export type InvoiceForm = {
   cgstAmount: number;
   sgstAmount: number;
   igstAmount: number;
+  roundOffAmount: number;
   total: number;
 
   // Seller

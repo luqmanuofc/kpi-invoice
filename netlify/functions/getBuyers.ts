@@ -13,7 +13,7 @@ export default async function handler(request: Request) {
   try {
     const buyers = await prisma.buyer.findMany({
       orderBy: {
-        createdAt: "desc",
+        name: "asc",
       },
     });
 

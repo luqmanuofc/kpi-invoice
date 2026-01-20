@@ -1,20 +1,21 @@
+import { useState, useEffect } from "react";
 import {
   Dialog,
-  DialogTitle,
   DialogContent,
-  DialogActions,
-  Button,
-  Checkbox,
-  FormControlLabel,
-  Typography,
-  Stack,
-  CircularProgress,
-  Box,
-  Divider,
-  IconButton,
-} from "@mui/material";
-import { ExpandMore, ExpandLess } from "@mui/icons-material";
-import { useState, useEffect } from "react";
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Loader2 } from "lucide-react";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "@/components/ui/accordion";
 import type { ProductCategory, Product } from "../api/products";
 import { useProducts } from "../hooks/useProducts";
 
@@ -41,9 +42,6 @@ export default function AddProductsModal({
   const [selectedProductIds, setSelectedProductIds] = useState<Set<string>>(
     new Set()
   );
-  const [expandedCategories, setExpandedCategories] = useState<
-    Set<ProductCategory>
-  >(new Set());
 
   useEffect(() => {
     if (open) {
@@ -58,18 +56,6 @@ export default function AddProductsModal({
         newSet.delete(productId);
       } else {
         newSet.add(productId);
-      }
-      return newSet;
-    });
-  };
-
-  const handleToggleCategory = (category: ProductCategory) => {
-    setExpandedCategories((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(category)) {
-        newSet.delete(category);
-      } else {
-        newSet.add(category);
       }
       return newSet;
     });
@@ -92,90 +78,84 @@ export default function AddProductsModal({
   }, {} as Record<ProductCategory, Product[]>);
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Add Products to Invoice</DialogTitle>
-      <DialogContent>
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader>
+          <DialogTitle className="text-xl">Add Products to Invoice</DialogTitle>
+        </DialogHeader>
         {loading ? (
-          <Box display="flex" justifyContent="center" py={4}>
-            <CircularProgress />
-          </Box>
+          <div className="flex justify-center py-8">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          </div>
         ) : (
-          <Stack spacing={3} sx={{ mt: 1 }}>
-            {Object.entries(productsByCategory).map(([category, items]) => {
-              const categoryKey = category as ProductCategory;
-              const isExpanded = expandedCategories.has(categoryKey);
+          <div className="max-h-[60vh] overflow-y-auto">
+            <Accordion type="multiple" className="w-full">
+              {Object.entries(productsByCategory).map(([category, items]) => {
+                const categoryKey = category as ProductCategory;
 
-              return (
-                <Box key={category}>
-                  <Box
-                    display="flex"
-                    alignItems="center"
-                    sx={{ cursor: "pointer" }}
-                    onClick={() => handleToggleCategory(categoryKey)}
-                  >
-                    <IconButton size="small" sx={{ mr: 1 }}>
-                      {isExpanded ? <ExpandLess /> : <ExpandMore />}
-                    </IconButton>
-                    <Typography
-                      variant="subtitle1"
-                      fontWeight="bold"
-                      color="primary"
-                      sx={{ flexGrow: 1 }}
-                    >
+                return (
+                  <AccordionItem key={category} value={category}>
+                    <AccordionTrigger className="">
                       {CATEGORY_LABELS[categoryKey]}
-                    </Typography>
-                  </Box>
-                  <Divider sx={{ my: 1 }} />
-                  {isExpanded && (
-                    <Stack spacing={0.5} sx={{ pl: 5 }}>
-                      {items.map((product) => (
-                        <FormControlLabel
-                          key={product.id}
-                          control={
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="space-y-3 pl-2">
+                        {items.map((product) => (
+                          <div
+                            key={product.id}
+                            className="flex items-start space-x-3 py-2"
+                          >
                             <Checkbox
+                              id={product.id}
                               checked={selectedProductIds.has(product.id)}
-                              onChange={() => handleToggleProduct(product.id)}
+                              onCheckedChange={() =>
+                                handleToggleProduct(product.id)
+                              }
                             />
-                          }
-                          label={
-                            <Box>
-                              <Typography variant="body1">
-                                {product.name}
-                              </Typography>
-                              <Typography
-                                variant="caption"
-                                color="text.secondary"
-                              >
-                                HSN: {product.hsn} | Rate: ₹
-                                {product.defaultPrice}
-                              </Typography>
-                            </Box>
-                          }
-                        />
-                      ))}
-                    </Stack>
-                  )}
-                </Box>
-              );
-            })}
+                            <Label
+                              htmlFor={product.id}
+                              className="flex flex-col text-left cursor-pointer space-y-1 leading-none"
+                            >
+                              <div className="font-medium w-full m-0">
+                                {product.name + " "}
+                                <span className="text-sm w-full text-muted-foreground">
+                                  {product.defaultPrice.toLocaleString(
+                                    "en-IN",
+                                    {
+                                      minimumFractionDigits: 2,
+                                      maximumFractionDigits: 2,
+                                    }
+                                  )}
+                                </span>
+                              </div>
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                );
+              })}
+            </Accordion>
             {products.length === 0 && !loading && (
-              <Typography color="text.secondary" align="center">
+              <p className="text-center text-muted-foreground py-4">
                 No products available. Please add products first.
-              </Typography>
+              </p>
             )}
-          </Stack>
+          </div>
         )}
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleAddProducts}
+            disabled={selectedProductIds.size === 0}
+          >
+            Add {selectedProductIds.size > 0 && `(${selectedProductIds.size})`}
+          </Button>
+        </DialogFooter>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button
-          onClick={handleAddProducts}
-          variant="contained"
-          disabled={selectedProductIds.size === 0}
-        >
-          Add {selectedProductIds.size > 0 && `(${selectedProductIds.size})`}
-        </Button>
-      </DialogActions>
     </Dialog>
   );
 }

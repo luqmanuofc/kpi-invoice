@@ -30,6 +30,9 @@ type InvoiceContextType = {
   setIsCheckingInvoiceNumber: (isChecking: boolean) => void;
   isCreatingInvoice: boolean;
   isFetchingNextInvoiceNumber: boolean;
+  showProductsModal: boolean;
+  setShowProductsModal: (show: boolean) => void;
+  fetchAndSetNextInvoiceNumber: () => Promise<void>;
 };
 
 const InvoiceContext = createContext<InvoiceContextType | undefined>(undefined);
@@ -41,6 +44,7 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
   const [isCreatingInvoice, setIsCreatingInvoice] = useState(false);
   const [isFetchingNextInvoiceNumber, setIsFetchingNextInvoiceNumber] =
     useState(false);
+  const [showProductsModal, setShowProductsModal] = useState(false);
   const navigate = useNavigate();
 
   const form = useForm<InvoiceForm>({
@@ -88,7 +92,11 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
 
   // Fetch and populate next invoice number on mount
   useEffect(() => {
-    fetchAndSetNextInvoiceNumber();
+    // Only fetch if user is authenticated
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      fetchAndSetNextInvoiceNumber();
+    }
   }, [form]);
 
   const formData = form.watch();
@@ -104,6 +112,7 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
       subtotal - formData.discount + cgstAmount + sgstAmount + igstAmount;
 
     const total = Math.round(computedTotal);
+    const roundOffAmount = total - computedTotal;
 
     const toWords = new ToWords({ localeCode: "en-IN" });
     const amountInWords = toWords.convert(total).toUpperCase() + " ONLY";
@@ -121,6 +130,7 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
       cgstAmount,
       sgstAmount,
       igstAmount,
+      roundOffAmount,
       total,
       amountInWords,
     };
@@ -187,6 +197,7 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
       sgstAmount: 0,
       igstAmount: 0,
       total: 0,
+      roundOffAmount: 0,
       amountInWords: "",
 
       // Copy seller info from snapshot
@@ -224,7 +235,10 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
         isCheckingInvoiceNumber,
         setIsCheckingInvoiceNumber,
         isCreatingInvoice,
+        fetchAndSetNextInvoiceNumber,
         isFetchingNextInvoiceNumber,
+        showProductsModal,
+        setShowProductsModal,
       }}
     >
       {children}

@@ -1,22 +1,19 @@
-import {
-  Typography,
-  Box,
-  Button,
-  CircularProgress,
-  Alert,
-  Card,
-  CardContent,
-  CardActionArea,
-  Divider,
-  IconButton,
-  Collapse,
-} from "@mui/material";
-import { Add, ExpandMore } from "@mui/icons-material";
+import { Loader2 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState, useMemo } from "react";
 import { type Product, type ProductCategory } from "../api/products";
 import { useProducts } from "../hooks/useProducts";
 import ProductDrawer from "../components/ProductDrawer";
+import ProductCard from "../components/ProductCard";
+import { Button } from "@/components/ui/button";
+import { Alert } from "@/components/ui/alert";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import SearchBox from "@/components/SearchBox";
 
 const CATEGORY_LABELS: Record<ProductCategory, string> = {
   PVC_PIPE: "PVC Pipe",
@@ -40,14 +37,10 @@ export default function ProductsPage() {
   const { data: products = [], isLoading, error } = useProducts();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerMode, setDrawerMode] = useState<"create" | "edit">("create");
-  const [selectedProductId, setSelectedProductId] = useState<string | undefined>();
-  const [expandedCategories, setExpandedCategories] = useState<Record<ProductCategory, boolean>>({
-    PVC_PIPE: false,
-    PVC_BEND: false,
-    PVC_CHANNEL: false,
-    WIRE: false,
-    ELECTRICAL_ACCESSORY: false,
-  });
+  const [selectedProductId, setSelectedProductId] = useState<
+    string | undefined
+  >();
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Handle URL-based drawer state
   useEffect(() => {
@@ -66,6 +59,24 @@ export default function ProductsPage() {
       setDrawerOpen(false);
     }
   }, [location.pathname]);
+
+  // Fuzzy/elastic search filter
+  const filteredProducts = useMemo(() => {
+    if (!searchQuery.trim()) return products;
+
+    const query = searchQuery.toLowerCase().trim();
+    return products.filter((product) => {
+      const searchableFields = [
+        product.name,
+        product.hsn,
+        CATEGORY_LABELS[product.category],
+        product.defaultPrice.toString(),
+      ].map((field) => field.toLowerCase());
+
+      // Check if any field contains the search query (partial matching)
+      return searchableFields.some((field) => field.includes(query));
+    });
+  }, [products, searchQuery]);
 
   const productsByCategory = useMemo(() => {
     const categorized = products.reduce((acc, product) => {
@@ -98,212 +109,97 @@ export default function ProductsPage() {
     navigate("/products");
   };
 
-  const toggleCategory = (category: ProductCategory) => {
-    setExpandedCategories((prev) => ({
-      ...prev,
-      [category]: !prev[category],
-    }));
-  };
-
   if (isLoading) {
     return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "400px",
-        }}
-      >
-        <CircularProgress />
-      </Box>
+      <div className="w-full h-hull flex justify-center items-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
     );
   }
 
   return (
-    <Box sx={{ margin: "2rem" }}>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          mb: 4,
-        }}
-      >
-        <Typography variant="h4" fontWeight={400}>
-          Products
-        </Typography>
-        <Button
-          variant="contained"
-          startIcon={<Add />}
-          onClick={handleCreateClick}
-        >
-          Add Product
+    <div className="w-full h-full p-4 md:p-8">
+      <div className="flex md:justify-between gap-2 items-center mb-8">
+        <SearchBox
+          placeholder="Search Products"
+          value={searchQuery}
+          onChange={setSearchQuery}
+        />
+        <Button variant="outline" size="sm" onClick={handleCreateClick}>
+          Create
         </Button>
-      </Box>
+      </div>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
+        <Alert variant="destructive" className="mb-6">
           {error.message || "Failed to load products"}
         </Alert>
       )}
 
-      {CATEGORIES.map((category) => (
-        <Box key={category} sx={{ mb: 3 }}>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 1,
-              mb: 2,
-              cursor: "pointer",
-            }}
-            onClick={() => toggleCategory(category)}
-          >
-            <IconButton
-              sx={{
-                transform: expandedCategories[category] ? "rotate(180deg)" : "rotate(0deg)",
-                transition: "transform 0.3s ease",
-              }}
-              size="small"
-            >
-              <ExpandMore />
-            </IconButton>
-            <Typography variant="h6" fontWeight={400}>
-              {CATEGORY_LABELS[category]}
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
-              ({productsByCategory[category]?.length || 0})
-            </Typography>
-          </Box>
-
-          <Collapse in={expandedCategories[category]} timeout="auto">
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: {
-                  xs: "1fr",
-                  sm: "repeat(auto-fill, minmax(250px, 1fr))",
-                },
-                gap: 3,
-                justifyItems: "start",
-                ml: 6,
-              }}
-            >
-            {productsByCategory[category]?.map((product) => (
-              <Card
+      {searchQuery.trim() && (
+        <div className="mb-8">
+          <h2 className="text-lg font-normal mb-4">
+            Search Results{" "}
+            <span className="text-lg text-muted-foreground">
+              ({filteredProducts.length})
+            </span>
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+            {filteredProducts.map((product) => (
+              <ProductCard
                 key={product.id}
-                sx={{
-                  width: "100%",
-                  maxWidth: 280,
-                  borderRadius: 2,
-                  transition: "all 0.3s ease",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-                  bgcolor: "grey.50",
-                  border: "1px solid",
-                  borderColor: "grey.200",
-                  "&:hover": {
-                    boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
-                    transform: "translateY(-4px)",
-                    bgcolor: "background.paper",
-                  },
-                }}
-              >
-                <CardActionArea
-                  onClick={() => handleProductClick(product.id)}
-                  sx={{
-                    height: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "stretch",
-                  }}
-                >
-                  <CardContent sx={{ p: 3, flex: 1 }}>
-                    <Typography
-                      variant="h6"
-                      align="left"
-                      sx={{
-                        fontWeight: 400,
-                        mb: 2,
-                        fontSize: "1.1rem",
-                        lineHeight: 1.3,
-                      }}
-                    >
-                      {product.name}
-                    </Typography>
-                    <Divider sx={{ mb: 2 }} />
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        mb: 2,
-                      }}
-                    >
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        fontWeight={500}
-                      >
-                        HSN CODE
-                      </Typography>
-                      <Typography variant="body2" fontWeight={600}>
-                        {product.hsn}
-                      </Typography>
-                    </Box>
-                    <Box
-                      sx={{
-                        mt: 2,
-                        p: 1,
-                        borderRadius: 1.5,
-                        textAlign: "center",
-                      }}
-                    >
-                      <Typography
-                        variant="h5"
-                        sx={{
-                          color: "primary.main",
-                          fontWeight: 500,
-                        }}
-                      >
-                        ₹
-                        {product.defaultPrice.toLocaleString("en-IN", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })}
-                      </Typography>
-                    </Box>
-                  </CardContent>
-                </CardActionArea>
-              </Card>
+                product={product}
+                onClick={handleProductClick}
+                showCategory
+              />
             ))}
 
-            {(!productsByCategory[category] ||
-              productsByCategory[category].length === 0) && (
-              <Box
-                sx={{
-                  p: 4,
-                  textAlign: "center",
-                  border: "2px dashed",
-                  borderColor: "divider",
-                  borderRadius: 2,
-                  gridColumn: "1 / -1",
-                  width: "100%",
-                }}
-              >
-                <Typography
-                  variant="body1"
-                  color="text.secondary"
-                  fontWeight={500}
-                >
-                  No products in this category yet
-                </Typography>
-              </Box>
+            {filteredProducts.length === 0 && (
+              <div className="col-span-full p-8 text-center border-2 border-dashed rounded-lg">
+                <p className="text-base text-muted-foreground font-medium">
+                  No products found matching "{searchQuery}"
+                </p>
+              </div>
             )}
-          </Box>
-          </Collapse>
-        </Box>
-      ))}
+          </div>
+        </div>
+      )}
+
+      <Accordion type="multiple" className="w-full">
+        {CATEGORIES.map((category) => (
+          <AccordionItem key={category} value={category} className="mb-6">
+            <AccordionTrigger className="flex items-center gap-2 mb-4 hover:no-underline">
+              <h2 className="text-lg font-normal">
+                {CATEGORY_LABELS[category]}{" "}
+                <span className="text-lg text-muted-foreground">
+                  ({productsByCategory[category]?.length || 0})
+                </span>
+              </h2>
+            </AccordionTrigger>
+
+            <AccordionContent className="h-fit">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 p-4">
+                {productsByCategory[category]?.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    onClick={handleProductClick}
+                  />
+                ))}
+
+                {(!productsByCategory[category] ||
+                  productsByCategory[category].length === 0) && (
+                  <div className="col-span-full p-8 text-center border-2 border-dashed rounded-lg">
+                    <p className="text-base text-muted-foreground font-medium">
+                      No products in this category yet
+                    </p>
+                  </div>
+                )}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        ))}
+      </Accordion>
 
       <ProductDrawer
         open={drawerOpen}
@@ -311,6 +207,6 @@ export default function ProductsPage() {
         mode={drawerMode}
         productId={selectedProductId}
       />
-    </Box>
+    </div>
   );
 }

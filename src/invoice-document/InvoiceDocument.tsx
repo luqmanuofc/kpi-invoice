@@ -1,12 +1,11 @@
 // InvoiceDocument.tsx
 import "./InvoiceDocument.css";
 import { forwardRef, useImperativeHandle, useState } from "react";
-import { Box, IconButton, Typography } from "@mui/material";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import InvoicePage from "./InvoicePage";
 import { useInvoicePaginator } from "./useInvoicePaginator";
 import type { InvoiceForm } from "../invoice-form/types";
+import { Button } from "../components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export type InvoiceDocumentHandle = {
   getPageElements: () => HTMLDivElement[];
@@ -84,43 +83,29 @@ const InvoiceDocument = forwardRef<InvoiceDocumentHandle, Props>(
 
         {/* Toolbar */}
         {pages.length > 1 && (
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 2,
-              padding: "8px 16px",
-              backgroundColor: "#f5f5f5",
-              borderRadius: "4px",
-              marginBottom: "16px",
-              width: "fit-content",
-              marginInline: "auto",
-            }}
-          >
-            <IconButton
+          <div className="flex items-center justify-center gap-4 p-2 bg-muted rounded-md mb-4 w-fit mx-auto mt-4">
+            <Button
               onClick={handlePrevPage}
               disabled={currentPageIndex === 0}
-              size="small"
+              size="icon"
+              variant="ghost"
             >
-              <ChevronLeftIcon />
-            </IconButton>
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
 
-            <Typography
-              variant="body2"
-              sx={{ fontWeight: 500, minWidth: "80px", textAlign: "center" }}
-            >
+            <span className="text-sm font-medium min-w-20 text-center">
               Page {currentPageIndex + 1} of {pages.length}
-            </Typography>
+            </span>
 
-            <IconButton
+            <Button
               onClick={handleNextPage}
               disabled={currentPageIndex === pages.length - 1}
-              size="small"
+              size="icon"
+              variant="ghost"
             >
-              <ChevronRightIcon />
-            </IconButton>
-          </Box>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
         )}
       </div>
     );

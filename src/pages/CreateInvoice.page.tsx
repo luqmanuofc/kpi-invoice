@@ -1,13 +1,12 @@
-import InvoiceFormPage from "../invoice-form/InvoiceFormPage";
+import InvoiceForm from "../invoice-form/InvoiceForm";
 import InvoiceDocument, {
   type InvoiceDocumentHandle,
 } from "../invoice-document/InvoiceDocument";
 import { useInvoice } from "../contexts/InvoiceProvider";
 import { useRef, useState, useEffect, useCallback } from "react";
 import { debounce } from "lodash";
-import { Box } from "@mui/material";
 
-export default function InvoicePage() {
+export default function CreateInvoicePage() {
   const { computedData } = useInvoice();
   const invoiceRef = useRef<InvoiceDocumentHandle | null>(null);
   const [debouncedData, setDebouncedData] = useState(computedData);
@@ -29,26 +28,17 @@ export default function InvoicePage() {
   }, [computedData, updateDebouncedData]);
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        margin: 0,
-        padding: "1rem",
-        gap: "1rem",
-        flexDirection: "row",
-        justifyContent: { xs: "center", md: "inherit" },
-      }}
-    >
-      <Box className="invoice-input-form-wrapper">
-        <InvoiceFormPage />
-      </Box>
-      <Box sx={{ display: { xs: "none", md: "block" } }}>
+    <div className="w-full flex-1 flex">
+      <div className="min-w-full md:min-w-125">
+        <InvoiceForm />
+      </div>
+      <div className="hidden md:block">
         <InvoiceDocument
+          ref={invoiceRef}
           data={debouncedData}
           transformOrigin="top left"
-          ref={invoiceRef}
         />
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 }

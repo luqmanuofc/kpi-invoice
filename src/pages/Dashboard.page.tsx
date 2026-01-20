@@ -1,18 +1,10 @@
-import {
-  Typography,
-  Box,
-  Card,
-  CardContent,
-  Grid,
-  CircularProgress,
-} from "@mui/material";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { useState, useEffect } from "react";
 import dayjs, { type Dayjs } from "dayjs";
-import CSVExportButton from "../components/CSVExportButton";
 import { getDashboardMetrics } from "../api/dashboard";
+import { Loader2, ChevronLeft, ChevronRight, Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useExportMonthlyCSV } from "@/hooks/useExportMonthlyCSV";
 
 interface DashboardMetrics {
   totalInvoices: number;
@@ -26,6 +18,7 @@ interface DashboardMetrics {
 
 export default function DashboardPage() {
   const [selectedMonth, setSelectedMonth] = useState<Dayjs | null>(dayjs());
+  const { exportToExcel, isExporting } = useExportMonthlyCSV();
   const [metrics, setMetrics] = useState<DashboardMetrics>({
     totalInvoices: 0,
     totalRevenue: 0,
@@ -33,6 +26,23 @@ export default function DashboardPage() {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const handlePreviousMonth = () => {
+    setSelectedMonth((prev) => prev?.subtract(1, "month") || dayjs());
+  };
+
+  const handleNextMonth = () => {
+    setSelectedMonth((prev) => prev?.add(1, "month") || dayjs());
+  };
+
+  const handleExport = async () => {
+    try {
+      await exportToExcel(selectedMonth?.format("YYYY-MM") || "");
+    } catch (error: any) {
+      console.error("Export failed:", error);
+      alert(`Failed to export Excel: ${error.message}`);
+    }
+  };
 
   useEffect(() => {
     const fetchMetrics = async () => {
@@ -60,98 +70,77 @@ export default function DashboardPage() {
     fetchMetrics();
   }, [selectedMonth]);
 
-  if (isLoading) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="50vh"
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
-
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <div style={{ margin: "2rem" }}>
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          mb={3}
+    <div className="m-8 w-full h-full">
+      <div className="flex flex-col md:flex-row md:justify-between w-full gap-4 p-1 mb-8">
+        <div className="flex justify-center gap-4 items-center">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={handlePreviousMonth}
+            aria-label="Previous month"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <div className="text-lg min-w-50 text-center">
+            {selectedMonth ? selectedMonth.format("MMMM YYYY") : "Select month"}
+          </div>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={handleNextMonth}
+            aria-label="Next month"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+        <Button
+          onClick={handleExport}
+          disabled={isExporting}
+          className="w-full md:w-auto"
         >
-          <Typography variant="h6">Dashboard</Typography>
-          <CSVExportButton month={selectedMonth?.format("YYYY-MM") || ""} />
-        </Box>
-
-        {error && (
-          <Box mb={3}>
-            <Typography color="error" variant="body2">
-              {error}
-            </Typography>
-          </Box>
-        )}
-
-        <Box mb={3} display="flex" gap={2} alignItems="center">
-          <Typography variant="body2" color="text.secondary">
-            Select Month:
-          </Typography>
-          <DatePicker
-            label="Month"
-            value={selectedMonth}
-            onChange={(newValue) => setSelectedMonth(newValue)}
-            views={["month", "year"]}
-            slotProps={{
-              textField: { size: "small", sx: { width: 200 } },
-            }}
-          />
-        </Box>
-
-        <Grid container spacing={3} sx={{ mb: 4 }}>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <Card>
-              <CardContent>
-                <Typography color="text.secondary" gutterBottom>
-                  Total # of Invoices
-                </Typography>
-                <Typography variant="h4">
-                  {metrics.totalInvoices.toLocaleString()}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  For {selectedMonth?.format("MMMM YYYY")}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <Card>
-              <CardContent>
-                <Typography color="text.secondary" gutterBottom>
-                  Total Revenue
-                </Typography>
-                <Typography variant="h4">
-                  ₹{metrics.totalRevenue.toLocaleString()}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  For {selectedMonth?.format("MMMM YYYY")}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
-
-        {/* <Card>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>
-              Monthly Revenue Chart
-            </Typography>
-            <MonthlyRevenueChart data={metrics.monthlyData} />
-          </CardContent>
-        </Card> */}
+          {isExporting ? <Loader2 className="animate-spin" /> : <Download />}
+          {isExporting ? "Exporting..." : "Export Excel"}
+        </Button>
       </div>
-    </LocalizationProvider>
+      {isLoading ? (
+        <div className="w-full h-hull flex justify-center items-center">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      ) : (
+        <div className="flex flex-wrap gap-6 w-full">
+          <Card className="gap-2 w-full md:max-w-75">
+            <CardHeader>
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Total Revenue
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">
+                ₹{metrics.totalRevenue.toLocaleString("en-IN")}
+              </div>
+              <p className="text-sm text-muted-foreground mt-2">
+                For {selectedMonth?.format("MMMM YYYY")}
+              </p>
+            </CardContent>
+          </Card>
+          <Card className="gap-2 w-full md:max-w-75">
+            <CardHeader>
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Total Invoices
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">
+                {metrics.totalInvoices.toLocaleString("en-IN")}
+              </div>
+              <p className="text-sm text-muted-foreground mt-2">
+                For {selectedMonth?.format("MMMM YYYY")}
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+    </div>
   );
 }

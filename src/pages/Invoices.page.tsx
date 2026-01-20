@@ -1,23 +1,15 @@
-import {
-  Typography,
-  Box,
-  Button,
-  useMediaQuery,
-  useTheme,
-} from "@mui/material";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getInvoices, type Invoice } from "../api/invoices";
-import InvoicesDataGrid from "../components/InvoicesDataGrid";
-import InvoicesCardView from "../components/InvoicesCardView";
-import InvoiceFilterToolbar, {
-  type InvoiceFilters,
-} from "../components/InvoiceFilterToolbar";
+import type { InvoiceFilters } from "@/invoices/InvoiceFilterToolbar";
+import InvoiceFilterToolbar from "@/invoices/InvoiceFilterToolbar";
+import InvoicesTable from "../invoices/InvoicesTable";
+import InvoicesCardView from "../invoices/InvoicesCardView";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 export default function InvoicesPage() {
-  const navigate = useNavigate();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [searchParams] = useSearchParams();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -25,6 +17,7 @@ export default function InvoicesPage() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
+  const isDesktop = useMediaQuery("(min-width: 768px)");
 
   // Initialize filters from URL params
   const [filters, setFilters] = useState<InvoiceFilters>(() => {
@@ -83,10 +76,6 @@ export default function InvoicesPage() {
     fetchInvoices();
   }, [page, pageSize, filters]);
 
-  const handleCreateClick = () => {
-    navigate("/");
-  };
-
   const handleStatusChange = (updatedInvoice: Invoice) => {
     setInvoices((prevInvoices) =>
       prevInvoices.map((invoice) =>
@@ -104,60 +93,70 @@ export default function InvoicesPage() {
     setTotalCount((prevCount) => prevCount - 1);
   };
 
-  return (
-    <div style={{ margin: "2rem" }}>
-      <Box
-        display={"flex"}
-        justifyContent={"space-between"}
-        alignContent={"center"}
-        p={1}
-      >
-        <Typography variant="h6" sx={{ mb: 3 }}>
-          Invoices
-        </Typography>
-        <div>
-          <Button variant="outlined" size="small" onClick={handleCreateClick}>
-            Create
-          </Button>
-        </div>
-      </Box>
+  const totalPages = Math.ceil(totalCount / pageSize);
+  const hasNextPage = page < totalPages;
+  const hasPrevPage = page > 1;
 
+  return (
+    <div className="p-8 space-y-4 w-full h-full">
       <InvoiceFilterToolbar
         filters={filters}
         onFiltersChange={setFilters}
         initialFilterType={filters.buyerId ? "buyer" : "invoiceNumber"}
       />
 
-      {isMobile ? (
+      {isDesktop ? (
+        <>
+          <InvoicesTable
+            invoices={invoices}
+            isLoading={isLoading}
+            error={error}
+            onStatusChange={handleStatusChange}
+            onInvoiceArchived={handleInvoiceArchived}
+          />
+        </>
+      ) : (
         <InvoicesCardView
           invoices={invoices}
           isLoading={isLoading}
           error={error}
-          page={page - 1}
+          page={page}
           pageSize={pageSize}
-          rowCount={totalCount}
-          onPageChange={(newPage) => setPage(newPage + 1)}
+          totalCount={totalCount}
+          onPageChange={setPage}
           onStatusChange={handleStatusChange}
           onInvoiceArchived={handleInvoiceArchived}
         />
-      ) : (
-        <InvoicesDataGrid
-          invoices={invoices}
-          isLoading={isLoading}
-          error={error}
-          showCheckboxes={false}
-          paginationMode="server"
-          rowCount={totalCount}
-          page={page - 1}
-          pageSize={pageSize}
-          onPageChange={(newPage) => setPage(newPage + 1)}
-          onPageSizeChange={(newPageSize) => {
-            setPageSize(newPageSize);
-            setPage(1);
-          }}
-          onStatusChange={handleStatusChange}
-          onInvoiceArchived={handleInvoiceArchived}
-        />
+      )}
+
+      {!isLoading && totalCount > 0 && (
+        <div className="flex items-center justify-between flex-wrap gap-4 *:mx-auto sm:*:mx-0">
+          <p className="text-sm text-muted-foreground">
+            Showing {(page - 1) * pageSize + 1} to{" "}
+            {Math.min(page * pageSize, totalCount)} of {totalCount} invoices
+          </p>
+          <div className="flex items-center gap-2 ">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => p - 1)}
+              disabled={!hasPrevPage}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <span className="text-sm text-muted-foreground">
+              Page {page} of {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => p + 1)}
+              disabled={!hasNextPage}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
       )}
     </div>
   );

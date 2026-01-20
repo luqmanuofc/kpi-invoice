@@ -1,4 +1,4 @@
-import { getAuthHeaders } from "../utils/auth";
+import { apiClient } from "../utils/auth";
 
 export interface Buyer {
   id: string;
@@ -18,9 +18,8 @@ export interface BuyerFormData {
 }
 
 export async function createBuyer(data: BuyerFormData) {
-  const response = await fetch("/.netlify/functions/createBuyer", {
+  const response = await apiClient("/.netlify/functions/createBuyer", {
     method: "POST",
-    headers: getAuthHeaders(),
     body: JSON.stringify(data),
   });
 
@@ -33,9 +32,8 @@ export async function createBuyer(data: BuyerFormData) {
 }
 
 export async function getBuyers(): Promise<Buyer[]> {
-  const response = await fetch("/.netlify/functions/getBuyers", {
+  const response = await apiClient("/.netlify/functions/getBuyers", {
     method: "GET",
-    headers: getAuthHeaders(),
   });
 
   if (!response.ok) {
@@ -47,9 +45,8 @@ export async function getBuyers(): Promise<Buyer[]> {
 }
 
 export async function getBuyerById(id: string): Promise<Buyer> {
-  const response = await fetch(`/.netlify/functions/getBuyer?id=${id}`, {
+  const response = await apiClient(`/.netlify/functions/getBuyer?id=${id}`, {
     method: "GET",
-    headers: getAuthHeaders(),
   });
 
   if (!response.ok) {
@@ -61,9 +58,8 @@ export async function getBuyerById(id: string): Promise<Buyer> {
 }
 
 export async function updateBuyer(id: string, data: BuyerFormData) {
-  const response = await fetch("/.netlify/functions/updateBuyer", {
+  const response = await apiClient("/.netlify/functions/updateBuyer", {
     method: "PUT",
-    headers: getAuthHeaders(),
     body: JSON.stringify({ id, ...data }),
   });
 

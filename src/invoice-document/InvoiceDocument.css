@@ -27,6 +27,10 @@
   background: white;
   font-family: Helvetica, Arial, sans-serif;
   color: #373b75;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   /* transform-origin: top left; DON'T USE THIS PROPERTY HERE. ITS BEING PASSED AS A PROP BECAUSE IT NEEDS TO CHANGE BASED ON THE PAGE */
 }
 
@@ -73,6 +77,8 @@
 
 .company-title {
   font-size: 22pt;
+  font-weight: bold;
+  line-height: 1.1;
   margin: 0;
   border-bottom: 1pt solid #373b75;
   text-align: left;

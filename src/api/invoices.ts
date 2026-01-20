@@ -1,5 +1,5 @@
 import type { InvoiceForm } from "../invoice-form/types";
-import { getAuthHeaders } from "../utils/auth";
+import { apiClient } from "../utils/auth";
 
 export interface Invoice {
   id: string;
@@ -95,9 +95,8 @@ function normalizeInvoice(invoice: any): Invoice {
 }
 
 export async function createInvoice(data: InvoiceForm): Promise<Invoice> {
-  const response = await fetch("/.netlify/functions/createInvoice", {
+  const response = await apiClient("/.netlify/functions/createInvoice", {
     method: "POST",
-    headers: getAuthHeaders(),
     body: JSON.stringify(data),
   });
 
@@ -144,9 +143,8 @@ export async function getInvoices(
     searchParams.toString() ? `?${searchParams.toString()}` : ""
   }`;
 
-  const response = await fetch(url, {
+  const response = await apiClient(url, {
     method: "GET",
-    headers: getAuthHeaders(),
   });
 
   if (!response.ok) {
@@ -162,9 +160,8 @@ export async function getInvoices(
 }
 
 export async function getInvoiceById(id: string): Promise<Invoice> {
-  const response = await fetch(`/.netlify/functions/getInvoice?id=${id}`, {
+  const response = await apiClient(`/.netlify/functions/getInvoice?id=${id}`, {
     method: "GET",
-    headers: getAuthHeaders(),
   });
 
   if (!response.ok) {
@@ -179,13 +176,12 @@ export async function getInvoiceById(id: string): Promise<Invoice> {
 export async function checkInvoiceNumber(
   invoiceNumber: string
 ): Promise<{ exists: boolean }> {
-  const response = await fetch(
+  const response = await apiClient(
     `/.netlify/functions/checkInvoiceNumber?invoiceNumber=${encodeURIComponent(
       invoiceNumber
     )}`,
     {
       method: "GET",
-      headers: getAuthHeaders(),
     }
   );
 
@@ -207,9 +203,8 @@ export async function updateInvoiceStatus(
     archived: "ARCHIVED",
   };
 
-  const response = await fetch("/.netlify/functions/updateInvoiceStatus", {
+  const response = await apiClient("/.netlify/functions/updateInvoiceStatus", {
     method: "PUT",
-    headers: getAuthHeaders(),
     body: JSON.stringify({
       id,
       status: statusMap[status],
@@ -236,11 +231,10 @@ export interface InvoiceStatusLog {
 export async function getInvoiceStatusLogs(
   invoiceId: string
 ): Promise<InvoiceStatusLog[]> {
-  const response = await fetch(
+  const response = await apiClient(
     `/.netlify/functions/getInvoiceStatusLogs?invoiceId=${invoiceId}`,
     {
       method: "GET",
-      headers: getAuthHeaders(),
     }
   );
 
@@ -259,13 +253,12 @@ export async function archiveInvoice(id: string): Promise<Invoice> {
 export async function getNextInvoiceNumber(
   prefix: string = "2025-26/"
 ): Promise<{ nextInvoiceNumber: string; prefix: string; nextNumber: number }> {
-  const response = await fetch(
+  const response = await apiClient(
     `/.netlify/functions/getNextInvoiceNumber?prefix=${encodeURIComponent(
       prefix
     )}`,
     {
       method: "GET",
-      headers: getAuthHeaders(),
     }
   );
 

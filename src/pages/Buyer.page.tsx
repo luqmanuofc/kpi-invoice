@@ -1,17 +1,18 @@
+import { useNavigate, useLocation } from "react-router-dom";
+import { useEffect, useState, useMemo } from "react";
+import { Loader2 } from "lucide-react";
+import BuyerDrawer from "../buyer/BuyerDrawer";
+import { useBuyers } from "../hooks/useBuyers";
+import { Button } from "@/components/ui/button";
+import { Alert } from "@/components/ui/alert";
+import SearchBox from "@/components/SearchBox";
 import {
-  Typography,
-  Box,
-  Button,
-  CircularProgress,
-  Alert,
   Card,
   CardContent,
-  CardActions,
-} from "@mui/material";
-import { useNavigate, useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
-import BuyerDrawer from "../components/BuyerDrawer";
-import { useBuyers } from "../hooks/useBuyers";
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export default function BuyerPage() {
   const navigate = useNavigate();
@@ -20,6 +21,7 @@ export default function BuyerPage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerMode, setDrawerMode] = useState<"create" | "edit">("create");
   const [selectedBuyerId, setSelectedBuyerId] = useState<string | undefined>();
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Handle URL-based drawer state
   useEffect(() => {
@@ -59,123 +61,87 @@ export default function BuyerPage() {
     navigate(`/invoices?buyerId=${buyerId}`);
   };
 
+  // Fuzzy/elastic search filter
+  const filteredBuyers = useMemo(() => {
+    if (!searchQuery.trim()) return buyers;
+
+    const query = searchQuery.toLowerCase().trim();
+    return buyers.filter((buyer) => {
+      const searchableFields = [
+        buyer.name,
+        buyer.address,
+        buyer.gstin || "",
+        buyer.phone || "",
+      ].map((field) => field.toLowerCase());
+
+      // Check if any field contains the search query (partial matching)
+      return searchableFields.some((field) => field.includes(query));
+    });
+  }, [buyers, searchQuery]);
+
   if (isLoading) {
     return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "400px",
-        }}
-      >
-        <CircularProgress />
-      </Box>
+      <div className="w-full h-hull flex justify-center items-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
     );
   }
 
   return (
-    <div style={{ margin: "2rem" }}>
-      <Box
-        display={"flex"}
-        justifyContent={"space-between"}
-        alignContent={"left"}
-        p={1}
-      >
-        <Typography
-          variant="h6"
-          textAlign={"left"}
-          fontWeight={400}
-          sx={{ mb: 3 }}
-        >
-          Buyers
-        </Typography>
-        <div>
-          {" "}
-          <Button variant="outlined" size="small" onClick={handleCreateClick}>
-            Create
-          </Button>
-        </div>
-      </Box>
+    <div className="m-8 w-full h-full">
+      <div className="flex md:justify-between gap-2 items-center p-1 mb-8">
+        <SearchBox
+          placeholder="Search Buyer"
+          value={searchQuery}
+          onChange={setSearchQuery}
+        />
+        <Button variant="outline" size="sm" onClick={handleCreateClick}>
+          Create
+        </Button>
+      </div>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
+        <Alert variant="destructive" className="mb-6">
           {error instanceof Error ? error.message : "Failed to load buyers"}
         </Alert>
       )}
 
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: {
-            xs: "1fr",
-            sm: "repeat(2, 1fr)",
-            md: "repeat(3, 1fr)",
-          },
-          gap: 3,
-        }}
-      >
-        {buyers.map((buyer) => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        {filteredBuyers.map((buyer) => (
           <Card
             key={buyer.id}
-            sx={{
-              width: "100%",
-              borderRadius: 2,
-              transition: "all 0.3s ease",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-              bgcolor: "grey.50",
-              border: "1px solid",
-              borderColor: "grey.200",
-              "&:hover": {
-                boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
-                transform: "translateY(-4px)",
-                bgcolor: "background.paper",
-              },
-            }}
+            className="w-full flex flex-col"
+            onClick={() => handleEditClick(buyer.id)}
           >
-            <CardContent sx={{ flexGrow: 1 }}>
-              <Typography variant="h6" component="div" gutterBottom>
-                {buyer.name}
-              </Typography>
-              <Typography
-                variant="body2"
-                align="left"
-                color="text.secondary"
-                sx={{ mb: 1 }}
-              >
+            <CardHeader>
+              <CardTitle>{buyer.name}</CardTitle>
+            </CardHeader>
+            <CardContent className="grow space-y-2">
+              <p className="text-sm text-muted-foreground text-left">
                 <strong>Address:</strong> {buyer.address}
-              </Typography>
-              <Typography
-                variant="body2"
-                align="left"
-                color="text.secondary"
-                sx={{ mb: 1 }}
-              >
+              </p>
+              <p className="text-sm text-muted-foreground text-left">
                 <strong>GSTIN:</strong> {buyer.gstin || ""}
-              </Typography>
-              <Typography variant="body2" align="left" color="text.secondary">
+              </p>
+              <p className="text-sm text-muted-foreground text-left">
                 <strong>Phone:</strong> {buyer.phone || ""}
-              </Typography>
+              </p>
             </CardContent>
-            <CardActions sx={{ justifyContent: "flex-end", p: 2, pt: 0 }}>
+            <CardFooter className="flex justify-end gap-2 pt-0">
               <Button
-                size="small"
-                variant="outlined"
-                onClick={() => handleEditClick(buyer.id)}
-              >
-                Edit
-              </Button>
-              <Button
-                size="small"
-                variant="contained"
+                size="sm"
+                variant="outline"
                 onClick={() => handleViewInvoicesClick(buyer.id)}
               >
                 View Invoices
               </Button>
-            </CardActions>
+              <Button size="sm" onClick={() => handleEditClick(buyer.id)}>
+                Edit
+              </Button>
+            </CardFooter>
           </Card>
         ))}
-      </Box>
+      </div>
 
       <BuyerDrawer
         open={drawerOpen}

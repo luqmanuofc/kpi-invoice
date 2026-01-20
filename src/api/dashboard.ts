@@ -1,4 +1,4 @@
-import { getAuthHeaders } from "../utils/auth";
+import { apiClient } from "../utils/auth";
 
 export interface DashboardMetrics {
   totalInvoices: number;
@@ -25,9 +25,8 @@ export async function getDashboardMetrics(
 ): Promise<DashboardMetrics> {
   const url = `/.netlify/functions/getDashboardMetrics?month=${month}`;
 
-  const response = await fetch(url, {
+  const response = await apiClient(url, {
     method: "GET",
-    headers: getAuthHeaders(),
   });
 
   if (!response.ok) {
@@ -43,9 +42,8 @@ export async function getInvoicesForExport(
 ): Promise<InvoiceExportData[]> {
   const url = `/.netlify/functions/getInvoicesForExport?month=${month}`;
 
-  const response = await fetch(url, {
+  const response = await apiClient(url, {
     method: "GET",
-    headers: getAuthHeaders(),
   });
 
   if (!response.ok) {
