@@ -15,7 +15,7 @@ export default function InvoicesPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const pageSize = 10;
   const [totalCount, setTotalCount] = useState(0);
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
