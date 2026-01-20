@@ -15,6 +15,33 @@
   overflow: hidden;
 }
 
+.invoice-page:not(.pdf-export) {
+  background: #ffffff;
+  color: #252525;
+  --invoice-primary: #343434;
+  --invoice-background: #ffffff;
+  --invoice-muted-bg: #f7f7f7;
+  --invoice-text: #252525;
+}
+.dark .invoice-page:not(.pdf-export) {
+  background: #000000;
+  color: #fbfbfb;
+  --invoice-primary: #ebebeb;
+  --invoice-background: #000000;
+  --invoice-muted-bg: #000000;
+  --invoice-text: #fbfbfb;
+}
+/* Override with original colors for PDF generation */
+.invoice-page.pdf-export {
+  --invoice-primary: #373b75;
+  --invoice-background: #ffffff;
+  --invoice-muted-bg: #f8f8f8;
+  --invoice-text: #373b75;
+  background: #ffffff;
+  color: #373b75;
+}
+
+
 .invoice-page {
   width: 595pt;   /* A4 width in points - NEVER CHANGES */
   height: 842pt;  /* A4 height - NEVER CHANGES */
@@ -24,9 +51,9 @@
   max-height: 842pt;
   padding: 0;
   position: relative;
-  background: white;
+  background: var(--invoice-background);
   font-family: Helvetica, Arial, sans-serif;
-  color: #373b75;
+  color: var(--invoice-text);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -50,7 +77,7 @@
 }
 
 .invoice-border {
-  border: 2pt solid #373b75;
+  border: 2pt solid var(--invoice-primary);
   position: absolute;
   top: 15pt;
   left: 15pt;
@@ -66,7 +93,7 @@
   top: -15pt;
   left: 50%;
   transform: translateX(-50%);
-  background: white;
+  background: var(--invoice-background);
   padding: 3pt 6pt;
 }
 
@@ -80,13 +107,13 @@
   font-weight: bold;
   line-height: 1.1;
   margin: 0;
-  border-bottom: 1pt solid #373b75;
+  border-bottom: 1pt solid var(--invoice-primary);
   text-align: left;
 }
 
 .address {
   font-size: 11pt;
-  border-bottom: 1pt solid #373b75;
+  border-bottom: 1pt solid var(--invoice-primary);
   width: fit-content;
 }
 
@@ -97,7 +124,7 @@
 
 .divider {
   border: none;
-  border-top: 1pt solid #373b75;
+  border-top: 1pt solid var(--invoice-primary);
   margin-left: -10pt;
   margin-right: -10pt;
   margin-top: 2pt;
@@ -162,14 +189,14 @@
 
 .items-table th,
 .items-table td {
-  border: 1pt solid #373b75;
+  border: 1pt solid var(--invoice-primary);
   padding: 4pt 6pt;
   text-align: center;
 }
 
 .items-table th {
   font-weight: bold;
-  background: #f8f8f8;
+  background: var(--invoice-muted-bg);
 }
 
 .items-table td:nth-child(2) {
@@ -184,7 +211,7 @@
   font-size: 10pt;
   float: right;                
   width: 44.075%;                   
-  border: 1pt solid #373b75; 
+  border: 1pt solid var(--invoice-primary);
   margin-top: 5pt;
   /* border-top: none;              */
   text-align: right;
@@ -195,7 +222,7 @@
 } */
 
 .totals-table td {
-  border: 1pt solid #373b75;
+  border: 1pt solid var(--invoice-primary);
   padding: 4pt 6pt;
 }
 
@@ -212,7 +239,7 @@
 .totals-table .grand-total td {
   font-size: 11pt;
   font-weight: bold;
-  background: #f0f0f0;
+  background: var(--invoice-muted-bg);
 }
 
 .clear-float {
@@ -230,14 +257,14 @@
 }
 
 .dotted-line {
-  border-top: 2pt dotted #373b75;
+  border-top: 2pt dotted var(--invoice-primary);
   margin: 4pt 0;
 }
 
 .amount-text {
   font-size: 12pt;
   font-weight: bold;
-  color: #373b75;
+  color: var(--invoice-primary) ;
 }
 
 .amount-words {
@@ -258,7 +285,7 @@
 /* Left: Terms */
 .terms {
   width: 60%;
-  color: #373b75;
+  color: var(--invoice-primary);
    text-align: left;
 }
 
@@ -266,7 +293,7 @@
 .signature-block {
   width: 40%;
   text-align: right;
-  color: #373b75;
+  color: var(--invoice-primary);
 }
 
 .signature-spacer{
@@ -297,7 +324,7 @@
 .payment-header {
   font-weight: bold;
   text-align: left;
-  color: #373b75;
+  color: var(--invoice-primary);
 }
 
 .payment-accounts {
@@ -314,7 +341,7 @@
 
 .payment-line {
   line-height: 1.4;
-  color: #373b75;
+  color: var(--invoice-primary);
 }
 
 
@@ -325,9 +352,9 @@
   transform: translateX(-50%);
   font-size: 10pt;
   font-weight: bold;
-  background: white;
+  background: var(--invoice-background);
   padding: 2pt 6pt;
-  color: #373b75;
+  color: var(--invoice-primary);
 }
 
 .probe {

@@ -126,7 +126,7 @@ export default function InvoiceViewPage() {
       // Show all pages and remove zoom for PDF generation
       pageElements.forEach((el, idx) => {
         el.style.display = "block";
-        invoicePages[idx]?.classList.add("no-zoom");
+        invoicePages[idx]?.classList.add("no-zoom", "pdf-export");
       });
 
       // Wait for layout to update
@@ -205,7 +205,7 @@ export default function InvoiceViewPage() {
       // Restore original display styles and remove no-zoom class
       pageElements.forEach((el, idx) => {
         el.style.display = originalStyles[idx];
-        invoicePages[idx]?.classList.remove("no-zoom");
+        invoicePages[idx]?.classList.remove("no-zoom", "pdf-export");
       });
       // Hide loading modal after a short delay
       await new Promise((resolve) => setTimeout(resolve, 500));
