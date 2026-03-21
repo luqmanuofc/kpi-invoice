@@ -81,7 +81,10 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
   const fetchAndSetNextInvoiceNumber = async () => {
     setIsFetchingNextInvoiceNumber(true);
     try {
-      const result = await getNextInvoiceNumber("2025-26/");
+      const today = new Date();
+      const year = today.getMonth() >= 3 ? today.getFullYear() : today.getFullYear() - 1;
+      const fiscalYearPrefix = `${year}-${String(year + 1).slice(-2)}/`;
+      const result = await getNextInvoiceNumber(fiscalYearPrefix);
       form.setValue("invoiceNumber", result.nextInvoiceNumber);
     } catch (err) {
       console.error("Failed to fetch next invoice number:", err);
