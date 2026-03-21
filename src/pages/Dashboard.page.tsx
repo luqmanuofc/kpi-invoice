@@ -9,11 +9,44 @@ import { useExportMonthlyCSV } from "@/hooks/useExportMonthlyCSV";
 interface DashboardMetrics {
   totalInvoices: number;
   totalRevenue: number;
-  monthlyData: Array<{
-    month: string;
-    revenue: number;
-    sales: number;
-  }>;
+  topBuyers: Array<{ name: string; total: number }>;
+  topProduct: { name: string; qty: number } | null;
+  revenueChart: Array<{ month: string; revenue: number }>;
+}
+
+function formatIndian(value: number): string {
+  if (value >= 1_00_00_000) return `${(value / 1_00_00_000).toFixed(1).replace(/\.0$/, "")} Cr`;
+  if (value >= 1_00_000) return `${(value / 1_00_000).toFixed(1).replace(/\.0$/, "")} L`;
+  if (value >= 1_000) return `${(value / 1_000).toFixed(1).replace(/\.0$/, "")} K`;
+  return value.toLocaleString("en-IN");
+}
+
+function RevenueBarChart({ data }: { data: Array<{ month: string; revenue: number }> }) {
+  const max = Math.max(...data.map((d) => d.revenue), 1);
+
+  return (
+    <div className="flex items-end gap-3 h-20 w-full">
+      {data.map((d) => {
+        const heightPct = Math.round((d.revenue / max) * 100);
+        const label = dayjs(d.month + "-01").format("MMM");
+        const isLast = d === data[data.length - 1];
+        return (
+          <div key={d.month} className="flex flex-col items-center gap-1 flex-1">
+            <span className="text-xs text-muted-foreground">
+              ₹{formatIndian(d.revenue)}
+            </span>
+            <div className="w-full flex items-end" style={{ height: "48px" }}>
+              <div
+                className={`w-full rounded-sm transition-all ${isLast ? "bg-primary" : "bg-primary/30"}`}
+                style={{ height: `${heightPct}%`, minHeight: d.revenue > 0 ? "4px" : "0" }}
+              />
+            </div>
+            <span className="text-xs font-medium">{label}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
 }
 
 export default function DashboardPage() {
@@ -22,7 +55,9 @@ export default function DashboardPage() {
   const [metrics, setMetrics] = useState<DashboardMetrics>({
     totalInvoices: 0,
     totalRevenue: 0,
-    monthlyData: [],
+    topBuyers: [],
+    topProduct: null,
+    revenueChart: [],
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -58,7 +93,9 @@ export default function DashboardPage() {
         setMetrics({
           totalInvoices: data.totalInvoices,
           totalRevenue: data.totalRevenue,
-          monthlyData: [], // TODO: Populate with chart data when needed
+          topBuyers: data.topBuyers ?? [],
+          topProduct: data.topProduct,
+          revenueChart: data.revenueChart ?? [],
         });
       } catch (err: any) {
         setError(err.message || "Failed to load dashboard metrics");
@@ -132,6 +169,7 @@ export default function DashboardPage() {
               </p>
             </CardContent>
           </Card>
+
           <Card className="gap-2 w-full md:max-w-75">
             <CardHeader>
               <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -147,6 +185,79 @@ export default function DashboardPage() {
               </p>
             </CardContent>
           </Card>
+
+          <Card className="gap-2 w-full md:max-w-sm">
+            <CardHeader>
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Top Buyers — {selectedMonth?.format("MMMM YYYY")}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {metrics.topBuyers.length > 0 ? (
+                <div className="flex flex-col gap-3">
+                  {metrics.topBuyers.map((buyer, i) => {
+                    const max = metrics.topBuyers[0].total;
+                    const widthPct = Math.round((buyer.total / max) * 100);
+                    return (
+                      <div key={i} className="flex flex-col gap-1">
+                        <div className="flex justify-between items-center text-sm">
+                          <span className="truncate font-medium max-w-[60%]" title={buyer.name}>
+                            {buyer.name}
+                          </span>
+                          <span className="text-muted-foreground text-xs shrink-0">
+                            ₹{formatIndian(buyer.total)}
+                          </span>
+                        </div>
+                        <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all ${i === 0 ? "bg-primary" : "bg-primary/40"}`}
+                            style={{ width: `${widthPct}%` }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">No data</p>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card className="gap-2 w-full md:max-w-75">
+            <CardHeader>
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Top Product
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {metrics.topProduct ? (
+                <>
+                  <div className="text-2xl font-bold truncate" title={metrics.topProduct.name}>
+                    {metrics.topProduct.name}
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    {metrics.topProduct.qty.toLocaleString("en-IN")} units in {selectedMonth?.format("MMMM YYYY")}
+                  </p>
+                </>
+              ) : (
+                <p className="text-sm text-muted-foreground">No data</p>
+              )}
+            </CardContent>
+          </Card>
+
+          {metrics.revenueChart.length > 0 && (
+            <Card className="gap-2 w-full md:max-w-sm">
+              <CardHeader>
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Revenue — Last 3 Months
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <RevenueBarChart data={metrics.revenueChart} />
+              </CardContent>
+            </Card>
+          )}
         </div>
       )}
     </div>

@@ -4,6 +4,9 @@ export interface DashboardMetrics {
   totalInvoices: number;
   totalRevenue: number;
   month: string;
+  topBuyers: Array<{ name: string; total: number }>;
+  topProduct: { name: string; qty: number } | null;
+  revenueChart: Array<{ month: string; revenue: number }>;
 }
 
 export interface InvoiceExportData {
