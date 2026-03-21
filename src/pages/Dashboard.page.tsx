@@ -10,8 +10,8 @@ interface DashboardMetrics {
   totalInvoices: number;
   totalRevenue: number;
   topBuyers: Array<{ name: string; total: number }>;
-  topProduct: { name: string; qty: number } | null;
   revenueChart: Array<{ month: string; revenue: number }>;
+  productRevenue: Array<{ name: string; revenue: number }>;
 }
 
 function formatIndian(value: number): string {
@@ -56,11 +56,13 @@ export default function DashboardPage() {
     totalInvoices: 0,
     totalRevenue: 0,
     topBuyers: [],
-    topProduct: null,
     revenueChart: [],
+    productRevenue: [],
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [buyersExpanded, setBuyersExpanded] = useState(false);
+  const [productsExpanded, setProductsExpanded] = useState(false);
 
   const handlePreviousMonth = () => {
     setSelectedMonth((prev) => prev?.subtract(1, "month") || dayjs());
@@ -94,8 +96,8 @@ export default function DashboardPage() {
           totalInvoices: data.totalInvoices,
           totalRevenue: data.totalRevenue,
           topBuyers: data.topBuyers ?? [],
-          topProduct: data.topProduct,
           revenueChart: data.revenueChart ?? [],
+          productRevenue: data.productRevenue ?? [],
         });
       } catch (err: any) {
         setError(err.message || "Failed to load dashboard metrics");
@@ -195,7 +197,7 @@ export default function DashboardPage() {
             <CardContent>
               {metrics.topBuyers.length > 0 ? (
                 <div className="flex flex-col gap-3">
-                  {metrics.topBuyers.map((buyer, i) => {
+                  {(buyersExpanded ? metrics.topBuyers : metrics.topBuyers.slice(0, 5)).map((buyer, i) => {
                     const max = metrics.topBuyers[0].total;
                     const widthPct = Math.round((buyer.total / max) * 100);
                     return (
@@ -217,6 +219,14 @@ export default function DashboardPage() {
                       </div>
                     );
                   })}
+                  {metrics.topBuyers.length > 5 && (
+                    <button
+                      onClick={() => setBuyersExpanded((v) => !v)}
+                      className="text-xs text-primary hover:underline text-left mt-1"
+                    >
+                      {buyersExpanded ? "View less" : `View ${metrics.topBuyers.length - 5} more`}
+                    </button>
+                  )}
                 </div>
               ) : (
                 <p className="text-sm text-muted-foreground">No data</p>
@@ -224,27 +234,49 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          <Card className="gap-2 w-full md:max-w-75">
-            <CardHeader>
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Top Product
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {metrics.topProduct ? (
-                <>
-                  <div className="text-2xl font-bold truncate" title={metrics.topProduct.name}>
-                    {metrics.topProduct.name}
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-2">
-                    {metrics.topProduct.qty.toLocaleString("en-IN")} units in {selectedMonth?.format("MMMM YYYY")}
-                  </p>
-                </>
-              ) : (
-                <p className="text-sm text-muted-foreground">No data</p>
-              )}
-            </CardContent>
-          </Card>
+          {metrics.productRevenue.length > 0 && (
+            <Card className="gap-2 w-full md:max-w-sm">
+              <CardHeader>
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Revenue by Product — {selectedMonth?.format("MMMM YYYY")}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col gap-3">
+                  {(productsExpanded ? metrics.productRevenue : metrics.productRevenue.slice(0, 5)).map((product, i) => {
+                    const max = metrics.productRevenue[0].revenue;
+                    const widthPct = Math.round((product.revenue / max) * 100);
+                    return (
+                      <div key={i} className="flex flex-col gap-1">
+                        <div className="flex justify-between items-center text-sm">
+                          <span className="truncate font-medium max-w-[60%]" title={product.name}>
+                            {product.name}
+                          </span>
+                          <span className="text-muted-foreground text-xs shrink-0">
+                            ₹{formatIndian(product.revenue)}
+                          </span>
+                        </div>
+                        <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all ${i === 0 ? "bg-primary" : "bg-primary/40"}`}
+                            style={{ width: `${widthPct}%` }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {metrics.productRevenue.length > 5 && (
+                    <button
+                      onClick={() => setProductsExpanded((v) => !v)}
+                      className="text-xs text-primary hover:underline text-left mt-1"
+                    >
+                      {productsExpanded ? "View less" : `View ${metrics.productRevenue.length - 5} more`}
+                    </button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {metrics.revenueChart.length > 0 && (
             <Card className="gap-2 w-full md:max-w-sm">

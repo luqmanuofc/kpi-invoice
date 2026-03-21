@@ -34,7 +34,7 @@ export default async function handler(request: Request) {
     const endDate = new Date(year, monthNum, 1); // First day of next month
 
     // Fetch all metrics in parallel
-    const [totalInvoices, revenueData, topBuyerData, topProductData, rev2MonthsAgo, rev1MonthAgo] =
+    const [totalInvoices, revenueData, topBuyerData, rev2MonthsAgo, rev1MonthAgo, productRevenueData] =
       await Promise.all([
         // Count total invoices in the month (excluding archived)
         prisma.invoice.count({
@@ -62,21 +62,6 @@ export default async function handler(request: Request) {
           },
           _sum: { total: true },
           orderBy: { _sum: { total: "desc" } },
-          take: 5,
-        }),
-
-        // Top product by quantity sold
-        prisma.invoiceItem.groupBy({
-          by: ["description"],
-          where: {
-            invoice: {
-              date: { gte: startDate, lt: endDate },
-              status: { in: ["PENDING", "PAID"] },
-            },
-          },
-          _sum: { qty: true },
-          orderBy: { _sum: { qty: "desc" } },
-          take: 1,
         }),
 
         // Revenue for 2 months ago
@@ -102,6 +87,19 @@ export default async function handler(request: Request) {
           },
           _sum: { total: true },
         }),
+
+        // Revenue per product for selected month
+        prisma.invoiceItem.groupBy({
+          by: ["description"],
+          where: {
+            invoice: {
+              date: { gte: startDate, lt: endDate },
+              status: { in: ["PENDING", "PAID"] },
+            },
+          },
+          _sum: { lineTotal: true },
+          orderBy: { _sum: { lineTotal: "desc" } },
+        }),
       ]);
 
     const totalRevenue = revenueData._sum.total || 0;
@@ -111,12 +109,10 @@ export default async function handler(request: Request) {
       total: Number(b._sum.total || 0),
     }));
 
-    const topProduct = topProductData[0]
-      ? {
-          name: topProductData[0].description,
-          qty: Number(topProductData[0]._sum.qty || 0),
-        }
-      : null;
+    const productRevenue = productRevenueData.map((p) => ({
+      name: p.description,
+      revenue: Number(p._sum.lineTotal || 0),
+    }));
 
     // Build 3-month revenue chart (oldest to newest)
     const revenueChart = [
@@ -140,8 +136,8 @@ export default async function handler(request: Request) {
         totalRevenue: Number(totalRevenue),
         month,
         topBuyers,
-        topProduct,
         revenueChart,
+        productRevenue,
       }),
       {
         status: 200,
