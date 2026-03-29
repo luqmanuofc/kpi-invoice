@@ -203,6 +203,11 @@
   text-align: left; /* Description column left aligned */
 }
 
+.items-table th:last-child,
+.items-table td:last-child {
+  text-align: right;
+}
+
 /* ================================
    Totals Table (Right-Aligned)
    ================================ */
