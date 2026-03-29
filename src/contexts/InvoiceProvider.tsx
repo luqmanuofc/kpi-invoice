@@ -105,14 +105,14 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
   const formData = form.watch();
 
   const computedData = useMemo<InvoiceForm>(() => {
-    const subtotal = formData.items.reduce((sum, i) => sum + i.qty * i.rate, 0);
+    const itemsTotal = formData.items.reduce((sum, i) => sum + i.qty * i.rate, 0);
+    const subtotal = itemsTotal - formData.discount;
 
     const cgstAmount = (subtotal * formData.cgstRate) / 100;
     const sgstAmount = (subtotal * formData.sgstRate) / 100;
     const igstAmount = (subtotal * formData.igstRate) / 100;
 
-    const computedTotal =
-      subtotal - formData.discount + cgstAmount + sgstAmount + igstAmount;
+    const computedTotal = subtotal + cgstAmount + sgstAmount + igstAmount;
 
     const total = Math.round(computedTotal);
     const roundOffAmount = total - computedTotal;

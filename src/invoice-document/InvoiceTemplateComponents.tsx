@@ -130,20 +130,20 @@ export function TotalsTable({ data }: { data: InvoiceForm }) {
     <table className="totals-table">
       <tbody>
         <tr>
-          <td>Sub Total</td>
+          <td>Discount</td>
           <td className="amount">
             ₹
-            {subtotal.toLocaleString("en-IN", {
+            {discount.toLocaleString("en-IN", {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })}
           </td>
         </tr>
         <tr>
-          <td>Discount</td>
+          <td>Sub Total</td>
           <td className="amount">
             ₹
-            {discount.toLocaleString("en-IN", {
+            {subtotal.toLocaleString("en-IN", {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })}
