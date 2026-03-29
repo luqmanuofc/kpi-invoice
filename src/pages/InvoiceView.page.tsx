@@ -66,8 +66,8 @@ export default function InvoiceViewPage() {
     const sgstAmount = Number(invoice.sgstAmount);
     const igstAmount = Number(invoice.igstAmount);
 
-    const computedTotal =
-      subtotal - discount + cgstAmount + sgstAmount + igstAmount;
+    // discount is already included in subtotal, so we don't subtract it again here
+    const computedTotal = subtotal + cgstAmount + sgstAmount + igstAmount;
 
     const roundOffAmount = total - computedTotal;
 
@@ -270,12 +270,12 @@ export default function InvoiceViewPage() {
         const message = encodeURIComponent(
           `Invoice ${invoiceData?.invoiceNumber || ""} for ${
             invoiceData?.buyer?.name || ""
-          }`
+          }`,
         );
         const whatsappUrl = `https://wa.me/?text=${message}`;
         window.open(whatsappUrl, "_blank");
         alert(
-          "PDF cannot be shared directly. Please use the generic share button or download and share manually."
+          "PDF cannot be shared directly. Please use the generic share button or download and share manually.",
         );
       }
     } catch (error: any) {
