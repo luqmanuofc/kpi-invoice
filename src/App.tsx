@@ -10,6 +10,7 @@ import InvoiceViewPage from "./pages/InvoiceView.page";
 import BuyerPage from "./pages/Buyer.page";
 import ProductsPage from "./pages/Products.page";
 import DashboardPage from "./pages/Dashboard.page";
+import SettingsPage from "./pages/Settings.page";
 
 function App() {
   return (
@@ -63,6 +64,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <SettingsPage />
               </ProtectedRoute>
             }
           />

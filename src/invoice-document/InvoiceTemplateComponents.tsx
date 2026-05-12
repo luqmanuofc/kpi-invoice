@@ -1,5 +1,14 @@
 // Shared invoice template components used in both rendering and pagination
 import type { InvoiceForm, InvoiceItem } from "../invoice-form/types";
+import type { BankAccount } from "../api/settings";
+
+export type PaymentSettings = {
+  bankAccounts: BankAccount[];
+};
+
+export const EMPTY_PAYMENT_SETTINGS: PaymentSettings = {
+  bankAccounts: [],
+};
 
 export function TaxLabel() {
   return <div className="tax-label">Tax Invoice</div>;
@@ -216,7 +225,15 @@ export function AmountWordsSection({ data }: { data: InvoiceForm }) {
   );
 }
 
-export function FooterSection({ data }: { data: InvoiceForm }) {
+export function FooterSection({
+  data,
+  paymentSettings,
+}: {
+  data: InvoiceForm;
+  paymentSettings: PaymentSettings;
+}) {
+  const visibleBanks = paymentSettings.bankAccounts.filter((b) => b.visible);
+
   return (
     <div>
       <div className="footer-section">
@@ -249,31 +266,29 @@ export function FooterSection({ data }: { data: InvoiceForm }) {
           </div>
         </div>
       </div>
-      <div>
-        <div className="payment-info-section">
-          <div className="payment-header">Payment Information</div>
-          <div className="payment-accounts">
-            <div className="payment-account">
-              <div className="payment-line">
-                1.<span style={{ fontWeight: "bold" }}> Bank: </span> JK Bank,
-                Zainakot
-                <span style={{ fontWeight: "bold" }}> Account no: </span>
-                0258020100000059
-                <span style={{ fontWeight: "bold" }}> IFSC:</span> JAKA0ZANKOT
-              </div>
-            </div>
-            <div className="payment-account">
-              <div className="payment-line">
-                2.<span style={{ fontWeight: "bold" }}> Bank: </span> HDFC Bank,
-                Malru
-                <span style={{ fontWeight: "bold" }}> Account no: </span>
-                50200098216650
-                <span style={{ fontWeight: "bold" }}> IFSC:</span> HDFC0003580
-              </div>
+      {visibleBanks.length > 0 && (
+        <div>
+          <div className="payment-info-section">
+            <div className="payment-header">Payment Information</div>
+            <div className="payment-accounts">
+              {visibleBanks.map((acct, idx) => (
+                <div className="payment-account" key={idx}>
+                  <div className="payment-line">
+                    {idx + 1}.
+                    <span style={{ fontWeight: "bold" }}> Bank: </span>
+                    {acct.bank}
+                    {acct.branch ? `, ${acct.branch}` : ""}
+                    <span style={{ fontWeight: "bold" }}> Account no: </span>
+                    {acct.accountNo}
+                    <span style={{ fontWeight: "bold" }}> IFSC:</span>{" "}
+                    {acct.ifsc}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

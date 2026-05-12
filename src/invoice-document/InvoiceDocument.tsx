@@ -1,11 +1,16 @@
 // InvoiceDocument.tsx
 import "./InvoiceDocument.css";
-import { forwardRef, useImperativeHandle, useState } from "react";
+import { forwardRef, useImperativeHandle, useMemo, useState } from "react";
 import InvoicePage from "./InvoicePage";
 import { useInvoicePaginator } from "./useInvoicePaginator";
 import type { InvoiceForm } from "../invoice-form/types";
 import { Button } from "../components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useSettings } from "../hooks/useSettings";
+import {
+  EMPTY_PAYMENT_SETTINGS,
+  type PaymentSettings,
+} from "./InvoiceTemplateComponents";
 
 export type InvoiceDocumentHandle = {
   getPageElements: () => HTMLDivElement[];
@@ -18,7 +23,16 @@ type Props = {
 
 const InvoiceDocument = forwardRef<InvoiceDocumentHandle, Props>(
   ({ data, transformOrigin }, ref) => {
-    const { pages, probeRootRef } = useInvoicePaginator(data);
+    const { data: settings } = useSettings();
+    const paymentSettings = useMemo<PaymentSettings>(
+      () =>
+        settings
+          ? { bankAccounts: settings.bankAccounts }
+          : EMPTY_PAYMENT_SETTINGS,
+      [settings]
+    );
+
+    const { pages, probeRootRef } = useInvoicePaginator(data, paymentSettings);
     const [currentPageIndex, setCurrentPageIndex] = useState(0);
 
     let pageRefs: HTMLDivElement[] = [];
@@ -75,6 +89,7 @@ const InvoiceDocument = forwardRef<InvoiceDocumentHandle, Props>(
                   isFirstPage={idx === 0}
                   pageNumber={p.pageNumber}
                   totalPages={p.totalPages}
+                  paymentSettings={paymentSettings}
                 />
               </div>
             );

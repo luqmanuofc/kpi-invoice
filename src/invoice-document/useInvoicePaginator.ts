@@ -11,6 +11,7 @@ import {
   TotalsTable,
   AmountWordsSection,
   FooterSection,
+  type PaymentSettings,
 } from "./InvoiceTemplateComponents";
 
 export type PageConfig = {
@@ -30,14 +31,17 @@ export type PageConfig = {
  * the next element (row/totals/words/footer) overlaps
  * the bottom of the page.
  */
-export function useInvoicePaginator(data: InvoiceForm) {
+export function useInvoicePaginator(
+  data: InvoiceForm,
+  paymentSettings: PaymentSettings,
+) {
   const [pages, setPages] = useState<PageConfig[]>([]);
   const probeRootRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!probeRootRef.current) return;
     paginate();
-  }, [data]);
+  }, [data, paymentSettings]);
 
   function paginate() {
     const root = probeRootRef.current!;
@@ -57,7 +61,7 @@ export function useInvoicePaginator(data: InvoiceForm) {
       probeRootRef.current!.appendChild(probePage);
 
       // Render the skeleton page (header+meta+receiver+table-header)
-      const probe = renderProbePageSkeleton(probePage, data);
+      const probe = renderProbePageSkeleton(probePage, data, paymentSettings);
 
       // Convert DOM nodes for probing
       const tbody = probe.tbody;
@@ -160,7 +164,11 @@ export function useInvoicePaginator(data: InvoiceForm) {
 -------------------------------------------------- */
 
 // Render empty page with header + meta + buyer + table header
-function renderProbePageSkeleton(container: HTMLElement, data: InvoiceForm) {
+function renderProbePageSkeleton(
+  container: HTMLElement,
+  data: InvoiceForm,
+  paymentSettings: PaymentSettings,
+) {
   // Use the same React components rendered to HTML
   const taxLabel = renderToStaticMarkup(TaxLabel());
   const headerSection = renderToStaticMarkup(HeaderSection({ data }));
@@ -193,7 +201,7 @@ function renderProbePageSkeleton(container: HTMLElement, data: InvoiceForm) {
   const tbody = container.querySelector(".items-table tbody")!;
   const totalsTemplate = createTotalsTemplate(data);
   const wordsTemplate = createWordsTemplate(data);
-  const footerTemplate = createFooterTemplate(data);
+  const footerTemplate = createFooterTemplate(data, paymentSettings);
 
   return {
     pageBorder: container.querySelector(".invoice-border") as HTMLElement,
@@ -225,8 +233,13 @@ function createWordsTemplate(data: InvoiceForm) {
   return wrap.firstElementChild as HTMLElement;
 }
 
-function createFooterTemplate(data: InvoiceForm) {
+function createFooterTemplate(
+  data: InvoiceForm,
+  paymentSettings: PaymentSettings,
+) {
   const wrap = document.createElement("div");
-  wrap.innerHTML = renderToStaticMarkup(FooterSection({ data }));
+  wrap.innerHTML = renderToStaticMarkup(
+    FooterSection({ data, paymentSettings }),
+  );
   return wrap.firstElementChild as HTMLElement;
 }

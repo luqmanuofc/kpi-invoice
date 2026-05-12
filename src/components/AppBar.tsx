@@ -19,6 +19,7 @@ import {
   LogOut,
   FileIcon,
   RotateCw,
+  Settings as SettingsIcon,
 } from "lucide-react";
 import {
   Sheet,
@@ -44,6 +45,10 @@ export default function NavigationAppBar() {
     { label: "Create", path: "/", icon: PlusIcon },
     { label: "Buyers", path: "/buyer", icon: Users },
     { label: "Products", path: "/products", icon: Package },
+  ];
+
+  const desktopExtraItems = [
+    { label: "Settings", path: "/settings", icon: SettingsIcon },
   ];
 
   const handleLogout = () => {
@@ -106,6 +111,23 @@ export default function NavigationAppBar() {
               <RotateCw className="h-4 w-4" />
               Refresh
             </button>
+            {desktopExtraItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = location.pathname === item.path;
+              return (
+                <button
+                  key={item.path}
+                  onClick={() => navigate(item.path)}
+                  className={cn(
+                    "text-sm font-medium hover:underline cursor-pointer flex items-center gap-1",
+                    isActive && "font-bold"
+                  )}
+                >
+                  <Icon className="h-4 w-4" />
+                  {item.label}
+                </button>
+              );
+            })}
             <button
               onClick={handleLogout}
               className="text-sm font-medium hover:underline cursor-pointer"
@@ -165,6 +187,16 @@ export default function NavigationAppBar() {
                     onCheckedChange={toggleTheme}
                   />
                 </div>
+                <button
+                  onClick={() => {
+                    navigate("/settings");
+                    setMoreMenuOpen(false);
+                  }}
+                  className="flex items-center gap-3 w-full py-3 border-b text-sm font-medium"
+                >
+                  <SettingsIcon className="h-5 w-5" />
+                  Settings
+                </button>
                 <button
                   onClick={handleRefresh}
                   className="flex items-center gap-3 w-full py-3 border-b text-sm font-medium"

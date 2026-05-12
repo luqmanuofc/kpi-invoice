@@ -10,6 +10,7 @@ import {
   TotalsTable,
   AmountWordsSection,
   FooterSection,
+  type PaymentSettings,
 } from "./InvoiceTemplateComponents";
 
 type Props = {
@@ -22,6 +23,7 @@ type Props = {
   isFirstPage: boolean;
   pageNumber: number;
   totalPages: number;
+  paymentSettings: PaymentSettings;
 };
 
 export default function InvoicePage({
@@ -34,6 +36,7 @@ export default function InvoicePage({
   isFirstPage,
   pageNumber,
   totalPages,
+  paymentSettings,
 }: Props) {
   return (
     <div className="invoice-border">
@@ -71,7 +74,9 @@ export default function InvoicePage({
 
       {showWords && <AmountWordsSection data={data} />}
 
-      {showFooter && <FooterSection data={data} />}
+      {showFooter && (
+        <FooterSection data={data} paymentSettings={paymentSettings} />
+      )}
 
       <div className="page-number-label">
         Page {pageNumber} of {totalPages}

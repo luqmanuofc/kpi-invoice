@@ -158,3 +158,12 @@ model InvoiceStatusLog {
   @@index([invoiceId])
   @@index([newStatus])
 }
+
+//
+// SETTINGS (singleton row, id="singleton")
+//
+model Settings {
+  id           String   @id @default("singleton")
+  bankAccounts Json     @default("[]")
+  updatedAt    DateTime @updatedAt
+}

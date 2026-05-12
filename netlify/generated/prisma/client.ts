@@ -64,3 +64,8 @@ export type InvoiceItem = Prisma.InvoiceItemModel
  * 
  */
 export type InvoiceStatusLog = Prisma.InvoiceStatusLogModel
+/**
+ * Model Settings
+ * 
+ */
+export type Settings = Prisma.SettingsModel
