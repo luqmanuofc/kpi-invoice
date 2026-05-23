@@ -11,7 +11,12 @@ interface DashboardMetrics {
   totalRevenue: number;
   topBuyers: Array<{ name: string; total: number }>;
   revenueChart: Array<{ month: string; revenue: number }>;
-  productRevenue: Array<{ name: string; revenue: number }>;
+  productRevenue: Array<{
+    name: string;
+    unit: string;
+    qty: number;
+    revenue: number;
+  }>;
 }
 
 function formatIndian(value: number): string {
@@ -249,11 +254,15 @@ export default function DashboardPage() {
                     return (
                       <div key={i} className="flex flex-col gap-1">
                         <div className="flex justify-between items-center text-sm">
-                          <span className="truncate font-medium max-w-[60%]" title={product.name}>
+                          <span className="truncate font-medium max-w-[55%]" title={product.name}>
                             {product.name}
                           </span>
-                          <span className="text-muted-foreground text-xs shrink-0">
-                            ₹{formatIndian(product.revenue)}
+                          <span className="text-muted-foreground text-xs shrink-0 flex items-center gap-2">
+                            <span>
+                              {formatIndian(product.qty)} {product.unit}
+                            </span>
+                            <span className="text-muted-foreground/50">·</span>
+                            <span>₹{formatIndian(product.revenue)}</span>
                           </span>
                         </div>
                         <div className="h-2 w-full bg-muted rounded-full overflow-hidden">

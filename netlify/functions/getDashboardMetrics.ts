@@ -90,14 +90,14 @@ export default async function handler(request: Request) {
 
         // Revenue per product for selected month
         prisma.invoiceItem.groupBy({
-          by: ["description"],
+          by: ["description", "unit"],
           where: {
             invoice: {
               date: { gte: startDate, lt: endDate },
               status: { in: ["PENDING", "PAID"] },
             },
           },
-          _sum: { lineTotal: true },
+          _sum: { lineTotal: true, qty: true },
           orderBy: { _sum: { lineTotal: "desc" } },
         }),
       ]);
@@ -111,6 +111,8 @@ export default async function handler(request: Request) {
 
     const productRevenue = productRevenueData.map((p) => ({
       name: p.description,
+      unit: p.unit,
+      qty: Number(p._sum.qty || 0),
       revenue: Number(p._sum.lineTotal || 0),
     }));
 
