@@ -57,6 +57,39 @@ export async function getBuyerById(id: string): Promise<Buyer> {
   return response.json();
 }
 
+export interface BuyerAnalytics {
+  lifetimeInvoiceCount: number;
+  thisFiscalYearInvoiceCount: number;
+  fiscalYearRevenue: number;
+  lastFiscalYearToDateRevenue: number;
+  yoyChangePct: number | null;
+  avgCadenceDays: number | null;
+  daysSinceLastInvoice: number | null;
+  revenueChart: Array<{ month: string; revenue: number }>;
+  topProducts: Array<{
+    name: string;
+    unit: string;
+    qty: number;
+    revenue: number;
+  }>;
+}
+
+export async function getBuyerAnalytics(id: string): Promise<BuyerAnalytics> {
+  const response = await apiClient(
+    `/.netlify/functions/getBuyerAnalytics?buyerId=${id}`,
+    {
+      method: "GET",
+    }
+  );
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`Get buyer analytics failed: ${text}`);
+  }
+
+  return response.json();
+}
+
 export async function updateBuyer(id: string, data: BuyerFormData) {
   const response = await apiClient("/.netlify/functions/updateBuyer", {
     method: "PUT",

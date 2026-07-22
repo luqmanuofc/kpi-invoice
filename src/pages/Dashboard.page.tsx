@@ -1,15 +1,17 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import dayjs, { type Dayjs } from "dayjs";
 import { getDashboardMetrics } from "../api/dashboard";
 import { Loader2, ChevronLeft, ChevronRight, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useExportMonthlyCSV } from "@/hooks/useExportMonthlyCSV";
+import { formatIndian } from "@/utils/format";
 
 interface DashboardMetrics {
   totalInvoices: number;
   totalRevenue: number;
-  topBuyers: Array<{ name: string; total: number }>;
+  topBuyers: Array<{ id: string; name: string; total: number }>;
   revenueChart: Array<{ month: string; revenue: number }>;
   productRevenue: Array<{
     name: string;
@@ -17,13 +19,6 @@ interface DashboardMetrics {
     qty: number;
     revenue: number;
   }>;
-}
-
-function formatIndian(value: number): string {
-  if (value >= 1_00_00_000) return `${(value / 1_00_00_000).toFixed(1).replace(/\.0$/, "")} Cr`;
-  if (value >= 1_00_000) return `${(value / 1_00_000).toFixed(1).replace(/\.0$/, "")} L`;
-  if (value >= 1_000) return `${(value / 1_000).toFixed(1).replace(/\.0$/, "")} K`;
-  return value.toLocaleString("en-IN");
 }
 
 function RevenueBarChart({ data }: { data: Array<{ month: string; revenue: number }> }) {
@@ -55,6 +50,7 @@ function RevenueBarChart({ data }: { data: Array<{ month: string; revenue: numbe
 }
 
 export default function DashboardPage() {
+  const navigate = useNavigate();
   const [selectedMonth, setSelectedMonth] = useState<Dayjs | null>(dayjs());
   const { exportToExcel, isExporting } = useExportMonthlyCSV();
   const [metrics, setMetrics] = useState<DashboardMetrics>({
@@ -116,7 +112,7 @@ export default function DashboardPage() {
 
   if (error) {
     return (
-      <div className="p-4 md:p-8 w-full h-full flex justify-center items-center">
+      <div className="p-4 md:p-8 w-full h-full md:min-h-[calc(100vh-4rem)] flex justify-center items-center">
         <p className="text-destructive">Error: {error}</p>
       </div>
     );
@@ -156,7 +152,7 @@ export default function DashboardPage() {
         </Button>
       </div>
       {isLoading ? (
-        <div className="w-full h-hull flex justify-center items-center">
+        <div className="w-full h-full md:min-h-[calc(100vh-4rem)] flex justify-center items-center">
           <Loader2 className="h-8 w-8 animate-spin" />
         </div>
       ) : (
@@ -206,9 +202,16 @@ export default function DashboardPage() {
                     const max = metrics.topBuyers[0].total;
                     const widthPct = Math.round((buyer.total / max) * 100);
                     return (
-                      <div key={i} className="flex flex-col gap-1">
+                      <button
+                        key={buyer.id}
+                        onClick={() => navigate(`/buyer/${buyer.id}`)}
+                        className="flex flex-col gap-1 text-left group cursor-pointer"
+                      >
                         <div className="flex justify-between items-center text-sm">
-                          <span className="truncate font-medium max-w-[60%]" title={buyer.name}>
+                          <span
+                            className="truncate font-medium max-w-[60%] group-hover:text-primary group-hover:underline"
+                            title={buyer.name}
+                          >
                             {buyer.name}
                           </span>
                           <span className="text-muted-foreground text-xs shrink-0">
@@ -221,7 +224,7 @@ export default function DashboardPage() {
                             style={{ width: `${widthPct}%` }}
                           />
                         </div>
-                      </div>
+                      </button>
                     );
                   })}
                   {metrics.topBuyers.length > 5 && (

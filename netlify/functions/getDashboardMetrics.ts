@@ -105,6 +105,7 @@ export default async function handler(request: Request) {
     const totalRevenue = revenueData._sum.total || 0;
 
     const topBuyers = topBuyerData.map((b) => ({
+      id: b.buyerId,
       name: b.buyerNameSnapshot,
       total: Number(b._sum.total || 0),
     }));

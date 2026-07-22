@@ -1,5 +1,10 @@
 import { useEffect, useState, useMemo, useRef } from "react";
-import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+import {
+  useParams,
+  useNavigate,
+  useSearchParams,
+  useLocation,
+} from "react-router-dom";
 import { Loader2, ArrowLeft, Printer, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -24,6 +29,7 @@ const WhatsAppIcon = () => (
 export default function InvoiceViewPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const [invoice, setInvoice] = useState<Invoice | null>(null);
   const invoiceRef = useRef<InvoiceDocumentHandle | null>(null);
@@ -287,8 +293,17 @@ export default function InvoiceViewPage() {
   };
 
   const handleBack = () => {
-    const returnUrl = searchParams.get("returnUrl") || "/invoices";
-    navigate(returnUrl);
+    // Prefer real browser back navigation so we pop the existing history
+    // entry instead of pushing a duplicate one on top of it (which breaks
+    // subsequent back navigation further up the chain, e.g. dashboard ->
+    // buyer -> invoice -> back -> back). Only fall back to returnUrl when
+    // there's no in-app history to go back to (direct link/refresh).
+    if (location.key !== "default") {
+      navigate(-1);
+    } else {
+      const returnUrl = searchParams.get("returnUrl") || "/invoices";
+      navigate(returnUrl);
+    }
   };
 
   if (isLoading) {

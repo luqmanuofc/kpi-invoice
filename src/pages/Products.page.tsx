@@ -111,7 +111,7 @@ export default function ProductsPage() {
 
   if (isLoading) {
     return (
-      <div className="w-full h-hull flex justify-center items-center">
+      <div className="w-full h-full md:min-h-[calc(100vh-4rem)] flex justify-center items-center">
         <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     );

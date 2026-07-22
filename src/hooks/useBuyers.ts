@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   getBuyers,
   getBuyerById,
+  getBuyerAnalytics,
   createBuyer,
   updateBuyer,
   type BuyerFormData,
@@ -21,6 +22,15 @@ export function useBuyer(id: string | undefined) {
     queryKey: [...BUYERS_QUERY_KEY, id] as const,
     queryFn: () => getBuyerById(id!),
     enabled: !!id,
+  });
+}
+
+export function useBuyerAnalytics(id: string | undefined) {
+  return useQuery({
+    queryKey: [...BUYERS_QUERY_KEY, id, "analytics"] as const,
+    queryFn: () => getBuyerAnalytics(id!),
+    enabled: !!id,
+    staleTime: 60_000,
   });
 }
 

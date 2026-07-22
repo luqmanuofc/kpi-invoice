@@ -4,7 +4,7 @@ export interface DashboardMetrics {
   totalInvoices: number;
   totalRevenue: number;
   month: string;
-  topBuyers: Array<{ name: string; total: number }>;
+  topBuyers: Array<{ id: string; name: string; total: number }>;
   revenueChart: Array<{ month: string; revenue: number }>;
   productRevenue: Array<{
     name: string;

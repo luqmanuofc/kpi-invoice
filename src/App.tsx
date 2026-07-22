@@ -8,6 +8,7 @@ import CreateInvoicePage from "./pages/CreateInvoice.page";
 import InvoicesPage from "./pages/Invoices.page";
 import InvoiceViewPage from "./pages/InvoiceView.page";
 import BuyerPage from "./pages/Buyer.page";
+import BuyerDetailPage from "./pages/BuyerDetail.page";
 import ProductsPage from "./pages/Products.page";
 import DashboardPage from "./pages/Dashboard.page";
 import SettingsPage from "./pages/Settings.page";
@@ -40,6 +41,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <InvoiceViewPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/buyer/:id"
+            element={
+              <ProtectedRoute>
+                <BuyerDetailPage />
               </ProtectedRoute>
             }
           />

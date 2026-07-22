@@ -9,7 +9,6 @@ import SearchBox from "@/components/SearchBox";
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -19,8 +18,6 @@ export default function BuyerPage() {
   const location = useLocation();
   const { data: buyers = [], isLoading, error, refetch } = useBuyers();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [drawerMode, setDrawerMode] = useState<"create" | "edit">("create");
-  const [selectedBuyerId, setSelectedBuyerId] = useState<string | undefined>();
   const [searchQuery, setSearchQuery] = useState("");
 
   // Handle URL-based drawer state
@@ -28,13 +25,6 @@ export default function BuyerPage() {
     const path = location.pathname;
 
     if (path === "/buyer/create") {
-      setDrawerMode("create");
-      setSelectedBuyerId(undefined);
-      setDrawerOpen(true);
-    } else if (path.match(/^\/buyer\/([^/]+)\/edit$/)) {
-      const buyerId = path.split("/")[2];
-      setDrawerMode("edit");
-      setSelectedBuyerId(buyerId);
       setDrawerOpen(true);
     } else if (path === "/buyer" || path === "/buyer/") {
       setDrawerOpen(false);
@@ -45,8 +35,8 @@ export default function BuyerPage() {
     navigate("/buyer/create");
   };
 
-  const handleEditClick = (buyerId: string) => {
-    navigate(`/buyer/${buyerId}/edit`);
+  const handleViewClick = (buyerId: string) => {
+    navigate(`/buyer/${buyerId}`);
   };
 
   const handleDrawerClose = () => {
@@ -55,10 +45,6 @@ export default function BuyerPage() {
 
   const handleDrawerSuccess = () => {
     refetch();
-  };
-
-  const handleViewInvoicesClick = (buyerId: string) => {
-    navigate(`/invoices?buyerId=${buyerId}`);
   };
 
   // Fuzzy/elastic search filter
@@ -81,7 +67,7 @@ export default function BuyerPage() {
 
   if (isLoading) {
     return (
-      <div className="w-full h-hull flex justify-center items-center">
+      <div className="w-full h-full md:min-h-[calc(100vh-4rem)] flex justify-center items-center">
         <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     );
@@ -110,8 +96,8 @@ export default function BuyerPage() {
         {filteredBuyers.map((buyer) => (
           <Card
             key={buyer.id}
-            className="w-full flex flex-col"
-            onClick={() => handleEditClick(buyer.id)}
+            className="w-full flex flex-col cursor-pointer"
+            onClick={() => handleViewClick(buyer.id)}
           >
             <CardHeader>
               <CardTitle>{buyer.name}</CardTitle>
@@ -127,18 +113,6 @@ export default function BuyerPage() {
                 <strong>Phone:</strong> {buyer.phone || ""}
               </p>
             </CardContent>
-            <CardFooter className="flex justify-end gap-2 pt-0">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => handleViewInvoicesClick(buyer.id)}
-              >
-                View Invoices
-              </Button>
-              <Button size="sm" onClick={() => handleEditClick(buyer.id)}>
-                Edit
-              </Button>
-            </CardFooter>
           </Card>
         ))}
       </div>
@@ -146,8 +120,7 @@ export default function BuyerPage() {
       <BuyerDrawer
         open={drawerOpen}
         onClose={handleDrawerClose}
-        mode={drawerMode}
-        buyerId={selectedBuyerId}
+        mode="create"
         onSuccess={handleDrawerSuccess}
       />
     </div>
