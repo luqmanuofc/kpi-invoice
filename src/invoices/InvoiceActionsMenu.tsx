@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Eye, Copy, History, Archive, MoreVertical } from "lucide-react";
 import {
   DropdownMenu,
@@ -25,6 +26,7 @@ export default function InvoiceActionsMenu({
 }: InvoiceActionsMenuProps) {
   const navigate = useNavigate();
   const location = useLocation();
+  const queryClient = useQueryClient();
   const { duplicateInvoice } = useInvoice();
   const [logsModalOpen, setLogsModalOpen] = useState(false);
   const [archiveDialogOpen, setArchiveDialogOpen] = useState(false);
@@ -58,6 +60,7 @@ export default function InvoiceActionsMenu({
     try {
       const archivedInvoice = await archiveInvoice(invoice.id);
       onInvoiceArchived?.(archivedInvoice);
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
       setArchiveDialogOpen(false);
     } catch (error) {
       console.error("Failed to archive invoice:", error);

@@ -1,25 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import dayjs, { type Dayjs } from "dayjs";
-import { getDashboardMetrics } from "../api/dashboard";
 import { Loader2, ChevronLeft, ChevronRight, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useExportMonthlyCSV } from "@/hooks/useExportMonthlyCSV";
+import { useDashboardMetrics } from "@/hooks/useDashboard";
 import { formatIndian } from "@/utils/format";
-
-interface DashboardMetrics {
-  totalInvoices: number;
-  totalRevenue: number;
-  topBuyers: Array<{ id: string; name: string; total: number }>;
-  revenueChart: Array<{ month: string; revenue: number }>;
-  productRevenue: Array<{
-    name: string;
-    unit: string;
-    qty: number;
-    revenue: number;
-  }>;
-}
 
 function RevenueBarChart({ data }: { data: Array<{ month: string; revenue: number }> }) {
   const max = Math.max(...data.map((d) => d.revenue), 1);
@@ -53,15 +40,24 @@ export default function DashboardPage() {
   const navigate = useNavigate();
   const [selectedMonth, setSelectedMonth] = useState<Dayjs | null>(dayjs());
   const { exportToExcel, isExporting } = useExportMonthlyCSV();
-  const [metrics, setMetrics] = useState<DashboardMetrics>({
-    totalInvoices: 0,
-    totalRevenue: 0,
-    topBuyers: [],
-    revenueChart: [],
-    productRevenue: [],
-  });
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const monthParam = selectedMonth?.format("YYYY-MM");
+  const {
+    data,
+    isLoading,
+    error: errorObj,
+  } = useDashboardMetrics(monthParam);
+  const metrics = {
+    totalInvoices: data?.totalInvoices ?? 0,
+    totalRevenue: data?.totalRevenue ?? 0,
+    topBuyers: data?.topBuyers ?? [],
+    revenueChart: data?.revenueChart ?? [],
+    productRevenue: data?.productRevenue ?? [],
+  };
+  const error = errorObj
+    ? errorObj instanceof Error
+      ? errorObj.message
+      : "Failed to load dashboard metrics"
+    : null;
   const [buyersExpanded, setBuyersExpanded] = useState(false);
   const [productsExpanded, setProductsExpanded] = useState(false);
 
@@ -81,34 +77,6 @@ export default function DashboardPage() {
       alert(`Failed to export Excel: ${error.message}`);
     }
   };
-
-  useEffect(() => {
-    const fetchMetrics = async () => {
-      if (!selectedMonth) return;
-
-      try {
-        setIsLoading(true);
-        setError(null);
-
-        const month = selectedMonth.format("YYYY-MM");
-        const data = await getDashboardMetrics(month);
-
-        setMetrics({
-          totalInvoices: data.totalInvoices,
-          totalRevenue: data.totalRevenue,
-          topBuyers: data.topBuyers ?? [],
-          revenueChart: data.revenueChart ?? [],
-          productRevenue: data.productRevenue ?? [],
-        });
-      } catch (err: any) {
-        setError(err.message || "Failed to load dashboard metrics");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchMetrics();
-  }, [selectedMonth]);
 
   if (error) {
     return (

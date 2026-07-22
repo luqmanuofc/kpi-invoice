@@ -4,10 +4,10 @@ import { Loader2 } from "lucide-react";
 import {
   createBuyer,
   updateBuyer,
-  getBuyerById,
   type Buyer,
   type BuyerFormData,
 } from "../api/buyers";
+import { useBuyer } from "../hooks/useBuyers";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -36,36 +36,22 @@ export default function BuyerDrawer({
   onSuccess,
 }: BuyerDrawerProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [isFetching, setIsFetching] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [initialData, setInitialData] = useState<BuyerFormData | undefined>();
+
+  const {
+    data: buyer,
+    isLoading: isFetching,
+    error: fetchErrorObj,
+  } = useBuyer(mode === "edit" && open ? buyerId : undefined);
+
+  const fetchError = fetchErrorObj
+    ? fetchErrorObj instanceof Error
+      ? fetchErrorObj.message
+      : "Failed to load buyer"
+    : null;
 
   useEffect(() => {
-    if (mode === "edit" && buyerId && open) {
-      const fetchBuyer = async () => {
-        try {
-          setIsFetching(true);
-          setError(null);
-          const buyer = await getBuyerById(buyerId);
-          setInitialData({
-            name: buyer.name,
-            address: buyer.address,
-            gstin: buyer.gstin || "",
-            phone: buyer.phone || "",
-          });
-        } catch (err: any) {
-          setError(err.message || "Failed to load buyer");
-        } finally {
-          setIsFetching(false);
-        }
-      };
-
-      fetchBuyer();
-    } else if (mode === "create" && open) {
-      // Reset form data when opening in create mode
-      setInitialData(undefined);
-      setError(null);
-    }
+    setError(null);
   }, [mode, buyerId, open]);
 
   const handleSubmit = async (data: BuyerFormData) => {
@@ -101,7 +87,6 @@ export default function BuyerDrawer({
 
   const handleClose = () => {
     if (!isLoading) {
-      setInitialData(undefined);
       onClose();
     }
   };
@@ -111,14 +96,19 @@ export default function BuyerDrawer({
     handleSubmit: formSubmit,
     formState: { errors },
     reset,
-  } = useForm<BuyerFormData>({
-    defaultValues: initialData,
-  });
+  } = useForm<BuyerFormData>();
 
   useEffect(() => {
-    if (initialData) {
-      reset(initialData);
-    } else {
+    if (!open) return;
+
+    if (mode === "edit" && buyer) {
+      reset({
+        name: buyer.name,
+        address: buyer.address,
+        gstin: buyer.gstin || "",
+        phone: buyer.phone || "",
+      });
+    } else if (mode === "create") {
       reset({
         name: "",
         address: "",
@@ -126,7 +116,7 @@ export default function BuyerDrawer({
         phone: "",
       });
     }
-  }, [initialData, reset]);
+  }, [buyer, mode, open, reset]);
 
   const submitButtonText = mode === "create" ? "Create" : "Update";
   const loadingButtonText = mode === "create" ? "Creating..." : "Updating...";
@@ -153,9 +143,9 @@ export default function BuyerDrawer({
         </SheetHeader>
 
         <div className="overflow-auto px-4">
-          {error && (
+          {(error || fetchError) && (
             <Alert variant="destructive" className="mb-6">
-              {error}
+              {error || fetchError}
             </Alert>
           )}
 

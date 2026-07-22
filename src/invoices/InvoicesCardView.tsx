@@ -2,6 +2,7 @@ import { Loader2, AlertCircle } from "lucide-react";
 import type { Invoice } from "../api/invoices";
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { updateInvoiceStatus } from "../api/invoices";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -58,6 +59,7 @@ export default function InvoicesCardView({
 }: InvoicesCardViewProps) {
   const navigate = useNavigate();
   const location = useLocation();
+  const queryClient = useQueryClient();
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
 
   const handleCardClick = (
@@ -82,6 +84,7 @@ export default function InvoicesCardView({
     try {
       const updatedInvoice = await updateInvoiceStatus(invoiceId, newStatus);
       onStatusChange?.(updatedInvoice);
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
     } catch (error) {
       console.error("Failed to update invoice status:", error);
     } finally {

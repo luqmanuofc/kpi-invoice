@@ -2,6 +2,7 @@ import { Loader2, AlertCircle } from "lucide-react";
 import type { Invoice } from "../api/invoices";
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { updateInvoiceStatus } from "../api/invoices";
 import {
   Table,
@@ -60,6 +61,7 @@ export default function InvoicesTable({
 }: InvoicesTableProps) {
   const navigate = useNavigate();
   const location = useLocation();
+  const queryClient = useQueryClient();
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
 
   const handleRowClick = (
@@ -84,6 +86,10 @@ export default function InvoicesTable({
     try {
       const updatedInvoice = await updateInvoiceStatus(invoiceId, newStatus);
       onStatusChange?.(updatedInvoice);
+      // A status change can move revenue in or out of the PENDING/PAID/
+      // CHEQUE_ISSUED bucket the dashboard sums, so its cached totals need
+      // to be treated as stale too.
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
     } catch (error) {
       console.error("Failed to update invoice status:", error);
     } finally {
