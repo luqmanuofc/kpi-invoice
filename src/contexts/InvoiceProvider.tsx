@@ -16,6 +16,7 @@ import {
   type Invoice,
 } from "../api/invoices";
 import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 
 type InvoiceContextType = {
   form: UseFormReturn<InvoiceForm, any, InvoiceForm>;
@@ -46,6 +47,7 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
     useState(false);
   const [showProductsModal, setShowProductsModal] = useState(false);
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const form = useForm<InvoiceForm>({
     defaultValues: {
@@ -144,6 +146,10 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
     try {
       const result = await createInvoice(computedData);
       console.log("Invoice created:", result);
+      // Cached invoice lists (both the main list and each buyer's detail
+      // page) have a 5 minute staleTime, so without this a newly created
+      // invoice could stay invisible in those views until the cache expires.
+      queryClient.invalidateQueries({ queryKey: ["invoices"] });
       setActiveStep(0);
       form.reset();
       fetchAndSetNextInvoiceNumber();

@@ -1,5 +1,9 @@
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
-import { getInvoices, getInvoiceById } from "../api/invoices";
+import {
+  getInvoices,
+  getInvoiceById,
+  type GetInvoicesParams,
+} from "../api/invoices";
 
 export function invoiceQueryKey(id: string | undefined) {
   return ["invoices", "detail", id] as const;
@@ -33,9 +37,21 @@ export function useBuyerInvoices(
         buyerId: buyerId!,
         page,
         pageSize,
-        status: ["pending", "paid"],
+        status: ["pending", "paid", "cheque_issued"],
       }),
     enabled: !!buyerId,
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function invoicesListQueryKey(params: GetInvoicesParams) {
+  return ["invoices", "list", params] as const;
+}
+
+export function useInvoicesList(params: GetInvoicesParams) {
+  return useQuery({
+    queryKey: invoicesListQueryKey(params),
+    queryFn: () => getInvoices(params),
     placeholderData: keepPreviousData,
   });
 }

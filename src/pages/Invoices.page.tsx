@@ -1,6 +1,7 @@
 import { useSearchParams } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { getInvoices, type Invoice } from "../api/invoices";
+import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import type { GetInvoicesParams, Invoice } from "../api/invoices";
 import type { InvoiceFilters } from "@/invoices/InvoiceFilterToolbar";
 import InvoiceFilterToolbar from "@/invoices/InvoiceFilterToolbar";
 import InvoicesTable from "../invoices/InvoicesTable";
@@ -8,16 +9,14 @@ import InvoicesCardView from "../invoices/InvoicesCardView";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { useInvoicesList, invoicesListQueryKey } from "@/hooks/useInvoices";
 
 export default function InvoicesPage() {
   const [searchParams] = useSearchParams();
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const pageSize = 10;
-  const [totalCount, setTotalCount] = useState(0);
   const isDesktop = useMediaQuery("(min-width: 768px)");
+  const queryClient = useQueryClient();
 
   // Initialize filters from URL params
   const [filters, setFilters] = useState<InvoiceFilters>(() => {
@@ -32,64 +31,70 @@ export default function InvoicesPage() {
     };
   });
 
-  // Reset to page 1 when filters change
-  useEffect(() => {
+  const handleFiltersChange = (newFilters: InvoiceFilters) => {
+    setFilters(newFilters);
     setPage(1);
-  }, [filters]);
+  };
 
-  useEffect(() => {
-    const fetchInvoices = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
+  // Build params object, excluding empty string values
+  const params: GetInvoicesParams = { page, pageSize };
+  if (filters.invoiceNumber) params.invoiceNumber = filters.invoiceNumber;
+  if (filters.buyerId) params.buyerId = filters.buyerId;
+  if (filters.startDate) params.startDate = filters.startDate;
+  if (filters.endDate) params.endDate = filters.endDate;
 
-        // Build params object, excluding empty string values
-        const params: any = { page, pageSize };
+  // Build status array based on showArchived checkbox
+  // By default: show pending, paid, cheque_issued
+  // If showArchived is true: also include archived
+  const statusArray: Array<"pending" | "paid" | "cheque_issued" | "archived"> =
+    ["pending", "paid", "cheque_issued"];
+  if (filters.showArchived) {
+    statusArray.push("archived");
+  }
+  params.status = statusArray;
 
-        if (filters.invoiceNumber) params.invoiceNumber = filters.invoiceNumber;
-        if (filters.buyerId) params.buyerId = filters.buyerId;
-        if (filters.startDate) params.startDate = filters.startDate;
-        if (filters.endDate) params.endDate = filters.endDate;
+  const {
+    data,
+    isLoading,
+    error: errorObj,
+  } = useInvoicesList(params);
 
-        // Build status array based on showArchived checkbox
-        // By default: show pending, paid, cheque_issued
-        // If showArchived is true: also include archived
-        const statusArray: Array<
-          "pending" | "paid" | "cheque_issued" | "archived"
-        > = ["pending", "paid", "cheque_issued"];
-        if (filters.showArchived) {
-          statusArray.push("archived");
-        }
-        params.status = statusArray;
-
-        const data = await getInvoices(params);
-        setInvoices(data.invoices);
-        setTotalCount(data.pagination.totalCount);
-      } catch (err: any) {
-        setError(err.message || "Failed to load invoices");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchInvoices();
-  }, [page, pageSize, filters]);
+  const invoices = data?.invoices ?? [];
+  const totalCount = data?.pagination.totalCount ?? 0;
+  const error = errorObj
+    ? errorObj instanceof Error
+      ? errorObj.message
+      : "Failed to load invoices"
+    : null;
 
   const handleStatusChange = (updatedInvoice: Invoice) => {
-    setInvoices((prevInvoices) =>
-      prevInvoices.map((invoice) =>
-        invoice.id === updatedInvoice.id ? updatedInvoice : invoice
-      )
+    queryClient.setQueryData(
+      invoicesListQueryKey(params),
+      (old: typeof data) =>
+        old && {
+          ...old,
+          invoices: old.invoices.map((invoice) =>
+            invoice.id === updatedInvoice.id ? updatedInvoice : invoice
+          ),
+        }
     );
   };
 
   const handleInvoiceArchived = (archivedInvoice: Invoice) => {
-    // Remove the archived invoice from the list
-    setInvoices((prevInvoices) =>
-      prevInvoices.filter((invoice) => invoice.id !== archivedInvoice.id)
+    queryClient.setQueryData(
+      invoicesListQueryKey(params),
+      (old: typeof data) =>
+        old && {
+          ...old,
+          invoices: old.invoices.filter(
+            (invoice) => invoice.id !== archivedInvoice.id
+          ),
+          pagination: {
+            ...old.pagination,
+            totalCount: old.pagination.totalCount - 1,
+          },
+        }
     );
-    // Update total count
-    setTotalCount((prevCount) => prevCount - 1);
   };
 
   const totalPages = Math.ceil(totalCount / pageSize);
@@ -100,7 +105,7 @@ export default function InvoicesPage() {
     <div className="p-4 md:p-8 space-y-4 w-full h-full">
       <InvoiceFilterToolbar
         filters={filters}
-        onFiltersChange={setFilters}
+        onFiltersChange={handleFiltersChange}
         initialFilterType={filters.buyerId ? "buyer" : "invoiceNumber"}
       />
 
