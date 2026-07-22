@@ -52,12 +52,11 @@ export default function InvoicesPage() {
         if (filters.endDate) params.endDate = filters.endDate;
 
         // Build status array based on showArchived checkbox
-        // By default: show pending, paid
+        // By default: show pending, paid, cheque_issued
         // If showArchived is true: also include archived
-        const statusArray: Array<"pending" | "paid" | "archived"> = [
-          "pending",
-          "paid",
-        ];
+        const statusArray: Array<
+          "pending" | "paid" | "cheque_issued" | "archived"
+        > = ["pending", "paid", "cheque_issued"];
         if (filters.showArchived) {
           statusArray.push("archived");
         }

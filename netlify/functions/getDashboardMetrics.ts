@@ -40,7 +40,7 @@ export default async function handler(request: Request) {
         prisma.invoice.count({
           where: {
             date: { gte: startDate, lt: endDate },
-            status: { in: ["PENDING", "PAID"] },
+            status: { in: ["PENDING", "PAID", "CHEQUE_ISSUED"] },
           },
         }),
 
@@ -48,7 +48,7 @@ export default async function handler(request: Request) {
         prisma.invoice.aggregate({
           where: {
             date: { gte: startDate, lt: endDate },
-            status: { in: ["PENDING", "PAID"] },
+            status: { in: ["PENDING", "PAID", "CHEQUE_ISSUED"] },
           },
           _sum: { total: true },
         }),
@@ -58,7 +58,7 @@ export default async function handler(request: Request) {
           by: ["buyerId", "buyerNameSnapshot"],
           where: {
             date: { gte: startDate, lt: endDate },
-            status: { in: ["PENDING", "PAID"] },
+            status: { in: ["PENDING", "PAID", "CHEQUE_ISSUED"] },
           },
           _sum: { total: true },
           orderBy: { _sum: { total: "desc" } },
@@ -71,7 +71,7 @@ export default async function handler(request: Request) {
               gte: new Date(year, monthNum - 3, 1),
               lt: new Date(year, monthNum - 2, 1),
             },
-            status: { in: ["PENDING", "PAID"] },
+            status: { in: ["PENDING", "PAID", "CHEQUE_ISSUED"] },
           },
           _sum: { total: true },
         }),
@@ -83,7 +83,7 @@ export default async function handler(request: Request) {
               gte: new Date(year, monthNum - 2, 1),
               lt: new Date(year, monthNum - 1, 1),
             },
-            status: { in: ["PENDING", "PAID"] },
+            status: { in: ["PENDING", "PAID", "CHEQUE_ISSUED"] },
           },
           _sum: { total: true },
         }),
@@ -94,7 +94,7 @@ export default async function handler(request: Request) {
           where: {
             invoice: {
               date: { gte: startDate, lt: endDate },
-              status: { in: ["PENDING", "PAID"] },
+              status: { in: ["PENDING", "PAID", "CHEQUE_ISSUED"] },
             },
           },
           _sum: { lineTotal: true, qty: true },

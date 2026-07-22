@@ -43,7 +43,7 @@ export default async function handler(request: Request) {
           lt: endDate,
         },
         status: {
-          in: ["PENDING", "PAID"], // Exclude archived
+          in: ["PENDING", "PAID", "CHEQUE_ISSUED"], // Exclude archived
         },
       },
       orderBy: [

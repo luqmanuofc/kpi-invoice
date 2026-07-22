@@ -63,7 +63,10 @@ export default function StatusLogsModal({
   };
 
   const getStatusLabel = (status: string): string => {
-    return status.charAt(0).toUpperCase() + status.slice(1);
+    return status
+      .split("_")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
   };
 
   const formatDate = (dateString: string): string => {

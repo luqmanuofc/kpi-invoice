@@ -76,7 +76,7 @@ export default function InvoicesCardView({
 
   const handleStatusChange = async (
     invoiceId: string,
-    newStatus: "pending" | "paid"
+    newStatus: "pending" | "paid" | "cheque_issued"
   ) => {
     setUpdatingStatus(invoiceId);
     try {
@@ -144,7 +144,9 @@ export default function InvoicesCardView({
                   <div className="flex items-center gap-2">
                     <span className="text-muted-foreground">Status:</span>
                     {updatingStatus === invoice.id ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <div className="inline-flex h-5 w-5 items-center justify-center">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      </div>
                     ) : (
                       <InvoiceStatusChip
                         status={invoice.status}

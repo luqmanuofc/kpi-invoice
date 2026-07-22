@@ -23,6 +23,7 @@ export type ProductCategory = (typeof ProductCategory)[keyof typeof ProductCateg
 export const InvoiceStatus = {
   PENDING: 'PENDING',
   PAID: 'PAID',
+  CHEQUE_ISSUED: 'CHEQUE_ISSUED',
   ARCHIVED: 'ARCHIVED'
 } as const
 

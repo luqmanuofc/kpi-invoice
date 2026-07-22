@@ -31,11 +31,12 @@ export default async function handler(request: Request) {
       });
     }
 
-    const validStatuses = ["PENDING", "PAID", "ARCHIVED"];
+    const validStatuses = ["PENDING", "PAID", "CHEQUE_ISSUED", "ARCHIVED"];
     if (!validStatuses.includes(data.status)) {
       return new Response(
         JSON.stringify({
-          error: "Invalid status. Must be one of: PENDING, PAID, ARCHIVED",
+          error:
+            "Invalid status. Must be one of: PENDING, PAID, CHEQUE_ISSUED, ARCHIVED",
         }),
         {
           status: 400,

@@ -113,6 +113,7 @@ model Invoice {
 enum InvoiceStatus {
   PENDING
   PAID
+  CHEQUE_ISSUED
   ARCHIVED
 }
 

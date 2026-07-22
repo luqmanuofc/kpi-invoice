@@ -64,7 +64,7 @@ export default async function handler(request: Request) {
       topProductsData,
     ] = await Promise.all([
       prisma.invoice.aggregate({
-        where: { buyerId, status: { in: ["PENDING", "PAID"] } },
+        where: { buyerId, status: { in: ["PENDING", "PAID", "CHEQUE_ISSUED"] } },
         _count: true,
         _min: { date: true },
         _max: { date: true },
@@ -74,7 +74,7 @@ export default async function handler(request: Request) {
         where: {
           buyerId,
           date: { gte: fiscalYearStart, lt: fiscalYearEnd },
-          status: { in: ["PENDING", "PAID"] },
+          status: { in: ["PENDING", "PAID", "CHEQUE_ISSUED"] },
         },
       }),
 
@@ -82,7 +82,7 @@ export default async function handler(request: Request) {
         where: {
           buyerId,
           date: { gte: fiscalYearStart, lt: fiscalYearEnd },
-          status: { in: ["PENDING", "PAID"] },
+          status: { in: ["PENDING", "PAID", "CHEQUE_ISSUED"] },
         },
         _sum: { total: true },
       }),
@@ -91,7 +91,7 @@ export default async function handler(request: Request) {
         where: {
           buyerId,
           date: { gte: lastFiscalYearStart, lt: lastFiscalYearToDateEnd },
-          status: { in: ["PENDING", "PAID"] },
+          status: { in: ["PENDING", "PAID", "CHEQUE_ISSUED"] },
         },
         _sum: { total: true },
       }),
@@ -103,7 +103,7 @@ export default async function handler(request: Request) {
             where: {
               buyerId,
               date: { gte: start, lt: end },
-              status: { in: ["PENDING", "PAID"] },
+              status: { in: ["PENDING", "PAID", "CHEQUE_ISSUED"] },
             },
             _sum: { total: true },
           });
@@ -116,7 +116,7 @@ export default async function handler(request: Request) {
           invoice: {
             buyerId,
             date: { gte: fiscalYearStart, lt: fiscalYearEnd },
-            status: { in: ["PENDING", "PAID"] },
+            status: { in: ["PENDING", "PAID", "CHEQUE_ISSUED"] },
           },
         },
         _sum: { lineTotal: true, qty: true },

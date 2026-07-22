@@ -32,7 +32,7 @@ export interface Invoice {
   total: number;
   amountInWords: string;
 
-  status: "pending" | "paid" | "archived";
+  status: "pending" | "paid" | "cheque_issued" | "archived";
   internalNote: string | null;
 
   createdAt: string;
@@ -67,7 +67,7 @@ export interface GetInvoicesParams {
   page?: number;
   pageSize?: number;
   invoiceNumber?: string;
-  status?: Array<"pending" | "paid" | "archived">;
+  status?: Array<"pending" | "paid" | "cheque_issued" | "archived">;
   startDate?: string;
   endDate?: string;
 }
@@ -195,11 +195,12 @@ export async function checkInvoiceNumber(
 
 export async function updateInvoiceStatus(
   id: string,
-  status: "pending" | "paid" | "archived"
+  status: "pending" | "paid" | "cheque_issued" | "archived"
 ): Promise<Invoice> {
   const statusMap = {
     pending: "PENDING",
     paid: "PAID",
+    cheque_issued: "CHEQUE_ISSUED",
     archived: "ARCHIVED",
   };
 
@@ -223,8 +224,8 @@ export async function updateInvoiceStatus(
 export interface InvoiceStatusLog {
   id: string;
   invoiceId: string;
-  oldStatus: "pending" | "paid" | "archived";
-  newStatus: "pending" | "paid" | "archived";
+  oldStatus: "pending" | "paid" | "cheque_issued" | "archived";
+  newStatus: "pending" | "paid" | "cheque_issued" | "archived";
   changedAt: string;
 }
 
