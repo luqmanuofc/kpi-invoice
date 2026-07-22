@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useRef } from "react";
+import { useState, useMemo, useRef } from "react";
 import {
   useParams,
   useNavigate,
@@ -12,12 +12,12 @@ import { AlertCircle } from "lucide-react";
 import InvoiceDocument, {
   type InvoiceDocumentHandle,
 } from "../invoice-document/InvoiceDocument";
-import { getInvoiceById, type Invoice } from "../api/invoices";
 import type { Buyer, InvoiceForm } from "../invoice-form/types";
 import dayjs from "dayjs";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { useInvoice } from "@/hooks/useInvoices";
 
 // WhatsApp icon component (since lucide-react doesn't have it)
 const WhatsAppIcon = () => (
@@ -31,36 +31,23 @@ export default function InvoiceViewPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
-  const [invoice, setInvoice] = useState<Invoice | null>(null);
   const invoiceRef = useRef<InvoiceDocumentHandle | null>(null);
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    data: invoice,
+    isLoading,
+    error: invoiceErrorObj,
+  } = useInvoice(id);
+  const error = !id
+    ? "Invoice ID is required"
+    : invoiceErrorObj
+      ? invoiceErrorObj instanceof Error
+        ? invoiceErrorObj.message
+        : "Failed to load invoice"
+      : null;
+
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const isMobile = useMediaQuery("(max-width: 768px)");
-
-  useEffect(() => {
-    const fetchInvoice = async () => {
-      if (!id) {
-        setError("Invoice ID is required");
-        setIsLoading(false);
-        return;
-      }
-
-      try {
-        setIsLoading(true);
-        setError(null);
-        const data = await getInvoiceById(id);
-        setInvoice(data);
-      } catch (err: any) {
-        setError(err.message || "Failed to load invoice");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchInvoice();
-  }, [id]);
 
   // Transform Invoice to InvoiceForm format
   const invoiceData = useMemo<InvoiceForm | null>(() => {
