@@ -5,7 +5,7 @@ import {
   useSearchParams,
   useLocation,
 } from "react-router-dom";
-import { Loader2, ArrowLeft, Download, Send } from "lucide-react";
+import { Loader2, ArrowLeft, Download, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
@@ -385,11 +385,11 @@ export default function InvoiceViewPage() {
               }
             >
               {printMutation.isPending || isPrintJobInFlight(printJob?.status) ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className={isMobile ? "h-4 w-4 animate-spin" : "mr-2 h-4 w-4 animate-spin"} />
               ) : (
-                <Send className="mr-2 h-4 w-4" />
+                <Printer className={isMobile ? "h-4 w-4" : "mr-2 h-4 w-4"} />
               )}
-              Print to Epson
+              {!isMobile && "Print to Epson"}
             </Button>
             {isMobile && (
               <Button
