@@ -56,7 +56,9 @@ export const ModelName = {
   Invoice: 'Invoice',
   InvoiceItem: 'InvoiceItem',
   InvoiceStatusLog: 'InvoiceStatusLog',
-  Settings: 'Settings'
+  Settings: 'Settings',
+  EpsonConnection: 'EpsonConnection',
+  EpsonPrintJob: 'EpsonPrintJob'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -170,6 +172,30 @@ export const SettingsScalarFieldEnum = {
 } as const
 
 export type SettingsScalarFieldEnum = (typeof SettingsScalarFieldEnum)[keyof typeof SettingsScalarFieldEnum]
+
+
+export const EpsonConnectionScalarFieldEnum = {
+  id: 'id',
+  accessToken: 'accessToken',
+  refreshToken: 'refreshToken',
+  accessTokenExpiresAt: 'accessTokenExpiresAt',
+  refreshedAt: 'refreshedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type EpsonConnectionScalarFieldEnum = (typeof EpsonConnectionScalarFieldEnum)[keyof typeof EpsonConnectionScalarFieldEnum]
+
+
+export const EpsonPrintJobScalarFieldEnum = {
+  id: 'id',
+  invoiceId: 'invoiceId',
+  epsonJobId: 'epsonJobId',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type EpsonPrintJobScalarFieldEnum = (typeof EpsonPrintJobScalarFieldEnum)[keyof typeof EpsonPrintJobScalarFieldEnum]
 
 
 export const SortOrder = {

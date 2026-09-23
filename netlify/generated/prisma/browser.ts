@@ -47,3 +47,13 @@ export type InvoiceStatusLog = Prisma.InvoiceStatusLogModel
  * 
  */
 export type Settings = Prisma.SettingsModel
+/**
+ * Model EpsonConnection
+ * 
+ */
+export type EpsonConnection = Prisma.EpsonConnectionModel
+/**
+ * Model EpsonPrintJob
+ * 
+ */
+export type EpsonPrintJob = Prisma.EpsonPrintJobModel

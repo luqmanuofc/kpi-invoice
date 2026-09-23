@@ -5,10 +5,10 @@ import {
   useSearchParams,
   useLocation,
 } from "react-router-dom";
-import { Loader2, ArrowLeft, Printer, Download } from "lucide-react";
+import { Loader2, ArrowLeft, Download, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, CheckCircle2 } from "lucide-react";
 import InvoiceDocument, {
   type InvoiceDocumentHandle,
 } from "../invoice-document/InvoiceDocument";
@@ -18,6 +18,40 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useInvoice } from "@/hooks/useInvoices";
+import { usePrintJob, usePrintInvoiceEpson, isPrintJobInFlight } from "@/hooks/usePrintJob";
+
+// Translates Epson's raw job status into something a non-technical user can
+// act on -- "media_empty" means nothing to someone printing an invoice.
+function printStatusDisplay(status: string): {
+  label: string;
+  tone: "pending" | "success" | "error" | "neutral";
+} {
+  switch (status) {
+    case "preparing":
+    case "reserved":
+    case "pending":
+      return { label: "Sending to printer…", tone: "pending" };
+    case "processing":
+      return { label: "Printing…", tone: "pending" };
+    case "completed":
+      return { label: "Printed", tone: "success" };
+    case "media_empty":
+      return { label: "Printer is out of paper", tone: "error" };
+    case "media_jam":
+      return { label: "Paper jam", tone: "error" };
+    case "marker_supply_empty":
+      return { label: "Printer is out of ink", tone: "error" };
+    case "error_occurred":
+    case "stopped_other":
+      return { label: "Print failed", tone: "error" };
+    case "canceled":
+      return { label: "Print canceled", tone: "neutral" };
+    case "expired":
+      return { label: "Print job expired (never printed)", tone: "neutral" };
+    default:
+      return { label: status, tone: "neutral" };
+  }
+}
 
 // WhatsApp icon component (since lucide-react doesn't have it)
 const WhatsAppIcon = () => (
@@ -48,6 +82,8 @@ export default function InvoiceViewPage() {
 
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const isMobile = useMediaQuery("(max-width: 768px)");
+  const { data: printJob } = usePrintJob(id);
+  const printMutation = usePrintInvoiceEpson(id);
 
   // Transform Invoice to InvoiceForm format
   const invoiceData = useMemo<InvoiceForm | null>(() => {
@@ -216,23 +252,20 @@ export default function InvoiceViewPage() {
     pdf.save(fileName);
   };
 
-  const printPDF = async () => {
-    const pdf = await generatePDF(1); // Slightly lower quality for print
+  const printToEpson = async () => {
+    if (!id) return;
+    const pdf = await generatePDF(0.85); // keep the upload small
     if (!pdf) return;
 
-    // Create a blob URL and open it for printing
-    const pdfBlob = pdf.output("blob");
-    const blobUrl = URL.createObjectURL(pdfBlob);
+    const fileName = `Invoice_${
+      invoiceData?.invoiceNumber || "draft"
+    }_${dayjs().format("YYYYMMDD")}.pdf`;
 
-    // Open in new window and trigger print
-    const printWindow = window.open(blobUrl);
-    if (printWindow) {
-      printWindow.onload = () => {
-        printWindow.print();
-        // Clean up the blob URL after a delay
-        setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
-      };
-    }
+    // jsPDF's data URI is already base64; strip the "data:...;base64," prefix.
+    const dataUri = pdf.output("datauristring");
+    const pdfBase64 = dataUri.slice(dataUri.indexOf(",") + 1);
+
+    printMutation.mutate({ invoiceId: id, fileName, pdfBase64 });
   };
 
   const shareWhatsApp = async () => {
@@ -343,9 +376,20 @@ export default function InvoiceViewPage() {
               <Download className="mr-2 h-4 w-4" />
               Download
             </Button>
-            <Button variant="outline" size="sm" onClick={printPDF}>
-              <Printer className="mr-2 h-4 w-4" />
-              Print
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={printToEpson}
+              disabled={
+                printMutation.isPending || isPrintJobInFlight(printJob?.status)
+              }
+            >
+              {printMutation.isPending || isPrintJobInFlight(printJob?.status) ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="mr-2 h-4 w-4" />
+              )}
+              Print to Epson
             </Button>
             {isMobile && (
               <Button
@@ -360,6 +404,39 @@ export default function InvoiceViewPage() {
           </div>
         )}
       </div>
+
+      {printMutation.error && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            {printMutation.error instanceof Error
+              ? printMutation.error.message
+              : "Failed to send invoice to printer"}
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {printJob && !printMutation.error && (
+        <Alert
+          variant={
+            printStatusDisplay(printJob.status).tone === "error"
+              ? "destructive"
+              : "default"
+          }
+          className="mb-4"
+        >
+          {printStatusDisplay(printJob.status).tone === "success" ? (
+            <CheckCircle2 className="h-4 w-4" />
+          ) : printStatusDisplay(printJob.status).tone === "error" ? (
+            <AlertCircle className="h-4 w-4" />
+          ) : (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          )}
+          <AlertDescription>
+            {printStatusDisplay(printJob.status).label}
+          </AlertDescription>
+        </Alert>
+      )}
 
       <InvoiceDocument
         data={invoiceData}

@@ -389,7 +389,9 @@ export const ModelName = {
   Invoice: 'Invoice',
   InvoiceItem: 'InvoiceItem',
   InvoiceStatusLog: 'InvoiceStatusLog',
-  Settings: 'Settings'
+  Settings: 'Settings',
+  EpsonConnection: 'EpsonConnection',
+  EpsonPrintJob: 'EpsonPrintJob'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -405,7 +407,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "buyer" | "product" | "invoice" | "invoiceItem" | "invoiceStatusLog" | "settings"
+    modelProps: "buyer" | "product" | "invoice" | "invoiceItem" | "invoiceStatusLog" | "settings" | "epsonConnection" | "epsonPrintJob"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -853,6 +855,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    EpsonConnection: {
+      payload: Prisma.$EpsonConnectionPayload<ExtArgs>
+      fields: Prisma.EpsonConnectionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.EpsonConnectionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EpsonConnectionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.EpsonConnectionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EpsonConnectionPayload>
+        }
+        findFirst: {
+          args: Prisma.EpsonConnectionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EpsonConnectionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.EpsonConnectionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EpsonConnectionPayload>
+        }
+        findMany: {
+          args: Prisma.EpsonConnectionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EpsonConnectionPayload>[]
+        }
+        create: {
+          args: Prisma.EpsonConnectionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EpsonConnectionPayload>
+        }
+        createMany: {
+          args: Prisma.EpsonConnectionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.EpsonConnectionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EpsonConnectionPayload>[]
+        }
+        delete: {
+          args: Prisma.EpsonConnectionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EpsonConnectionPayload>
+        }
+        update: {
+          args: Prisma.EpsonConnectionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EpsonConnectionPayload>
+        }
+        deleteMany: {
+          args: Prisma.EpsonConnectionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.EpsonConnectionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.EpsonConnectionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EpsonConnectionPayload>[]
+        }
+        upsert: {
+          args: Prisma.EpsonConnectionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EpsonConnectionPayload>
+        }
+        aggregate: {
+          args: Prisma.EpsonConnectionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateEpsonConnection>
+        }
+        groupBy: {
+          args: Prisma.EpsonConnectionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EpsonConnectionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.EpsonConnectionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EpsonConnectionCountAggregateOutputType> | number
+        }
+      }
+    }
+    EpsonPrintJob: {
+      payload: Prisma.$EpsonPrintJobPayload<ExtArgs>
+      fields: Prisma.EpsonPrintJobFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.EpsonPrintJobFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EpsonPrintJobPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.EpsonPrintJobFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EpsonPrintJobPayload>
+        }
+        findFirst: {
+          args: Prisma.EpsonPrintJobFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EpsonPrintJobPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.EpsonPrintJobFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EpsonPrintJobPayload>
+        }
+        findMany: {
+          args: Prisma.EpsonPrintJobFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EpsonPrintJobPayload>[]
+        }
+        create: {
+          args: Prisma.EpsonPrintJobCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EpsonPrintJobPayload>
+        }
+        createMany: {
+          args: Prisma.EpsonPrintJobCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.EpsonPrintJobCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EpsonPrintJobPayload>[]
+        }
+        delete: {
+          args: Prisma.EpsonPrintJobDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EpsonPrintJobPayload>
+        }
+        update: {
+          args: Prisma.EpsonPrintJobUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EpsonPrintJobPayload>
+        }
+        deleteMany: {
+          args: Prisma.EpsonPrintJobDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.EpsonPrintJobUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.EpsonPrintJobUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EpsonPrintJobPayload>[]
+        }
+        upsert: {
+          args: Prisma.EpsonPrintJobUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EpsonPrintJobPayload>
+        }
+        aggregate: {
+          args: Prisma.EpsonPrintJobAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateEpsonPrintJob>
+        }
+        groupBy: {
+          args: Prisma.EpsonPrintJobGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EpsonPrintJobGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.EpsonPrintJobCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EpsonPrintJobCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -987,6 +1137,30 @@ export const SettingsScalarFieldEnum = {
 } as const
 
 export type SettingsScalarFieldEnum = (typeof SettingsScalarFieldEnum)[keyof typeof SettingsScalarFieldEnum]
+
+
+export const EpsonConnectionScalarFieldEnum = {
+  id: 'id',
+  accessToken: 'accessToken',
+  refreshToken: 'refreshToken',
+  accessTokenExpiresAt: 'accessTokenExpiresAt',
+  refreshedAt: 'refreshedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type EpsonConnectionScalarFieldEnum = (typeof EpsonConnectionScalarFieldEnum)[keyof typeof EpsonConnectionScalarFieldEnum]
+
+
+export const EpsonPrintJobScalarFieldEnum = {
+  id: 'id',
+  invoiceId: 'invoiceId',
+  epsonJobId: 'epsonJobId',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type EpsonPrintJobScalarFieldEnum = (typeof EpsonPrintJobScalarFieldEnum)[keyof typeof EpsonPrintJobScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1247,6 +1421,8 @@ export type GlobalOmitConfig = {
   invoiceItem?: Prisma.InvoiceItemOmit
   invoiceStatusLog?: Prisma.InvoiceStatusLogOmit
   settings?: Prisma.SettingsOmit
+  epsonConnection?: Prisma.EpsonConnectionOmit
+  epsonPrintJob?: Prisma.EpsonPrintJobOmit
 }
 
 /* Types for Logging */

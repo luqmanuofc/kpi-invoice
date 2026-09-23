@@ -435,6 +435,7 @@ export type InvoiceWhereInput = {
   buyer?: Prisma.XOR<Prisma.BuyerScalarRelationFilter, Prisma.BuyerWhereInput>
   items?: Prisma.InvoiceItemListRelationFilter
   statusChangeEvents?: Prisma.InvoiceStatusLogListRelationFilter
+  printJobs?: Prisma.EpsonPrintJobListRelationFilter
 }
 
 export type InvoiceOrderByWithRelationInput = {
@@ -469,6 +470,7 @@ export type InvoiceOrderByWithRelationInput = {
   buyer?: Prisma.BuyerOrderByWithRelationInput
   items?: Prisma.InvoiceItemOrderByRelationAggregateInput
   statusChangeEvents?: Prisma.InvoiceStatusLogOrderByRelationAggregateInput
+  printJobs?: Prisma.EpsonPrintJobOrderByRelationAggregateInput
 }
 
 export type InvoiceWhereUniqueInput = Prisma.AtLeast<{
@@ -506,6 +508,7 @@ export type InvoiceWhereUniqueInput = Prisma.AtLeast<{
   buyer?: Prisma.XOR<Prisma.BuyerScalarRelationFilter, Prisma.BuyerWhereInput>
   items?: Prisma.InvoiceItemListRelationFilter
   statusChangeEvents?: Prisma.InvoiceStatusLogListRelationFilter
+  printJobs?: Prisma.EpsonPrintJobListRelationFilter
 }, "id">
 
 export type InvoiceOrderByWithAggregationInput = {
@@ -609,6 +612,7 @@ export type InvoiceCreateInput = {
   buyer: Prisma.BuyerCreateNestedOneWithoutInvoicesInput
   items?: Prisma.InvoiceItemCreateNestedManyWithoutInvoiceInput
   statusChangeEvents?: Prisma.InvoiceStatusLogCreateNestedManyWithoutInvoiceInput
+  printJobs?: Prisma.EpsonPrintJobCreateNestedManyWithoutInvoiceInput
 }
 
 export type InvoiceUncheckedCreateInput = {
@@ -642,6 +646,7 @@ export type InvoiceUncheckedCreateInput = {
   updatedAt?: Date | string
   items?: Prisma.InvoiceItemUncheckedCreateNestedManyWithoutInvoiceInput
   statusChangeEvents?: Prisma.InvoiceStatusLogUncheckedCreateNestedManyWithoutInvoiceInput
+  printJobs?: Prisma.EpsonPrintJobUncheckedCreateNestedManyWithoutInvoiceInput
 }
 
 export type InvoiceUpdateInput = {
@@ -675,6 +680,7 @@ export type InvoiceUpdateInput = {
   buyer?: Prisma.BuyerUpdateOneRequiredWithoutInvoicesNestedInput
   items?: Prisma.InvoiceItemUpdateManyWithoutInvoiceNestedInput
   statusChangeEvents?: Prisma.InvoiceStatusLogUpdateManyWithoutInvoiceNestedInput
+  printJobs?: Prisma.EpsonPrintJobUpdateManyWithoutInvoiceNestedInput
 }
 
 export type InvoiceUncheckedUpdateInput = {
@@ -708,6 +714,7 @@ export type InvoiceUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.InvoiceItemUncheckedUpdateManyWithoutInvoiceNestedInput
   statusChangeEvents?: Prisma.InvoiceStatusLogUncheckedUpdateManyWithoutInvoiceNestedInput
+  printJobs?: Prisma.EpsonPrintJobUncheckedUpdateManyWithoutInvoiceNestedInput
 }
 
 export type InvoiceCreateManyInput = {
@@ -1008,6 +1015,20 @@ export type InvoiceUpdateOneRequiredWithoutStatusChangeEventsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.InvoiceUpdateToOneWithWhereWithoutStatusChangeEventsInput, Prisma.InvoiceUpdateWithoutStatusChangeEventsInput>, Prisma.InvoiceUncheckedUpdateWithoutStatusChangeEventsInput>
 }
 
+export type InvoiceCreateNestedOneWithoutPrintJobsInput = {
+  create?: Prisma.XOR<Prisma.InvoiceCreateWithoutPrintJobsInput, Prisma.InvoiceUncheckedCreateWithoutPrintJobsInput>
+  connectOrCreate?: Prisma.InvoiceCreateOrConnectWithoutPrintJobsInput
+  connect?: Prisma.InvoiceWhereUniqueInput
+}
+
+export type InvoiceUpdateOneRequiredWithoutPrintJobsNestedInput = {
+  create?: Prisma.XOR<Prisma.InvoiceCreateWithoutPrintJobsInput, Prisma.InvoiceUncheckedCreateWithoutPrintJobsInput>
+  connectOrCreate?: Prisma.InvoiceCreateOrConnectWithoutPrintJobsInput
+  upsert?: Prisma.InvoiceUpsertWithoutPrintJobsInput
+  connect?: Prisma.InvoiceWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.InvoiceUpdateToOneWithWhereWithoutPrintJobsInput, Prisma.InvoiceUpdateWithoutPrintJobsInput>, Prisma.InvoiceUncheckedUpdateWithoutPrintJobsInput>
+}
+
 export type InvoiceCreateWithoutBuyerInput = {
   id?: string
   invoiceNumber: string
@@ -1038,6 +1059,7 @@ export type InvoiceCreateWithoutBuyerInput = {
   updatedAt?: Date | string
   items?: Prisma.InvoiceItemCreateNestedManyWithoutInvoiceInput
   statusChangeEvents?: Prisma.InvoiceStatusLogCreateNestedManyWithoutInvoiceInput
+  printJobs?: Prisma.EpsonPrintJobCreateNestedManyWithoutInvoiceInput
 }
 
 export type InvoiceUncheckedCreateWithoutBuyerInput = {
@@ -1070,6 +1092,7 @@ export type InvoiceUncheckedCreateWithoutBuyerInput = {
   updatedAt?: Date | string
   items?: Prisma.InvoiceItemUncheckedCreateNestedManyWithoutInvoiceInput
   statusChangeEvents?: Prisma.InvoiceStatusLogUncheckedCreateNestedManyWithoutInvoiceInput
+  printJobs?: Prisma.EpsonPrintJobUncheckedCreateNestedManyWithoutInvoiceInput
 }
 
 export type InvoiceCreateOrConnectWithoutBuyerInput = {
@@ -1162,6 +1185,7 @@ export type InvoiceCreateWithoutItemsInput = {
   updatedAt?: Date | string
   buyer: Prisma.BuyerCreateNestedOneWithoutInvoicesInput
   statusChangeEvents?: Prisma.InvoiceStatusLogCreateNestedManyWithoutInvoiceInput
+  printJobs?: Prisma.EpsonPrintJobCreateNestedManyWithoutInvoiceInput
 }
 
 export type InvoiceUncheckedCreateWithoutItemsInput = {
@@ -1194,6 +1218,7 @@ export type InvoiceUncheckedCreateWithoutItemsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   statusChangeEvents?: Prisma.InvoiceStatusLogUncheckedCreateNestedManyWithoutInvoiceInput
+  printJobs?: Prisma.EpsonPrintJobUncheckedCreateNestedManyWithoutInvoiceInput
 }
 
 export type InvoiceCreateOrConnectWithoutItemsInput = {
@@ -1242,6 +1267,7 @@ export type InvoiceUpdateWithoutItemsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   buyer?: Prisma.BuyerUpdateOneRequiredWithoutInvoicesNestedInput
   statusChangeEvents?: Prisma.InvoiceStatusLogUpdateManyWithoutInvoiceNestedInput
+  printJobs?: Prisma.EpsonPrintJobUpdateManyWithoutInvoiceNestedInput
 }
 
 export type InvoiceUncheckedUpdateWithoutItemsInput = {
@@ -1274,6 +1300,7 @@ export type InvoiceUncheckedUpdateWithoutItemsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   statusChangeEvents?: Prisma.InvoiceStatusLogUncheckedUpdateManyWithoutInvoiceNestedInput
+  printJobs?: Prisma.EpsonPrintJobUncheckedUpdateManyWithoutInvoiceNestedInput
 }
 
 export type InvoiceCreateWithoutStatusChangeEventsInput = {
@@ -1306,6 +1333,7 @@ export type InvoiceCreateWithoutStatusChangeEventsInput = {
   updatedAt?: Date | string
   buyer: Prisma.BuyerCreateNestedOneWithoutInvoicesInput
   items?: Prisma.InvoiceItemCreateNestedManyWithoutInvoiceInput
+  printJobs?: Prisma.EpsonPrintJobCreateNestedManyWithoutInvoiceInput
 }
 
 export type InvoiceUncheckedCreateWithoutStatusChangeEventsInput = {
@@ -1338,6 +1366,7 @@ export type InvoiceUncheckedCreateWithoutStatusChangeEventsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.InvoiceItemUncheckedCreateNestedManyWithoutInvoiceInput
+  printJobs?: Prisma.EpsonPrintJobUncheckedCreateNestedManyWithoutInvoiceInput
 }
 
 export type InvoiceCreateOrConnectWithoutStatusChangeEventsInput = {
@@ -1386,6 +1415,7 @@ export type InvoiceUpdateWithoutStatusChangeEventsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   buyer?: Prisma.BuyerUpdateOneRequiredWithoutInvoicesNestedInput
   items?: Prisma.InvoiceItemUpdateManyWithoutInvoiceNestedInput
+  printJobs?: Prisma.EpsonPrintJobUpdateManyWithoutInvoiceNestedInput
 }
 
 export type InvoiceUncheckedUpdateWithoutStatusChangeEventsInput = {
@@ -1418,6 +1448,155 @@ export type InvoiceUncheckedUpdateWithoutStatusChangeEventsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.InvoiceItemUncheckedUpdateManyWithoutInvoiceNestedInput
+  printJobs?: Prisma.EpsonPrintJobUncheckedUpdateManyWithoutInvoiceNestedInput
+}
+
+export type InvoiceCreateWithoutPrintJobsInput = {
+  id?: string
+  invoiceNumber: string
+  date: Date | string
+  vehicleNumber?: string | null
+  buyerNameSnapshot: string
+  buyerAddressSnapshot: string
+  buyerGstinSnapshot?: string | null
+  buyerPhoneSnapshot?: string | null
+  sellerNameSnapshot: string
+  sellerAddressSnapshot: string
+  sellerGstinSnapshot: string
+  sellerEmailSnapshot: string
+  sellerPhoneSnapshot: string
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  total: runtime.Decimal | runtime.DecimalJsLike | number | string
+  amountInWords: string
+  status?: $Enums.InvoiceStatus
+  internalNote?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  buyer: Prisma.BuyerCreateNestedOneWithoutInvoicesInput
+  items?: Prisma.InvoiceItemCreateNestedManyWithoutInvoiceInput
+  statusChangeEvents?: Prisma.InvoiceStatusLogCreateNestedManyWithoutInvoiceInput
+}
+
+export type InvoiceUncheckedCreateWithoutPrintJobsInput = {
+  id?: string
+  invoiceNumber: string
+  date: Date | string
+  vehicleNumber?: string | null
+  buyerId: string
+  buyerNameSnapshot: string
+  buyerAddressSnapshot: string
+  buyerGstinSnapshot?: string | null
+  buyerPhoneSnapshot?: string | null
+  sellerNameSnapshot: string
+  sellerAddressSnapshot: string
+  sellerGstinSnapshot: string
+  sellerEmailSnapshot: string
+  sellerPhoneSnapshot: string
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstRate: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  total: runtime.Decimal | runtime.DecimalJsLike | number | string
+  amountInWords: string
+  status?: $Enums.InvoiceStatus
+  internalNote?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  items?: Prisma.InvoiceItemUncheckedCreateNestedManyWithoutInvoiceInput
+  statusChangeEvents?: Prisma.InvoiceStatusLogUncheckedCreateNestedManyWithoutInvoiceInput
+}
+
+export type InvoiceCreateOrConnectWithoutPrintJobsInput = {
+  where: Prisma.InvoiceWhereUniqueInput
+  create: Prisma.XOR<Prisma.InvoiceCreateWithoutPrintJobsInput, Prisma.InvoiceUncheckedCreateWithoutPrintJobsInput>
+}
+
+export type InvoiceUpsertWithoutPrintJobsInput = {
+  update: Prisma.XOR<Prisma.InvoiceUpdateWithoutPrintJobsInput, Prisma.InvoiceUncheckedUpdateWithoutPrintJobsInput>
+  create: Prisma.XOR<Prisma.InvoiceCreateWithoutPrintJobsInput, Prisma.InvoiceUncheckedCreateWithoutPrintJobsInput>
+  where?: Prisma.InvoiceWhereInput
+}
+
+export type InvoiceUpdateToOneWithWhereWithoutPrintJobsInput = {
+  where?: Prisma.InvoiceWhereInput
+  data: Prisma.XOR<Prisma.InvoiceUpdateWithoutPrintJobsInput, Prisma.InvoiceUncheckedUpdateWithoutPrintJobsInput>
+}
+
+export type InvoiceUpdateWithoutPrintJobsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  invoiceNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicleNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerNameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerAddressSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerGstinSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerPhoneSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerNameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerAddressSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerGstinSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerEmailSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerPhoneSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amountInWords?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
+  internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  buyer?: Prisma.BuyerUpdateOneRequiredWithoutInvoicesNestedInput
+  items?: Prisma.InvoiceItemUpdateManyWithoutInvoiceNestedInput
+  statusChangeEvents?: Prisma.InvoiceStatusLogUpdateManyWithoutInvoiceNestedInput
+}
+
+export type InvoiceUncheckedUpdateWithoutPrintJobsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  invoiceNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicleNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerId?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerNameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerAddressSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerGstinSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerPhoneSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerNameSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerAddressSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerGstinSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerEmailSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerPhoneSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cgstAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  sgstAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  igstAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amountInWords?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumInvoiceStatusFieldUpdateOperationsInput | $Enums.InvoiceStatus
+  internalNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  items?: Prisma.InvoiceItemUncheckedUpdateManyWithoutInvoiceNestedInput
+  statusChangeEvents?: Prisma.InvoiceStatusLogUncheckedUpdateManyWithoutInvoiceNestedInput
 }
 
 export type InvoiceCreateManyBuyerInput = {
@@ -1480,6 +1659,7 @@ export type InvoiceUpdateWithoutBuyerInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.InvoiceItemUpdateManyWithoutInvoiceNestedInput
   statusChangeEvents?: Prisma.InvoiceStatusLogUpdateManyWithoutInvoiceNestedInput
+  printJobs?: Prisma.EpsonPrintJobUpdateManyWithoutInvoiceNestedInput
 }
 
 export type InvoiceUncheckedUpdateWithoutBuyerInput = {
@@ -1512,6 +1692,7 @@ export type InvoiceUncheckedUpdateWithoutBuyerInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.InvoiceItemUncheckedUpdateManyWithoutInvoiceNestedInput
   statusChangeEvents?: Prisma.InvoiceStatusLogUncheckedUpdateManyWithoutInvoiceNestedInput
+  printJobs?: Prisma.EpsonPrintJobUncheckedUpdateManyWithoutInvoiceNestedInput
 }
 
 export type InvoiceUncheckedUpdateManyWithoutBuyerInput = {
@@ -1552,11 +1733,13 @@ export type InvoiceUncheckedUpdateManyWithoutBuyerInput = {
 export type InvoiceCountOutputType = {
   items: number
   statusChangeEvents: number
+  printJobs: number
 }
 
 export type InvoiceCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   items?: boolean | InvoiceCountOutputTypeCountItemsArgs
   statusChangeEvents?: boolean | InvoiceCountOutputTypeCountStatusChangeEventsArgs
+  printJobs?: boolean | InvoiceCountOutputTypeCountPrintJobsArgs
 }
 
 /**
@@ -1581,6 +1764,13 @@ export type InvoiceCountOutputTypeCountItemsArgs<ExtArgs extends runtime.Types.E
  */
 export type InvoiceCountOutputTypeCountStatusChangeEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.InvoiceStatusLogWhereInput
+}
+
+/**
+ * InvoiceCountOutputType without action
+ */
+export type InvoiceCountOutputTypeCountPrintJobsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.EpsonPrintJobWhereInput
 }
 
 
@@ -1616,6 +1806,7 @@ export type InvoiceSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   buyer?: boolean | Prisma.BuyerDefaultArgs<ExtArgs>
   items?: boolean | Prisma.Invoice$itemsArgs<ExtArgs>
   statusChangeEvents?: boolean | Prisma.Invoice$statusChangeEventsArgs<ExtArgs>
+  printJobs?: boolean | Prisma.Invoice$printJobsArgs<ExtArgs>
   _count?: boolean | Prisma.InvoiceCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["invoice"]>
 
@@ -1719,6 +1910,7 @@ export type InvoiceInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   buyer?: boolean | Prisma.BuyerDefaultArgs<ExtArgs>
   items?: boolean | Prisma.Invoice$itemsArgs<ExtArgs>
   statusChangeEvents?: boolean | Prisma.Invoice$statusChangeEventsArgs<ExtArgs>
+  printJobs?: boolean | Prisma.Invoice$printJobsArgs<ExtArgs>
   _count?: boolean | Prisma.InvoiceCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type InvoiceIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1734,6 +1926,7 @@ export type $InvoicePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     buyer: Prisma.$BuyerPayload<ExtArgs>
     items: Prisma.$InvoiceItemPayload<ExtArgs>[]
     statusChangeEvents: Prisma.$InvoiceStatusLogPayload<ExtArgs>[]
+    printJobs: Prisma.$EpsonPrintJobPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2161,6 +2354,7 @@ export interface Prisma__InvoiceClient<T, Null = never, ExtArgs extends runtime.
   buyer<T extends Prisma.BuyerDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BuyerDefaultArgs<ExtArgs>>): Prisma.Prisma__BuyerClient<runtime.Types.Result.GetResult<Prisma.$BuyerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   items<T extends Prisma.Invoice$itemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Invoice$itemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InvoiceItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   statusChangeEvents<T extends Prisma.Invoice$statusChangeEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Invoice$statusChangeEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InvoiceStatusLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  printJobs<T extends Prisma.Invoice$printJobsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Invoice$printJobsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EpsonPrintJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2659,6 +2853,30 @@ export type Invoice$statusChangeEventsArgs<ExtArgs extends runtime.Types.Extensi
   take?: number
   skip?: number
   distinct?: Prisma.InvoiceStatusLogScalarFieldEnum | Prisma.InvoiceStatusLogScalarFieldEnum[]
+}
+
+/**
+ * Invoice.printJobs
+ */
+export type Invoice$printJobsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the EpsonPrintJob
+   */
+  select?: Prisma.EpsonPrintJobSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the EpsonPrintJob
+   */
+  omit?: Prisma.EpsonPrintJobOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EpsonPrintJobInclude<ExtArgs> | null
+  where?: Prisma.EpsonPrintJobWhereInput
+  orderBy?: Prisma.EpsonPrintJobOrderByWithRelationInput | Prisma.EpsonPrintJobOrderByWithRelationInput[]
+  cursor?: Prisma.EpsonPrintJobWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.EpsonPrintJobScalarFieldEnum | Prisma.EpsonPrintJobScalarFieldEnum[]
 }
 
 /**

@@ -8,3 +8,6 @@ dist
 
 # Local Netlify folder
 .netlify
+
+# Live Epson OAuth tokens written by scripts/epson/1-auth-setup.mjs
+scripts/epson/tokens.json

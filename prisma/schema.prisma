@@ -103,6 +103,7 @@ model Invoice {
 
   items              InvoiceItem[]
   statusChangeEvents InvoiceStatusLog[]
+  printJobs          EpsonPrintJob[]
 
   @@index([buyerId])
   @@index([invoiceNumber])
@@ -167,4 +168,33 @@ model Settings {
   id           String   @id @default("singleton")
   bankAccounts Json     @default("[]")
   updatedAt    DateTime @updatedAt
+}
+
+//
+// EPSON CONNECT OAUTH STATE (singleton row, id="singleton")
+// Not user-facing / not editable through Settings -- only the token refresh
+// logic and the one-time initial seed write here.
+//
+model EpsonConnection {
+  id                   String   @id @default("singleton")
+  accessToken          String
+  refreshToken         String
+  accessTokenExpiresAt DateTime
+  refreshedAt          DateTime @updatedAt
+  createdAt            DateTime @default(now())
+}
+
+//
+// EPSON PRINT JOB (one row per print attempt -- an invoice can have several)
+//
+model EpsonPrintJob {
+  id         String   @id @default(cuid())
+  invoiceId  String
+  invoice    Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  epsonJobId String   @unique
+  status     String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([invoiceId])
 }
