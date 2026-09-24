@@ -12,6 +12,7 @@ import BuyerDetailPage from "./pages/BuyerDetail.page";
 import ProductsPage from "./pages/Products.page";
 import DashboardPage from "./pages/Dashboard.page";
 import SettingsPage from "./pages/Settings.page";
+import EwayBillsPage from "./pages/EwayBills.page";
 
 function App() {
   return (
@@ -73,6 +74,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/eway"
+            element={
+              <ProtectedRoute>
+                <EwayBillsPage />
               </ProtectedRoute>
             }
           />

@@ -20,6 +20,7 @@ import {
   FileIcon,
   RotateCw,
   Settings as SettingsIcon,
+  Truck,
 } from "lucide-react";
 import {
   Sheet,
@@ -48,6 +49,7 @@ export default function NavigationAppBar() {
   ];
 
   const desktopExtraItems = [
+    { label: "E-way Bills", path: "/eway", icon: Truck },
     { label: "Settings", path: "/settings", icon: SettingsIcon },
   ];
 
@@ -187,6 +189,16 @@ export default function NavigationAppBar() {
                     onCheckedChange={toggleTheme}
                   />
                 </div>
+                <button
+                  onClick={() => {
+                    navigate("/eway");
+                    setMoreMenuOpen(false);
+                  }}
+                  className="flex items-center gap-3 w-full py-3 border-b text-sm font-medium"
+                >
+                  <Truck className="h-5 w-5" />
+                  E-way Bills
+                </button>
                 <button
                   onClick={() => {
                     navigate("/settings");
