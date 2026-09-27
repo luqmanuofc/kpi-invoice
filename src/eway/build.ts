@@ -45,6 +45,18 @@ export function buildEwayBill(input: EwayInput): EwayBill {
   }));
   const mainItem = items.reduce((a, b) => (b.taxableAmount > a.taxableAmount ? b : a), items[0]);
 
+  const totalValue = round2(items.reduce((s, i) => s + i.taxableAmount, 0));
+  const cgstValue = round2(input.cgstValue);
+  const sgstValue = round2(input.sgstValue);
+  const igstValue = round2(input.igstValue);
+  const totInvValue = round2(input.totInvValue);
+  // The invoice's own total is rounded to the nearest rupee, so it rarely
+  // equals taxable + tax to the paisa. Real accepted bills close that gap in
+  // OthValue (confirmed against actual EWB records: e.g. -0.40 on a bill whose
+  // taxable + tax was 68121.40 against a total of 68121), so we do the same
+  // instead of leaving totInvValue slightly off.
+  const OthValue = round2(totInvValue - (totalValue + cgstValue + sgstValue + igstValue));
+
   return {
     userGstin: input.userGstin,
     supplyType: SUPPLY_TYPE.OUTWARD,
@@ -68,14 +80,14 @@ export function buildEwayBill(input: EwayInput): EwayBill {
     toPincode: to.pincode ?? 0,
     toStateCode: to.stateCode ?? 0,
     actualToStateCode: to.actualStateCode ?? to.stateCode ?? 0,
-    totalValue: round2(items.reduce((s, i) => s + i.taxableAmount, 0)),
-    cgstValue: round2(input.cgstValue),
-    sgstValue: round2(input.sgstValue),
-    igstValue: round2(input.igstValue),
+    totalValue,
+    cgstValue,
+    sgstValue,
+    igstValue,
     cessValue: 0,
     TotNonAdvolVal: 0,
-    OthValue: 0,
-    totInvValue: round2(input.totInvValue),
+    OthValue,
+    totInvValue,
     transMode: t.mode,
     transDistance: t.distanceKm,
     transporterName: cleanText(t.transporterName, 25),

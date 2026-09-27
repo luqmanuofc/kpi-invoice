@@ -226,6 +226,13 @@ export function validateEwayBill(b: EwayBill): EwayIssue[] {
   for (const k of ["totalValue", "cgstValue", "sgstValue", "igstValue", "totInvValue"] as const) {
     need(money(b[k]) && b[k] >= 0, k, "Must be a non-negative amount with at most 2 decimals");
   }
+  // OthValue exists to make this exact (see build.ts); if it doesn't, something
+  // upstream changed and slipped past that.
+  need(
+    Math.abs(b.totalValue + b.cgstValue + b.sgstValue + b.igstValue + b.OthValue - b.totInvValue) < 0.005,
+    "OthValue",
+    "totalValue + tax + OthValue does not equal totInvValue"
+  );
   need(b.itemList.length > 0, "itemList", "No items");
   b.itemList.forEach((it, i) => {
     const f = (n: string) => `itemList[${i + 1}].${n}`;

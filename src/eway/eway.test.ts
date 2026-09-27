@@ -201,6 +201,20 @@ describe("invoiceToEwayInput / buildEwayBill", () => {
   it("always sends distance 0, the documented instruction for the portal to calculate it", () => {
     expect(input.transport.distanceKm).toBe(0);
   });
+
+  // Confirmed against two real accepted e-way bills (CommonReport.xls, 27 Sep
+  // 2026): taxable + tax came to 68121.40 and 134980.20, against rounded
+  // invoice totals of 68121 and 134980 -- the portal accepted both because
+  // OthValue carried the -0.40 / -0.20 remainder, not because it tolerated a
+  // mismatch.
+  it("puts the invoice's round-off into OthValue so totals reconcile exactly", () => {
+    // subtotal 77500 + tax 13950 = 91450 exactly, so nudge the total by a
+    // paisa-scale rounding remainder like a real invoice would have.
+    const rounded = invoiceToEwayInput(makeInvoice({ total: 91449 }), makeBuyer());
+    const b = buildEwayBill(rounded);
+    expect(b.OthValue).toBe(-1);
+    expect(b.totalValue + b.cgstValue + b.sgstValue + b.igstValue + b.OthValue).toBe(b.totInvValue);
+  });
 });
 
 describe("validation", () => {
@@ -218,9 +232,10 @@ describe("validation", () => {
     expect(errors(i).map((e) => e.field)).toContain("to.pincode");
   });
 
-  it("flags a missing seller PIN", () => {
+  it("falls back to the configured seller PIN when the address text has none", () => {
     const i = invoiceToEwayInput(makeInvoice({ sellerAddressSnapshot: "28A-SIDCO SRINAGAR" }), makeBuyer());
-    expect(errors(i).map((e) => e.field)).toContain("from.pincode");
+    expect(i.from.pincode).toBe(190017); // EWAY_SELLER.pincode, confirmed against a real accepted bill
+    expect(errors(i).map((e) => e.field)).not.toContain("from.pincode");
   });
 
   it("flags tax totals that don't add up", () => {
