@@ -3,9 +3,17 @@
 Flags invoices that need a GST e-way bill and exports them as the portal's
 bulk-upload JSON (e-Waybill → Generate Bulk). No paid API involved.
 
-UI: **E-way Bills** (`/eway`). Pick a date range, fill in what the invoice
-doesn't hold (buyer PIN, distance, vehicle, transporter), tick the bills that
-show **Ready**, and download the JSON.
+**Buyer setup (one time per buyer):** open the buyer's Edit form and fill in
+"Ship-to PIN code" and "Ship-to state". Bulk upload needs these already correct
+in the file — unlike the portal's single-bill "Generate New" form, which
+auto-fills them from the buyer's GSTIN as you type, bulk processing does no
+live lookup and just rejects a row with a missing/wrong one (confirmed against
+NIC's `generate-eway-bill` API docs, which describe the same underlying
+generation engine bulk upload uses). So this is entered once here instead.
+
+UI: **E-way Bills** (`/eway`). Pick a date range, fill in the vehicle number
+and transporter GSTIN if needed, tick the bills that show **Ready**, and
+download the JSON.
 
 ## Code (`src/eway/`)
 
@@ -19,8 +27,14 @@ API later.
 | `validate.ts` | pre-export checks (PIN/state, totals, HSN, units, dates, distance, Part-B) |
 | `build.ts` | invoice → bulk entry, `dd/mm/yyyy` dates, text cleaning |
 | `export.ts` | validate a batch, emit JSON for the bills that pass |
-| `fromInvoice.ts` | app `Invoice` → `EwayInput` (discount spread over items, unit mapping) |
+| `fromInvoice.ts` | app `Invoice` (+ `Buyer`) → `EwayInput` (discount spread over items, unit mapping) |
 | `config.ts` | **seller PIN code — must be set before any bill will validate** |
+
+Buyer ship-to PIN/state live on the `Buyer` model (`pincode`, `stateCode`),
+entered via `BuyerDrawer`. For a buyer without them set yet, `fromInvoice.ts`
+falls back to guessing a PIN from the free-text address snapshot — good enough
+to flag "needs an e-way bill" but not reliable enough to export without a
+warning, so the E-way Bills page also lists which buyers are missing them.
 
 Tests: `npm test`.
 
@@ -52,9 +66,13 @@ Known inconsistencies in the official files, and the choice made:
 
 - PIN → state uses prefix ranges, not NIC's PIN master; it catches clear
   mismatches only. Ambiguous prefixes accept any candidate state.
-- The portal's PIN-to-PIN distance isn't available offline. Leave distance `0`
-  (the official tool does this too) to let the portal calculate it, or pass
-  `estimateDistanceKm` to `validateEwayInput` from a distance source.
+- Distance is always sent as `0`. NIC's `generate-eway-bill` API docs confirm
+  this is a documented instruction meaning "use your own PIN-to-PIN distance",
+  not a workaround — a non-zero distance is only accepted within ±10% of the
+  portal's stored figure anyway (enforced in `validate.ts` if you ever pass a
+  real one via `estimateDistanceKm`), so there's nothing to gain by estimating
+  it ourselves. If the portal ever rejects 0 for a specific route (its distance
+  database has no entry for that PIN pair), fix that one bill on the portal.
 - Intra-state limits other than ₹50,000 come from secondary sources; verify.
 - Not modelled: goods exempt from e-way bills; multiple invoices in one vehicle
   summing towards the limit.
