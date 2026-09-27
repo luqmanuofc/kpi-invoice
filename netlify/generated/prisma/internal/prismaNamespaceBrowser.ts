@@ -83,6 +83,8 @@ export const BuyerScalarFieldEnum = {
   address: 'address',
   gstin: 'gstin',
   phone: 'phone',
+  pincode: 'pincode',
+  stateCode: 'stateCode',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

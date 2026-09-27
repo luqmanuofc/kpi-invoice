@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import type { Buyer } from "../api/buyers";
 import type { Invoice } from "../api/invoices";
 import { toNicUnit } from "./codes";
 import { buildEwayBill, toPortalDate } from "./build";
@@ -52,6 +53,21 @@ function makeInvoice(over: Partial<Invoice> = {}): Invoice {
 }
 // subtotal above = 78000 gross - 500 discount = 77500; tax 9% = 6975.
 
+function makeBuyer(over: Partial<Buyer> = {}): Buyer {
+  return {
+    id: "b1",
+    name: "Bashir Electricals",
+    address: "Lal Chowk, Srinagar 190001",
+    gstin: "01ABCDE1234F1Z5",
+    phone: null,
+    pincode: 190001,
+    stateCode: 1,
+    createdAt: "",
+    updatedAt: "",
+    ...over,
+  };
+}
+
 describe("assessEwayRequirement", () => {
   it("requires a bill only when value is strictly above 50,000", () => {
     const f = (v: number) => assessEwayRequirement({ invoiceValue: v, fromStateCode: 1, toStateCode: 7 }).required;
@@ -67,7 +83,7 @@ describe("assessEwayRequirement", () => {
     expect(assessEwayRequirement({ invoiceValue: 9e6, fromStateCode: 1, toStateCode: 1, isGoods: false }).required).toBe(false);
   });
   it("assesses an invoice using GSTIN-derived states", () => {
-    const r = assessInvoice(makeInvoice());
+    const r = assessInvoice(makeInvoice(), makeBuyer());
     expect(r).toMatchObject({ required: true, intraState: true, threshold: 50_000 });
   });
 });
@@ -107,7 +123,7 @@ describe("codes and helpers", () => {
 });
 
 describe("invoiceToEwayInput / buildEwayBill", () => {
-  const input = invoiceToEwayInput(makeInvoice());
+  const input = invoiceToEwayInput(makeInvoice(), makeBuyer());
   const bill = buildEwayBill(input);
 
   it("produces the expected bulk entry", () => {
@@ -168,10 +184,27 @@ describe("invoiceToEwayInput / buildEwayBill", () => {
     expect(keys.slice(0, 8)).toEqual(["userGstin", "supplyType", "subSupplyType", "docType", "docNo", "docDate", "fromGstin", "fromTrdName"]);
     expect(keys[keys.length - 1]).toBe("itemList");
   });
+
+  it("prefers the buyer record's PIN/state over the address text", () => {
+    const withBuyer = invoiceToEwayInput(
+      makeInvoice({ buyerAddressSnapshot: "Some other address 400001" }),
+      makeBuyer({ pincode: 190001, stateCode: 1 })
+    );
+    expect(withBuyer.to).toMatchObject({ pincode: 190001, stateCode: 1 });
+  });
+
+  it("falls back to guessing from the address when the buyer has no PIN/state set", () => {
+    const withoutBuyer = invoiceToEwayInput(makeInvoice(), makeBuyer({ pincode: null, stateCode: null }));
+    expect(withoutBuyer.to).toMatchObject({ pincode: 190001, stateCode: 1 });
+  });
+
+  it("always sends distance 0, the documented instruction for the portal to calculate it", () => {
+    expect(input.transport.distanceKm).toBe(0);
+  });
 });
 
 describe("validation", () => {
-  const good = () => invoiceToEwayInput(makeInvoice());
+  const good = () => invoiceToEwayInput(makeInvoice(), makeBuyer());
   const errors = (i = good()) => validateEwayInput(i, opts).filter((x) => x.severity === "error");
 
   it("passes a clean invoice", () => {
@@ -186,7 +219,7 @@ describe("validation", () => {
   });
 
   it("flags a missing seller PIN", () => {
-    const i = invoiceToEwayInput(makeInvoice({ sellerAddressSnapshot: "28A-SIDCO SRINAGAR" }));
+    const i = invoiceToEwayInput(makeInvoice({ sellerAddressSnapshot: "28A-SIDCO SRINAGAR" }), makeBuyer());
     expect(errors(i).map((e) => e.field)).toContain("from.pincode");
   });
 
@@ -253,18 +286,18 @@ describe("validation", () => {
 
   it("requires a state for an unregistered buyer, inferring it from the PIN when unambiguous", () => {
     const inv = makeInvoice({ buyerGstinSnapshot: null, buyerAddressSnapshot: "Karol Bagh, Delhi 110005" });
-    const i = invoiceToEwayInput(inv);
+    const i = invoiceToEwayInput(inv, undefined);
     expect(i.to).toMatchObject({ gstin: "URP", stateCode: 7 });
     const inv2 = makeInvoice({ buyerGstinSnapshot: null, buyerAddressSnapshot: "Somewhere" });
-    expect(errors(invoiceToEwayInput(inv2)).map((e) => e.field)).toContain("to.stateCode");
+    expect(errors(invoiceToEwayInput(inv2, undefined)).map((e) => e.field)).toContain("to.stateCode");
   });
 });
 
 describe("prepareBulkExport", () => {
   it("includes only bills without errors", () => {
-    const bad = invoiceToEwayInput(makeInvoice({ invoiceNumber: "2026-27/102" }));
+    const bad = invoiceToEwayInput(makeInvoice({ invoiceNumber: "2026-27/102" }), makeBuyer());
     bad.items[0].hsn = "1";
-    const r = prepareBulkExport([invoiceToEwayInput(makeInvoice()), bad], opts);
+    const r = prepareBulkExport([invoiceToEwayInput(makeInvoice(), makeBuyer()), bad], opts);
     expect(r.includedCount).toBe(1);
     expect(r.file.version).toBe("1.0.0918");
     expect(r.file.billLists.map((b) => b.docNo)).toEqual(["2026-27/101"]);

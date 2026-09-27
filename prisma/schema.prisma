@@ -17,6 +17,12 @@ model Buyer {
   gstin   String?
   phone   String?
 
+  // Ship-to details for e-way bills. The portal validates these against the
+  // GSTIN's registered state, so they're entered once here instead of on
+  // every invoice.
+  pincode   Int?
+  stateCode Int?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

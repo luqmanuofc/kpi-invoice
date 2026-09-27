@@ -8,49 +8,22 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { useInvoicesList } from "@/hooks/useInvoices";
+import { useBuyers } from "@/hooks/useBuyers";
 import type { Invoice } from "@/api/invoices";
-import { STATE_CODES, TRANS_MODE } from "@/eway/codes";
+import type { Buyer } from "@/api/buyers";
 import { prepareBill, prepareBulkExport, type PreparedBill } from "@/eway/export";
-import { assessInvoice, invoiceToEwayInput, type EwayOverrides } from "@/eway/fromInvoice";
+import { assessInvoice, invoiceToEwayInput, type TransportOverrides } from "@/eway/fromInvoice";
 import { normalizeVehicleNo } from "@/eway/gst";
 
-// Per-invoice values the invoice itself doesn't hold.
 interface Draft {
-  buyerPincode: string;
-  buyerStateCode: string;
-  distance: string;
   vehicleNo: string;
   transporterId: string;
 }
 
-// A buyer's PIN rarely changes, so remember it per buyer across sessions.
-const pinKey = (buyerId: string) => `eway.buyerPincode.${buyerId}`;
-function readSavedPin(buyerId: string): string {
-  try {
-    return localStorage.getItem(pinKey(buyerId)) ?? "";
-  } catch {
-    return "";
-  }
-}
-function savePin(buyerId: string, pin: string) {
-  try {
-    if (pin) localStorage.setItem(pinKey(buyerId), pin);
-  } catch {
-    /* storage unavailable; the PIN just isn't remembered */
-  }
-}
-
-function overridesFrom(inv: Invoice, d: Draft | undefined): EwayOverrides {
-  const pin = d?.buyerPincode ?? readSavedPin(inv.buyerId);
+function transportFrom(inv: Invoice, d: Draft | undefined): TransportOverrides {
   return {
-    buyerPincode: pin ? Number(pin) : undefined,
-    buyerStateCode: d?.buyerStateCode ? Number(d.buyerStateCode) : undefined,
-    transport: {
-      mode: TRANS_MODE.ROAD,
-      distanceKm: d?.distance ? Number(d.distance) : 0,
-      vehicleNo: d?.vehicleNo ?? inv.vehicleNumber ?? "",
-      transporterId: d?.transporterId ?? "",
-    },
+    vehicleNo: d?.vehicleNo ?? inv.vehicleNumber ?? "",
+    transporterId: d?.transporterId ?? "",
   };
 }
 
@@ -69,27 +42,30 @@ export default function EwayBillsPage() {
     endDate,
     status: ["pending", "paid", "cheque_issued"],
   });
+  const { data: buyers } = useBuyers();
+  const buyersById = useMemo(() => {
+    const m = new Map<string, Buyer>();
+    for (const b of buyers ?? []) m.set(b.id, b);
+    return m;
+  }, [buyers]);
 
   const rows = useMemo(() => {
     return (data?.invoices ?? [])
       .map((inv) => {
-        const o = overridesFrom(inv, drafts[inv.id]);
-        const req = assessInvoice(inv, o);
-        const prepared: PreparedBill = prepareBill(invoiceToEwayInput(inv, o), { today });
-        return { inv, req, prepared };
+        const buyer = buyersById.get(inv.buyerId);
+        const req = assessInvoice(inv, buyer);
+        const prepared: PreparedBill = prepareBill(
+          invoiceToEwayInput(inv, buyer, transportFrom(inv, drafts[inv.id])),
+          { today }
+        );
+        return { inv, buyer, req, prepared };
       })
       .filter((r) => showAll || r.req.required);
-  }, [data, drafts, showAll, today]);
+  }, [data, buyersById, drafts, showAll, today]);
 
   const setDraft = (inv: Invoice, patch: Partial<Draft>) =>
     setDrafts((prev) => {
-      const cur: Draft = prev[inv.id] ?? {
-        buyerPincode: readSavedPin(inv.buyerId),
-        buyerStateCode: "",
-        distance: "",
-        vehicleNo: inv.vehicleNumber ?? "",
-        transporterId: "",
-      };
+      const cur: Draft = prev[inv.id] ?? { vehicleNo: inv.vehicleNumber ?? "", transporterId: "" };
       return { ...prev, [inv.id]: { ...cur, ...patch } };
     });
 
@@ -104,6 +80,10 @@ export default function EwayBillsPage() {
     a.click();
     URL.revokeObjectURL(a.href);
   };
+
+  const buyersMissingPin = new Set(
+    rows.filter((r) => !r.buyer?.pincode || !r.buyer?.stateCode).map((r) => r.inv.buyerNameSnapshot)
+  );
 
   return (
     <div className="w-full h-full p-4 md:p-8 space-y-4">
@@ -129,6 +109,13 @@ export default function EwayBillsPage() {
         </label>
       </div>
 
+      {buyersMissingPin.size > 0 && (
+        <Alert>
+          Missing ship-to PIN/state for: {[...buyersMissingPin].join(", ")}. Add it once on
+          each buyer's Edit form — see the "Ship-to PIN code" field.
+        </Alert>
+      )}
+
       {error && <Alert variant="destructive">{error instanceof Error ? error.message : "Failed to load invoices"}</Alert>}
       {isLoading && <Loader2 className="h-6 w-6 animate-spin mx-auto" />}
       {!isLoading && rows.length === 0 && (
@@ -143,7 +130,6 @@ export default function EwayBillsPage() {
       {rows.map(({ inv, req, prepared }) => {
         const d = drafts[inv.id];
         const problems = prepared.issues.filter((i) => i.severity !== "info");
-        const buyerState = prepared.input.to.stateCode;
         return (
           <Card key={inv.id}>
             <CardContent className="space-y-3 pt-4">
@@ -172,47 +158,14 @@ export default function EwayBillsPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
-                <Input
-                  placeholder="Buyer PIN"
-                  inputMode="numeric"
-                  maxLength={6}
-                  value={d?.buyerPincode ?? String(prepared.input.to.pincode ?? "")}
-                  onChange={(e) => {
-                    const v = e.target.value.replace(/\D/g, "");
-                    setDraft(inv, { buyerPincode: v });
-                    if (v.length === 6) savePin(inv.buyerId, v);
-                  }}
-                />
-                {buyerState === null || d?.buyerStateCode ? (
-                  <select
-                    className="h-9 rounded-md border bg-transparent px-2 text-sm"
-                    value={d?.buyerStateCode ?? ""}
-                    onChange={(e) => setDraft(inv, { buyerStateCode: e.target.value })}
-                  >
-                    <option value="">Buyer state…</option>
-                    {Object.entries(STATE_CODES).map(([code, name]) => (
-                      <option key={code} value={code}>{code} {name}</option>
-                    ))}
-                  </select>
-                ) : (
-                  <div className="h-9 flex items-center text-sm text-muted-foreground">
-                    State {buyerState} {STATE_CODES[buyerState]}
-                  </div>
-                )}
-                <Input
-                  placeholder="Distance km (0 = auto)"
-                  inputMode="numeric"
-                  value={d?.distance ?? ""}
-                  onChange={(e) => setDraft(inv, { distance: e.target.value.replace(/\D/g, "") })}
-                />
+              <div className="grid grid-cols-2 md:grid-cols-2 gap-2">
                 <Input
                   placeholder="Vehicle no."
                   value={d?.vehicleNo ?? inv.vehicleNumber ?? ""}
                   onChange={(e) => setDraft(inv, { vehicleNo: normalizeVehicleNo(e.target.value) })}
                 />
                 <Input
-                  placeholder="Transporter GSTIN"
+                  placeholder="Transporter GSTIN (if not self-transporting)"
                   maxLength={15}
                   value={d?.transporterId ?? ""}
                   onChange={(e) => setDraft(inv, { transporterId: e.target.value.toUpperCase() })}

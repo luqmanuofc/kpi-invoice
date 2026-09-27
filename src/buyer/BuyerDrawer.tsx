@@ -19,6 +19,18 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { STATE_CODES } from "@/eway/codes";
+
+// react-hook-form needs controlled string inputs; pincode/stateCode are
+// converted to numbers (or null) only when submitting.
+interface BuyerFormValues {
+  name: string;
+  address: string;
+  gstin?: string;
+  phone?: string;
+  pincode: string;
+  stateCode: string;
+}
 
 interface BuyerDrawerProps {
   open: boolean;
@@ -54,9 +66,18 @@ export default function BuyerDrawer({
     setError(null);
   }, [mode, buyerId, open]);
 
-  const handleSubmit = async (data: BuyerFormData) => {
+  const handleSubmit = async (values: BuyerFormValues) => {
     setIsLoading(true);
     setError(null);
+
+    const data: BuyerFormData = {
+      name: values.name,
+      address: values.address,
+      gstin: values.gstin,
+      phone: values.phone,
+      pincode: values.pincode.trim() ? Number(values.pincode) : null,
+      stateCode: values.stateCode ? Number(values.stateCode) : null,
+    };
 
     try {
       let result;
@@ -96,7 +117,7 @@ export default function BuyerDrawer({
     handleSubmit: formSubmit,
     formState: { errors },
     reset,
-  } = useForm<BuyerFormData>();
+  } = useForm<BuyerFormValues>();
 
   useEffect(() => {
     if (!open) return;
@@ -107,6 +128,8 @@ export default function BuyerDrawer({
         address: buyer.address,
         gstin: buyer.gstin || "",
         phone: buyer.phone || "",
+        pincode: buyer.pincode ? String(buyer.pincode) : "",
+        stateCode: buyer.stateCode ? String(buyer.stateCode) : "",
       });
     } else if (mode === "create") {
       reset({
@@ -114,6 +137,8 @@ export default function BuyerDrawer({
         address: "",
         gstin: "",
         phone: "",
+        pincode: "",
+        stateCode: "",
       });
     }
   }, [buyer, mode, open, reset]);
@@ -229,6 +254,52 @@ export default function BuyerDrawer({
                   </p>
                 )}
               </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="pincode">Ship-to PIN code</Label>
+                  <Input
+                    id="pincode"
+                    inputMode="numeric"
+                    maxLength={6}
+                    {...register("pincode", {
+                      validate: (value) => {
+                        if (!value || value.trim() === "") return true;
+                        return /^[1-9]\d{5}$/.test(value.trim())
+                          ? true
+                          : "Enter a 6 digit PIN code or leave empty";
+                      },
+                    })}
+                    className={errors.pincode ? "border-destructive" : ""}
+                  />
+                  {errors.pincode && (
+                    <p className="text-sm text-destructive">
+                      {errors.pincode.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="stateCode">Ship-to state</Label>
+                  <select
+                    id="stateCode"
+                    {...register("stateCode")}
+                    className="h-9 w-full rounded-md border bg-transparent px-3 text-sm dark:bg-input/30"
+                  >
+                    <option value="">Select state...</option>
+                    {Object.entries(STATE_CODES).map(([code, name]) => (
+                      <option key={code} value={code}>
+                        {name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground -mt-4">
+                Used only for e-way bills: the PIN code and state goods are
+                shipped to. Fill this in once and every future invoice for
+                this buyer reuses it.
+              </p>
             </div>
 
             <div className="flex justify-end w-full">

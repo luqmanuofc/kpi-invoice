@@ -178,6 +178,8 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
         address: invoice.buyerAddressSnapshot,
         gstin: invoice.buyerGstinSnapshot,
         phone: invoice.buyerPhoneSnapshot,
+        pincode: null, // Not in the invoice snapshot; re-fetched from the buyer if needed
+        stateCode: null,
         createdAt: "", // Not needed for form
         updatedAt: "", // Not needed for form
       },

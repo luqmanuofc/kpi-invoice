@@ -1,3 +1,4 @@
+import type { Buyer } from "../api/buyers";
 import type { Invoice } from "../api/invoices";
 import { round2 } from "./build";
 import { EWAY_SELLER } from "./config";
@@ -7,14 +8,13 @@ import { extractPincode, inferStateFromPincode } from "./pincode";
 import { assessEwayRequirement, type EwayRequirement } from "./requirement";
 import type { EwayInput, EwayParty, EwayTransport } from "./types";
 
-/** Facts the invoice doesn't carry, supplied per bill (e.g. from the export UI). */
-export interface EwayOverrides {
-  buyerPincode?: number | null;
-  buyerStateCode?: number | null;
-  buyerPlace?: string;
-  sellerPincode?: number | null;
-  transport?: Partial<EwayTransport>;
-}
+/**
+ * Per-shipment transport details, entered on the E-way Bills page. Everything
+ * about the parties (PIN, state) comes from the Buyer record instead, since
+ * bulk upload needs it correct in the file up front and it rarely changes
+ * per invoice -- see [[EWAY_BILL.md]].
+ */
+export type TransportOverrides = Partial<EwayTransport>;
 
 function splitAddress(address: string): [string, string] {
   const a = address.replace(/\s+/g, " ").trim();
@@ -30,13 +30,18 @@ function guessPlace(address: string): string {
   return (parts[parts.length - 1] ?? "").slice(0, 50);
 }
 
-function buyerParty(inv: Invoice, o: EwayOverrides): EwayParty {
+/**
+ * The buyer's ship-to details. Prefers the one-time-entered Buyer record
+ * (pincode/stateCode); falls back to guessing from the free-text address
+ * snapshot for buyers that haven't been updated with that yet.
+ */
+function buyerParty(inv: Invoice, buyer: Buyer | undefined): EwayParty {
   const gstin = (inv.buyerGstinSnapshot ?? "").trim().toUpperCase() || URP;
   const address = inv.buyerAddressSnapshot ?? "";
-  const pincode = o.buyerPincode ?? extractPincode(address);
+  const pincode = buyer?.pincode ?? extractPincode(address);
   const stateCode =
     stateCodeFromGstin(gstin) ??
-    o.buyerStateCode ??
+    buyer?.stateCode ??
     (pincode !== null ? inferStateFromPincode(pincode) : null);
   const [address1, address2] = splitAddress(address);
   return {
@@ -44,14 +49,14 @@ function buyerParty(inv: Invoice, o: EwayOverrides): EwayParty {
     name: inv.buyerNameSnapshot,
     address1,
     address2,
-    place: o.buyerPlace ?? guessPlace(address),
+    place: guessPlace(address),
     pincode,
     stateCode,
     actualStateCode: stateCode,
   };
 }
 
-function sellerParty(inv: Invoice, o: EwayOverrides): EwayParty {
+function sellerParty(inv: Invoice): EwayParty {
   const gstin = inv.sellerGstinSnapshot.trim().toUpperCase();
   const stateCode = stateCodeFromGstin(gstin);
   const [address1, address2] = splitAddress(inv.sellerAddressSnapshot);
@@ -61,7 +66,7 @@ function sellerParty(inv: Invoice, o: EwayOverrides): EwayParty {
     address1,
     address2,
     place: EWAY_SELLER.place,
-    pincode: o.sellerPincode ?? extractPincode(inv.sellerAddressSnapshot) ?? EWAY_SELLER.pincode,
+    pincode: extractPincode(inv.sellerAddressSnapshot) ?? EWAY_SELLER.pincode,
     stateCode,
     actualStateCode: stateCode,
   };
@@ -80,15 +85,19 @@ function taxableAmounts(inv: Invoice): number[] {
   return out;
 }
 
-export function invoiceToEwayInput(inv: Invoice, o: EwayOverrides = {}): EwayInput {
+export function invoiceToEwayInput(
+  inv: Invoice,
+  buyer: Buyer | undefined,
+  transport: TransportOverrides = {}
+): EwayInput {
   const docDate = inv.date.slice(0, 10);
   const amounts = taxableAmounts(inv);
   return {
     userGstin: inv.sellerGstinSnapshot.trim().toUpperCase(),
     docNo: inv.invoiceNumber,
     docDate,
-    from: sellerParty(inv, o),
-    to: buyerParty(inv, o),
+    from: sellerParty(inv),
+    to: buyerParty(inv, buyer),
     items: (inv.items ?? []).map((it, i) => ({
       description: it.description,
       hsn: it.hsn,
@@ -105,6 +114,10 @@ export function invoiceToEwayInput(inv: Invoice, o: EwayOverrides = {}): EwayInp
     totInvValue: inv.total,
     transport: {
       mode: TRANS_MODE.ROAD,
+      // Always 0: an official, documented instruction to NIC's system to
+      // substitute its own PIN-to-PIN distance (see EWAY_BILL.md). Only
+      // override this for a specific bill if the portal itself rejects 0
+      // for that route -- there's no way to know that in advance.
       distanceKm: 0,
       vehicleNo: inv.vehicleNumber ?? "",
       vehicleType: VEHICLE_TYPE.REGULAR,
@@ -112,16 +125,16 @@ export function invoiceToEwayInput(inv: Invoice, o: EwayOverrides = {}): EwayInp
       transporterName: "",
       transDocNo: "",
       transDocDate: docDate,
-      ...o.transport,
+      ...transport,
     },
   };
 }
 
 /** Does this invoice need an e-way bill? (All products here are goods.) */
-export function assessInvoice(inv: Invoice, o: EwayOverrides = {}): EwayRequirement {
+export function assessInvoice(inv: Invoice, buyer: Buyer | undefined): EwayRequirement {
   return assessEwayRequirement({
     invoiceValue: inv.total,
     fromStateCode: stateCodeFromGstin(inv.sellerGstinSnapshot),
-    toStateCode: buyerParty(inv, o).stateCode,
+    toStateCode: buyerParty(inv, buyer).stateCode,
   });
 }

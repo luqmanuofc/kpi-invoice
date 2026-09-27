@@ -19,9 +19,15 @@ import type { EwayBill, EwayInput, EwayIssue, EwayParty } from "./types";
 export const TOTAL_TOLERANCE = 1;
 // Max per-invoice difference between stated tax and taxable x rate.
 export const TAX_TOLERANCE = 1;
-// The portal rejects a distance well above its own PIN-to-PIN figure. Its exact
-// tolerance isn't in the official files; ~10% is what NIC's FAQs describe.
+// Confirmed in NIC's e-way bill generation API docs (generate-eway-bill.html):
+// a non-zero distance is only accepted within +-10% of the portal's own
+// PIN-to-PIN distance (or, when that stored distance is under 100km, within
+// +10% of it). Passing 0 instead means "use the portal's own distance" and is
+// always accepted, which is why the app never sends a non-zero distance.
 export const DISTANCE_TOLERANCE = 0.1;
+// Same rule: if fromPincode === toPincode, distance can't exceed this (300 for
+// Line Sales, not modelled here since this app only builds outward-supply bills).
+export const MAX_SAME_PINCODE_DISTANCE_KM = 100;
 export const MAX_ITEMS_PER_BILL = 250;
 
 export interface ValidateOptions {
@@ -166,6 +172,8 @@ export function validateEwayInput(input: EwayInput, opts: ValidateOptions): Eway
     out.push(err("transport.distanceKm", `Distance must be a whole number from 0 to ${MAX_DISTANCE_KM}`));
   } else if (t.distanceKm === 0) {
     out.push(info("transport.distanceKm", "Distance 0: the portal calculates it from the PIN codes"));
+  } else if (from.pincode && to.pincode && from.pincode === to.pincode && t.distanceKm > MAX_SAME_PINCODE_DISTANCE_KM) {
+    out.push(err("transport.distanceKm", `Same PIN code on both ends: distance can't exceed ${MAX_SAME_PINCODE_DISTANCE_KM} km`));
   } else if (opts.estimateDistanceKm && from.pincode && to.pincode) {
     const est = opts.estimateDistanceKm(from.pincode, to.pincode);
     if (est !== undefined && est > 0) {

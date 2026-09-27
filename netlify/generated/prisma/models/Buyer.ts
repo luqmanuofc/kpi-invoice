@@ -20,8 +20,20 @@ export type BuyerModel = runtime.Types.Result.DefaultSelection<Prisma.$BuyerPayl
 
 export type AggregateBuyer = {
   _count: BuyerCountAggregateOutputType | null
+  _avg: BuyerAvgAggregateOutputType | null
+  _sum: BuyerSumAggregateOutputType | null
   _min: BuyerMinAggregateOutputType | null
   _max: BuyerMaxAggregateOutputType | null
+}
+
+export type BuyerAvgAggregateOutputType = {
+  pincode: number | null
+  stateCode: number | null
+}
+
+export type BuyerSumAggregateOutputType = {
+  pincode: number | null
+  stateCode: number | null
 }
 
 export type BuyerMinAggregateOutputType = {
@@ -30,6 +42,8 @@ export type BuyerMinAggregateOutputType = {
   address: string | null
   gstin: string | null
   phone: string | null
+  pincode: number | null
+  stateCode: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -40,6 +54,8 @@ export type BuyerMaxAggregateOutputType = {
   address: string | null
   gstin: string | null
   phone: string | null
+  pincode: number | null
+  stateCode: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -50,11 +66,23 @@ export type BuyerCountAggregateOutputType = {
   address: number
   gstin: number
   phone: number
+  pincode: number
+  stateCode: number
   createdAt: number
   updatedAt: number
   _all: number
 }
 
+
+export type BuyerAvgAggregateInputType = {
+  pincode?: true
+  stateCode?: true
+}
+
+export type BuyerSumAggregateInputType = {
+  pincode?: true
+  stateCode?: true
+}
 
 export type BuyerMinAggregateInputType = {
   id?: true
@@ -62,6 +90,8 @@ export type BuyerMinAggregateInputType = {
   address?: true
   gstin?: true
   phone?: true
+  pincode?: true
+  stateCode?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -72,6 +102,8 @@ export type BuyerMaxAggregateInputType = {
   address?: true
   gstin?: true
   phone?: true
+  pincode?: true
+  stateCode?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -82,6 +114,8 @@ export type BuyerCountAggregateInputType = {
   address?: true
   gstin?: true
   phone?: true
+  pincode?: true
+  stateCode?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -125,6 +159,18 @@ export type BuyerAggregateArgs<ExtArgs extends runtime.Types.Extensions.Internal
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: BuyerAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: BuyerSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: BuyerMinAggregateInputType
@@ -155,6 +201,8 @@ export type BuyerGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
   take?: number
   skip?: number
   _count?: BuyerCountAggregateInputType | true
+  _avg?: BuyerAvgAggregateInputType
+  _sum?: BuyerSumAggregateInputType
   _min?: BuyerMinAggregateInputType
   _max?: BuyerMaxAggregateInputType
 }
@@ -165,9 +213,13 @@ export type BuyerGroupByOutputType = {
   address: string
   gstin: string | null
   phone: string | null
+  pincode: number | null
+  stateCode: number | null
   createdAt: Date
   updatedAt: Date
   _count: BuyerCountAggregateOutputType | null
+  _avg: BuyerAvgAggregateOutputType | null
+  _sum: BuyerSumAggregateOutputType | null
   _min: BuyerMinAggregateOutputType | null
   _max: BuyerMaxAggregateOutputType | null
 }
@@ -196,6 +248,8 @@ export type BuyerWhereInput = {
   address?: Prisma.StringFilter<"Buyer"> | string
   gstin?: Prisma.StringNullableFilter<"Buyer"> | string | null
   phone?: Prisma.StringNullableFilter<"Buyer"> | string | null
+  pincode?: Prisma.IntNullableFilter<"Buyer"> | number | null
+  stateCode?: Prisma.IntNullableFilter<"Buyer"> | number | null
   createdAt?: Prisma.DateTimeFilter<"Buyer"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Buyer"> | Date | string
   invoices?: Prisma.InvoiceListRelationFilter
@@ -207,6 +261,8 @@ export type BuyerOrderByWithRelationInput = {
   address?: Prisma.SortOrder
   gstin?: Prisma.SortOrderInput | Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
+  pincode?: Prisma.SortOrderInput | Prisma.SortOrder
+  stateCode?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   invoices?: Prisma.InvoiceOrderByRelationAggregateInput
@@ -221,6 +277,8 @@ export type BuyerWhereUniqueInput = Prisma.AtLeast<{
   address?: Prisma.StringFilter<"Buyer"> | string
   gstin?: Prisma.StringNullableFilter<"Buyer"> | string | null
   phone?: Prisma.StringNullableFilter<"Buyer"> | string | null
+  pincode?: Prisma.IntNullableFilter<"Buyer"> | number | null
+  stateCode?: Prisma.IntNullableFilter<"Buyer"> | number | null
   createdAt?: Prisma.DateTimeFilter<"Buyer"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Buyer"> | Date | string
   invoices?: Prisma.InvoiceListRelationFilter
@@ -232,11 +290,15 @@ export type BuyerOrderByWithAggregationInput = {
   address?: Prisma.SortOrder
   gstin?: Prisma.SortOrderInput | Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
+  pincode?: Prisma.SortOrderInput | Prisma.SortOrder
+  stateCode?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.BuyerCountOrderByAggregateInput
+  _avg?: Prisma.BuyerAvgOrderByAggregateInput
   _max?: Prisma.BuyerMaxOrderByAggregateInput
   _min?: Prisma.BuyerMinOrderByAggregateInput
+  _sum?: Prisma.BuyerSumOrderByAggregateInput
 }
 
 export type BuyerScalarWhereWithAggregatesInput = {
@@ -248,6 +310,8 @@ export type BuyerScalarWhereWithAggregatesInput = {
   address?: Prisma.StringWithAggregatesFilter<"Buyer"> | string
   gstin?: Prisma.StringNullableWithAggregatesFilter<"Buyer"> | string | null
   phone?: Prisma.StringNullableWithAggregatesFilter<"Buyer"> | string | null
+  pincode?: Prisma.IntNullableWithAggregatesFilter<"Buyer"> | number | null
+  stateCode?: Prisma.IntNullableWithAggregatesFilter<"Buyer"> | number | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Buyer"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Buyer"> | Date | string
 }
@@ -258,6 +322,8 @@ export type BuyerCreateInput = {
   address: string
   gstin?: string | null
   phone?: string | null
+  pincode?: number | null
+  stateCode?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   invoices?: Prisma.InvoiceCreateNestedManyWithoutBuyerInput
@@ -269,6 +335,8 @@ export type BuyerUncheckedCreateInput = {
   address: string
   gstin?: string | null
   phone?: string | null
+  pincode?: number | null
+  stateCode?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutBuyerInput
@@ -280,6 +348,8 @@ export type BuyerUpdateInput = {
   address?: Prisma.StringFieldUpdateOperationsInput | string
   gstin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pincode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  stateCode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   invoices?: Prisma.InvoiceUpdateManyWithoutBuyerNestedInput
@@ -291,6 +361,8 @@ export type BuyerUncheckedUpdateInput = {
   address?: Prisma.StringFieldUpdateOperationsInput | string
   gstin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pincode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  stateCode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutBuyerNestedInput
@@ -302,6 +374,8 @@ export type BuyerCreateManyInput = {
   address: string
   gstin?: string | null
   phone?: string | null
+  pincode?: number | null
+  stateCode?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -312,6 +386,8 @@ export type BuyerUpdateManyMutationInput = {
   address?: Prisma.StringFieldUpdateOperationsInput | string
   gstin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pincode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  stateCode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -322,6 +398,8 @@ export type BuyerUncheckedUpdateManyInput = {
   address?: Prisma.StringFieldUpdateOperationsInput | string
   gstin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pincode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  stateCode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -332,8 +410,15 @@ export type BuyerCountOrderByAggregateInput = {
   address?: Prisma.SortOrder
   gstin?: Prisma.SortOrder
   phone?: Prisma.SortOrder
+  pincode?: Prisma.SortOrder
+  stateCode?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type BuyerAvgOrderByAggregateInput = {
+  pincode?: Prisma.SortOrder
+  stateCode?: Prisma.SortOrder
 }
 
 export type BuyerMaxOrderByAggregateInput = {
@@ -342,6 +427,8 @@ export type BuyerMaxOrderByAggregateInput = {
   address?: Prisma.SortOrder
   gstin?: Prisma.SortOrder
   phone?: Prisma.SortOrder
+  pincode?: Prisma.SortOrder
+  stateCode?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -352,8 +439,15 @@ export type BuyerMinOrderByAggregateInput = {
   address?: Prisma.SortOrder
   gstin?: Prisma.SortOrder
   phone?: Prisma.SortOrder
+  pincode?: Prisma.SortOrder
+  stateCode?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type BuyerSumOrderByAggregateInput = {
+  pincode?: Prisma.SortOrder
+  stateCode?: Prisma.SortOrder
 }
 
 export type BuyerScalarRelationFilter = {
@@ -367,6 +461,14 @@ export type StringFieldUpdateOperationsInput = {
 
 export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
+}
+
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
 }
 
 export type DateTimeFieldUpdateOperationsInput = {
@@ -393,6 +495,8 @@ export type BuyerCreateWithoutInvoicesInput = {
   address: string
   gstin?: string | null
   phone?: string | null
+  pincode?: number | null
+  stateCode?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -403,6 +507,8 @@ export type BuyerUncheckedCreateWithoutInvoicesInput = {
   address: string
   gstin?: string | null
   phone?: string | null
+  pincode?: number | null
+  stateCode?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -429,6 +535,8 @@ export type BuyerUpdateWithoutInvoicesInput = {
   address?: Prisma.StringFieldUpdateOperationsInput | string
   gstin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pincode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  stateCode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -439,6 +547,8 @@ export type BuyerUncheckedUpdateWithoutInvoicesInput = {
   address?: Prisma.StringFieldUpdateOperationsInput | string
   gstin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pincode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  stateCode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -480,6 +590,8 @@ export type BuyerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   address?: boolean
   gstin?: boolean
   phone?: boolean
+  pincode?: boolean
+  stateCode?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   invoices?: boolean | Prisma.Buyer$invoicesArgs<ExtArgs>
@@ -492,6 +604,8 @@ export type BuyerSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   address?: boolean
   gstin?: boolean
   phone?: boolean
+  pincode?: boolean
+  stateCode?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["buyer"]>
@@ -502,6 +616,8 @@ export type BuyerSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   address?: boolean
   gstin?: boolean
   phone?: boolean
+  pincode?: boolean
+  stateCode?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["buyer"]>
@@ -512,11 +628,13 @@ export type BuyerSelectScalar = {
   address?: boolean
   gstin?: boolean
   phone?: boolean
+  pincode?: boolean
+  stateCode?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type BuyerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "address" | "gstin" | "phone" | "createdAt" | "updatedAt", ExtArgs["result"]["buyer"]>
+export type BuyerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "address" | "gstin" | "phone" | "pincode" | "stateCode" | "createdAt" | "updatedAt", ExtArgs["result"]["buyer"]>
 export type BuyerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   invoices?: boolean | Prisma.Buyer$invoicesArgs<ExtArgs>
   _count?: boolean | Prisma.BuyerCountOutputTypeDefaultArgs<ExtArgs>
@@ -535,6 +653,8 @@ export type $BuyerPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     address: string
     gstin: string | null
     phone: string | null
+    pincode: number | null
+    stateCode: number | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["buyer"]>
@@ -966,6 +1086,8 @@ export interface BuyerFieldRefs {
   readonly address: Prisma.FieldRef<"Buyer", 'String'>
   readonly gstin: Prisma.FieldRef<"Buyer", 'String'>
   readonly phone: Prisma.FieldRef<"Buyer", 'String'>
+  readonly pincode: Prisma.FieldRef<"Buyer", 'Int'>
+  readonly stateCode: Prisma.FieldRef<"Buyer", 'Int'>
   readonly createdAt: Prisma.FieldRef<"Buyer", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Buyer", 'DateTime'>
 }

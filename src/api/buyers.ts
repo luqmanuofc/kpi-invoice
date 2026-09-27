@@ -6,6 +6,8 @@ export interface Buyer {
   address: string;
   gstin: string | null;
   phone: string | null;
+  pincode: number | null;
+  stateCode: number | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -15,6 +17,8 @@ export interface BuyerFormData {
   address: string;
   gstin?: string;
   phone?: string;
+  pincode?: number | null;
+  stateCode?: number | null;
 }
 
 export async function createBuyer(data: BuyerFormData) {
