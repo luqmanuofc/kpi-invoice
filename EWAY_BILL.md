@@ -28,7 +28,7 @@ API later.
 | `build.ts` | invoice → bulk entry, `dd/mm/yyyy` dates, text cleaning |
 | `export.ts` | validate a batch, emit JSON for the bills that pass |
 | `fromInvoice.ts` | app `Invoice` (+ `Buyer`) → `EwayInput` (discount spread over items, unit mapping) |
-| `config.ts` | **seller PIN code — must be set before any bill will validate** |
+| `config.ts` | seller PIN code (190017, confirmed against a real accepted bill) |
 
 Buyer ship-to PIN/state live on the `Buyer` model (`pincode`, `stateCode`),
 entered via `BuyerDrawer`. For a buyer without them set yet, `fromInvoice.ts`
@@ -61,6 +61,19 @@ Known inconsistencies in the official files, and the choice made:
 2. Optionally check payloads on a GSP sandbox (e.g. MasterGST).
 3. First live upload with a real shipment. Rejected entries create nothing; a
    wrongly generated bill can be cancelled within 24 hours.
+
+Already done once, informally: cross-checked the exporter's output against two
+real e-way bills the user generated manually (a `CommonReport.xls` export from
+the portal, matched read-only against prod to find the source invoices). This
+is what confirmed the seller PIN and caught the `OthValue` rounding issue
+above -- worth repeating against step 1's proper diff before the first bulk
+upload, since this was informal and only checked two intra-state, single-HSN
+bills.
+
+**Not yet deployed:** the `pincode`/`stateCode` columns this feature depends on
+(see below) exist on this branch's migration but haven't been applied to prod
+yet -- confirmed by querying prod's `Buyer` table directly. Deploy + migrate
+before relying on buyer ship-to data in production.
 
 ## Limits
 
