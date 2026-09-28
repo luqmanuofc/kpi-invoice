@@ -89,3 +89,14 @@ before relying on buyer ship-to data in production.
 - Intra-state limits other than ₹50,000 come from secondary sources; verify.
 - Not modelled: goods exempt from e-way bills; multiple invoices in one vehicle
   summing towards the limit.
+
+## Portal automation (exploratory, not adopted)
+
+`scripts/eway-poc/` is a proof-of-concept for driving the portal directly
+(Playwright + AI-solved captcha + human-entered OTP), stopping one click
+before actual submission. Explored as an alternative to the manual bulk
+upload above. Not integrated into the app, not a decided direction — it
+automates past the captcha the portal puts there specifically to stop
+automation, which is a real (if low-probability) legal/ToS exposure distinct
+from everything else in this file, all of which uses the portal as designed.
+See the script's own README for what it proves and its known gaps.
