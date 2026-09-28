@@ -1,9 +1,11 @@
 import Anthropic from "@anthropic-ai/sdk";
 
+// Shared by scripts/eway-poc and scripts/gstin-lookup.
+//
 // Cheap/fast is fine here -- this is reading ~5-6 distorted characters from a
 // small image, not a task that benefits from Opus-level reasoning. Swap back
 // to "claude-opus-5" if accuracy on your specific captcha style is poor.
-const MODEL_ID = process.env.EWAY_POC_CAPTCHA_MODEL || "claude-haiku-4-5-20251001";
+const MODEL_ID = process.env.CAPTCHA_SOLVE_MODEL || "claude-haiku-4-5-20251001";
 
 const client = new Anthropic(); // reads ANTHROPIC_API_KEY from env
 

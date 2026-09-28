@@ -90,13 +90,27 @@ before relying on buyer ship-to data in production.
 - Not modelled: goods exempt from e-way bills; multiple invoices in one vehicle
   summing towards the limit.
 
-## Portal automation (exploratory, not adopted)
+## Two phases, only one adopted
 
-`scripts/eway-poc/` is a proof-of-concept for driving the portal directly
-(Playwright + AI-solved captcha + human-entered OTP), stopping one click
-before actual submission. Explored as an alternative to the manual bulk
-upload above. Not integrated into the app, not a decided direction — it
-automates past the captcha the portal puts there specifically to stop
-automation, which is a real (if low-probability) legal/ToS exposure distinct
-from everything else in this file, all of which uses the portal as designed.
-See the script's own README for what it proves and its known gaps.
+Split deliberately into two pieces, and only the first is the actual plan:
+
+1. **Generate the bulk-upload document** (this file, `src/eway/`, the E-way
+   Bills page). The app produces the JSON; you upload it to the portal by
+   hand. This is what's built and staying.
+2. **Fully automate the portal** (login, captcha, OTP, submission) —
+   deliberately **not** being pursued. `scripts/eway-poc/` is a
+   proof-of-concept only, kept for reference: it proves login with an
+   AI-solved captcha and a human-entered-OTP pause work technically, and
+   stops one click before actual submission, but it's not integrated into
+   the app and there's no plan to make it so. It automates past the
+   captcha the portal puts there specifically to stop automation — a real
+   (if low-probability) legal/ToS exposure that the rest of this file
+   doesn't carry, since everything else here uses the portal as designed.
+
+**One piece of automation is adopted, and it's neither of the above:**
+`scripts/gstin-lookup/` looks a buyer's GSTIN up on the GST portal's free
+*public* Search Taxpayer tool (no login, no OTP — a public registry lookup,
+not a filing action) and stores the resulting PIN/state on that buyer's row,
+one time, instead of typing it in by hand. It never touches the actual e-way
+bill portal or generates any compliance document — see the script's own
+README.

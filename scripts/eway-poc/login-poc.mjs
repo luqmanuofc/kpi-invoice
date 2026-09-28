@@ -27,7 +27,7 @@
 
 import { chromium } from "playwright";
 import { promptInput } from "./promptInput.mjs";
-import { solveCaptcha } from "./solveCaptcha.mjs";
+import { solveCaptcha } from "../lib/solveCaptcha.mjs";
 
 const LOGIN_URL = "https://ewaybillgst.gov.in/"; // TODO: confirm exact login page URL
 
