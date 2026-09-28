@@ -104,19 +104,20 @@ async function lookupOne(page, gstin) {
   return { legalName, tradeName, address, pincode, stateCode };
 }
 
+const BUYER_COLS = `id, name, gstin, pincode, "stateCode", "gstVerifiedAt"`;
+
 async function fetchBuyers(client, args) {
   if (args.buyerId) {
-    const { rows } = await client.query(
-      `select id, name, gstin, pincode, "stateCode" from "Buyer" where id = $1`,
-      [args.buyerId]
-    );
+    const { rows } = await client.query(`select ${BUYER_COLS} from "Buyer" where id = $1`, [
+      args.buyerId,
+    ]);
     if (rows.length === 0) throw new Error(`No buyer with id ${args.buyerId}`);
     return rows;
   }
-  // --all-missing: every buyer with a GSTIN but no pincode/stateCode yet
+  // --all-missing: every buyer with a GSTIN that hasn't been verified yet
   const { rows } = await client.query(
-    `select id, name, gstin, pincode, "stateCode" from "Buyer"
-     where gstin is not null and gstin <> '' and (pincode is null or "stateCode" is null)
+    `select ${BUYER_COLS} from "Buyer"
+     where gstin is not null and gstin <> '' and "gstVerifiedAt" is null
      order by name`
   );
   return rows;
@@ -152,7 +153,7 @@ async function main() {
 
   const buyers = await fetchBuyers(db, args);
   if (buyers.length === 0) {
-    console.log("No buyers to look up (nothing missing pincode/stateCode, or bad --buyer id).");
+    console.log("No buyers to look up (everyone with a GSTIN is already verified, or bad --buyer id).");
     await db.end();
     return;
   }
@@ -171,21 +172,31 @@ async function main() {
     console.log(`- ${buyer.name} (${buyer.gstin})`);
     try {
       const found = await lookupOne(page, buyer.gstin);
-      console.log(`  found: ${found.legalName ?? found.tradeName ?? "?"}, pincode=${found.pincode}, stateCode=${found.stateCode}`);
+      console.log(`  legal name: ${found.legalName ?? "?"}  trade name: ${found.tradeName ?? "?"}`);
+      console.log(`  address: ${found.address ?? "?"}`);
+      console.log(`  pincode=${found.pincode} stateCode=${found.stateCode}`);
+      if (buyer.name !== (found.legalName ?? found.tradeName)) {
+        console.log(`  note: buyer is saved as "${buyer.name}" here, GST shows a different name -- compare above, not auto-applied.`);
+      }
 
       if (!found.pincode || !found.stateCode) {
+        // Deliberately not marking gstVerifiedAt here -- an incomplete result
+        // isn't a verification, it's a failed one. Re-run once selectors/the
+        // page layout are confirmed correct.
         results.push({ buyer: buyer.name, status: "incomplete result, not saved", detail: JSON.stringify(found) });
         continue;
       }
 
-      await db.query(`update "Buyer" set pincode = $1, "stateCode" = $2 where id = $3`, [
-        found.pincode,
-        found.stateCode,
-        buyer.id,
-      ]);
+      await db.query(
+        `update "Buyer"
+         set pincode = $1, "stateCode" = $2, "gstVerifiedAt" = now(),
+             "gstLegalName" = $3, "gstTradeName" = $4, "gstAddress" = $5
+         where id = $6`,
+        [found.pincode, found.stateCode, found.legalName, found.tradeName, found.address, buyer.id]
+      );
       results.push({
         buyer: buyer.name,
-        status: "saved",
+        status: "verified",
         detail: `pincode ${buyer.pincode ?? "∅"} -> ${found.pincode}, state ${buyer.stateCode ?? "∅"} -> ${found.stateCode}`,
       });
     } catch (err) {

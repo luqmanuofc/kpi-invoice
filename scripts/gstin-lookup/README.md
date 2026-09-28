@@ -1,9 +1,16 @@
-# Buyer PIN/state lookup — one time per buyer
+# Buyer GST verification — one time per buyer
 
 Looks a buyer's GSTIN up on the GST portal's free, public **Search
 Taxpayer** tool (`services.gst.gov.in/services/searchtp` — no login, no OTP,
-just a GSTIN and a captcha) and stores the resulting PIN code and state code
-on that buyer's row, so the E-way Bills page stops asking for them.
+just a GSTIN and a captcha), stores the resulting PIN code and state code on
+that buyer's row, and marks the buyer **verified** (`gstVerifiedAt`). The
+E-way Bills page only offers bulk-JSON generation for verified buyers — see
+[EWAY_BILL.md](../../EWAY_BILL.md).
+
+This is currently phase 1 of a planned two-phase rollout: right now,
+verification only happens by running this script by hand (`--buyer` or
+`--all-missing`). Phase 1.2 (not built) would trigger it automatically from
+the app the moment a GSTIN is entered on the buyer form.
 
 This is deliberately narrower than `scripts/eway-poc/`: it only reads public
 registry data and only writes to our own database. It never touches the
@@ -45,24 +52,35 @@ now, not prod):
 node -r dotenv/config scripts/gstin-lookup/lookup-and-store.mjs --buyer <buyerId>
 ```
 
-or, to sweep every buyer that has a GSTIN but no PIN/state yet:
+or, to sweep every buyer with a GSTIN that isn't verified yet:
 
 ```
 node -r dotenv/config scripts/gstin-lookup/lookup-and-store.mjs --all-missing
 ```
 
-Prints a per-buyer summary table at the end (saved / skipped / failed, with
-the before → after PIN and state for anything it wrote).
+Prints a per-buyer summary table at the end (verified / skipped / failed,
+with the before → after PIN and state for anything it wrote).
 
 ## What it writes
 
-Only `Buyer.pincode` and `Buyer.stateCode` — never `name` or `address`, even
-though the portal also returns a legal/trade name and a full address.
-Deliberate: those are printed to the console for you to eyeball, but not
-written automatically, since your `Buyer.name`/`address` might intentionally
-differ from GST's registered legal name (how you refer to a customer isn't
-necessarily their GST paperwork name) and overwriting them silently seemed
-like the wrong default. Say so if you'd rather it did.
+`Buyer.pincode`, `Buyer.stateCode`, `Buyer.gstVerifiedAt` (set to the time of
+the successful lookup — this is what "verified" means), and the raw values
+the portal returned for reference: `Buyer.gstLegalName`, `Buyer.gstTradeName`,
+`Buyer.gstAddress`.
+
+**Never** `Buyer.name` or `Buyer.address`, even though the portal also
+returns a legal/trade name and a full address that could fill those.
+Deliberate: your working `name`/`address` might intentionally differ from
+GST's registered legal name (how you refer to a customer isn't necessarily
+their GST paperwork name), so this only surfaces the official values
+(console output, and now `gstLegalName`/`gstAddress` on the row) for you to
+compare, rather than silently overwriting what you're already using. Say so
+if you'd rather it did.
+
+A verification is only valid for the GSTIN it ran against —
+`netlify/functions/updateBuyer.ts` clears `gstVerifiedAt` automatically if
+you edit a buyer's GSTIN afterward, so a stale "verified" badge never lingers
+under a changed GSTIN. Re-run this script to re-verify.
 
 ## Known gaps
 

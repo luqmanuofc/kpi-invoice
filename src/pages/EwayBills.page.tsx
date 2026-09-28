@@ -1,16 +1,24 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
-import { Download, Loader2 } from "lucide-react";
+import { Download, Loader2, ShieldAlert } from "lucide-react";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useInvoicesList } from "@/hooks/useInvoices";
 import { useBuyers } from "@/hooks/useBuyers";
 import type { Invoice } from "@/api/invoices";
-import type { Buyer } from "@/api/buyers";
+import { blockedByGstVerification, type Buyer } from "@/api/buyers";
 import { prepareBill, prepareBulkExport, type PreparedBill } from "@/eway/export";
 import { assessInvoice, invoiceToEwayInput, type TransportOverrides } from "@/eway/fromInvoice";
 import { normalizeVehicleNo } from "@/eway/gst";
@@ -28,12 +36,14 @@ function transportFrom(inv: Invoice, d: Draft | undefined): TransportOverrides {
 }
 
 export default function EwayBillsPage() {
+  const navigate = useNavigate();
   const today = dayjs().format("YYYY-MM-DD");
   const [startDate, setStartDate] = useState(dayjs().subtract(7, "day").format("YYYY-MM-DD"));
   const [endDate, setEndDate] = useState(today);
   const [showAll, setShowAll] = useState(false);
   const [drafts, setDrafts] = useState<Record<string, Draft>>({});
   const [selected, setSelected] = useState<Record<string, boolean>>({});
+  const [verifyModalBuyer, setVerifyModalBuyer] = useState<Buyer | null>(null);
 
   const { data, isLoading, error } = useInvoicesList({
     page: 1,
@@ -58,7 +68,8 @@ export default function EwayBillsPage() {
           invoiceToEwayInput(inv, buyer, transportFrom(inv, drafts[inv.id])),
           { today }
         );
-        return { inv, buyer, req, prepared };
+        const needsVerification = blockedByGstVerification(req.required, buyer);
+        return { inv, buyer, req, prepared, needsVerification };
       })
       .filter((r) => showAll || r.req.required);
   }, [data, buyersById, drafts, showAll, today]);
@@ -69,7 +80,11 @@ export default function EwayBillsPage() {
       return { ...prev, [inv.id]: { ...cur, ...patch } };
     });
 
-  const chosen = rows.filter((r) => selected[r.inv.id] && r.prepared.ok);
+  const chosen = rows.filter((r) => selected[r.inv.id] && r.prepared.ok && !r.needsVerification);
+
+  const unverifiedBuyerCount = new Set(
+    rows.filter((r) => r.needsVerification).map((r) => r.buyer!.id)
+  ).size;
 
   const download = () => {
     const { json } = prepareBulkExport(chosen.map((r) => r.prepared.input), { today });
@@ -81,8 +96,12 @@ export default function EwayBillsPage() {
     URL.revokeObjectURL(a.href);
   };
 
+  // Buyers with no GSTIN aren't gated by verification (nothing to verify
+  // against), but they still need PIN/state entered manually on their form.
   const buyersMissingPin = new Set(
-    rows.filter((r) => !r.buyer?.pincode || !r.buyer?.stateCode).map((r) => r.inv.buyerNameSnapshot)
+    rows
+      .filter((r) => !r.buyer?.gstin && (!r.buyer?.pincode || !r.buyer?.stateCode))
+      .map((r) => r.inv.buyerNameSnapshot)
   );
 
   return (
@@ -109,6 +128,15 @@ export default function EwayBillsPage() {
         </label>
       </div>
 
+      {unverifiedBuyerCount > 0 && (
+        <Alert variant="destructive">
+          <ShieldAlert className="h-4 w-4" />
+          {unverifiedBuyerCount} buyer{unverifiedBuyerCount === 1 ? "" : "s"} below need
+          {unverifiedBuyerCount === 1 ? "s" : ""} GST verification before their e-way bills
+          can be generated — run <code className="text-xs">scripts/gstin-lookup</code>.
+        </Alert>
+      )}
+
       {buyersMissingPin.size > 0 && (
         <Alert>
           Missing ship-to PIN/state for: {[...buyersMissingPin].join(", ")}. Add it once on
@@ -127,26 +155,39 @@ export default function EwayBillsPage() {
         <Alert>Only the first 100 invoices in this range are shown; narrow the dates.</Alert>
       )}
 
-      {rows.map(({ inv, req, prepared }) => {
+      {rows.map(({ inv, buyer, req, prepared, needsVerification }) => {
         const d = drafts[inv.id];
         const problems = prepared.issues.filter((i) => i.severity !== "info");
+        const rowReady = prepared.ok && !needsVerification;
         return (
           <Card key={inv.id}>
             <CardContent className="space-y-3 pt-4">
               <div className="flex items-start gap-3">
                 <Checkbox
                   className="mt-1"
-                  disabled={!prepared.ok}
-                  checked={!!selected[inv.id] && prepared.ok}
-                  onCheckedChange={(v) => setSelected((s) => ({ ...s, [inv.id]: v === true }))}
+                  disabled={!prepared.ok && !needsVerification}
+                  checked={!!selected[inv.id] && rowReady}
+                  onCheckedChange={(v) => {
+                    if (needsVerification) {
+                      setVerifyModalBuyer(buyer ?? null);
+                      return;
+                    }
+                    setSelected((s) => ({ ...s, [inv.id]: v === true }));
+                  }}
                 />
                 <div className="grow min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="font-semibold">{inv.invoiceNumber}</span>
                     <span className="text-sm text-muted-foreground">{dayjs(inv.date.slice(0, 10)).format("DD/MM/YYYY")}</span>
-                    <Badge variant={prepared.ok ? "default" : "destructive"}>
-                      {prepared.ok ? "Ready" : "Needs fixes"}
-                    </Badge>
+                    {needsVerification ? (
+                      <Badge variant="destructive">
+                        <ShieldAlert className="h-3 w-3" /> Buyer not verified
+                      </Badge>
+                    ) : (
+                      <Badge variant={prepared.ok ? "default" : "destructive"}>
+                        {prepared.ok ? "Ready" : "Needs fixes"}
+                      </Badge>
+                    )}
                     {!req.required && <Badge variant="outline">Below limit</Badge>}
                   </div>
                   <p className="text-sm truncate">
@@ -185,6 +226,34 @@ export default function EwayBillsPage() {
           </Card>
         );
       })}
+
+      <Dialog open={!!verifyModalBuyer} onOpenChange={(open) => !open && setVerifyModalBuyer(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ShieldAlert className="h-5 w-5 text-destructive" />
+              Please validate GST info for this buyer
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            {verifyModalBuyer?.name} has a GSTIN on file, but it hasn't been
+            confirmed against the government's own records yet. E-way bills
+            can only be generated for buyers whose GST details are verified —
+            run <code className="text-xs">scripts/gstin-lookup</code> for
+            this buyer, then come back here.
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setVerifyModalBuyer(null)}>
+              Close
+            </Button>
+            {verifyModalBuyer && (
+              <Button onClick={() => navigate(`/buyer/${verifyModalBuyer.id}`)}>
+                Go to buyer
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -114,3 +114,29 @@ not a filing action) and stores the resulting PIN/state on that buyer's row,
 one time, instead of typing it in by hand. It never touches the actual e-way
 bill portal or generates any compliance document — see the script's own
 README.
+
+Phase 1.2 (not built): trigger that lookup automatically from the app the
+moment a GSTIN is entered on the buyer form, instead of running the script
+by hand. For now, verification is a manual, deliberate step.
+
+## GST verification gate
+
+A buyer only counts as **verified** once `scripts/gstin-lookup` has
+successfully confirmed their GSTIN against the government's own Search
+Taxpayer data — tracked by `Buyer.gstVerifiedAt` (non-null = verified;
+`isBuyerGstVerified` / `blockedByGstVerification` in `src/api/buyers.ts`).
+Manually typing a PIN/state on the buyer form does **not** count as
+verified, even though the same fields get set either way — verified
+specifically means the values came from the government lookup, not from
+someone typing them in.
+
+The E-way Bills page only allows generating the bulk JSON for **required**
+bills whose buyer is verified. A buyer with no GSTIN (URP) is exempt from
+this gate entirely — there's no registration to verify, so their PIN/state
+stays manual as before. Clicking a blocked row's checkbox opens a modal
+("Please validate GST info for this buyer") instead of selecting it, with a
+link to that buyer's page.
+
+Editing a buyer's GSTIN clears `gstVerifiedAt` (`updateBuyer.ts`) — a
+verification is only valid for the GSTIN it was run against, so changing it
+un-verifies the buyer until `scripts/gstin-lookup` is re-run.

@@ -16,6 +16,7 @@ import { useBuyerInvoices, buyerInvoicesQueryKey } from "@/hooks/useInvoices";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import type { Invoice } from "@/api/invoices";
 import BuyerDrawer from "@/buyer/BuyerDrawer";
+import GstVerifiedBadge from "@/buyer/GstVerifiedBadge";
 import {
   BuyerAnalyticsSummaryCards,
   BuyerAnalyticsDetailCards,
@@ -136,9 +137,15 @@ export default function BuyerDetailPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="gap-2">
           <CardHeader>
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Buyer Info
-            </CardTitle>
+            <div className="flex items-center justify-between gap-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Buyer Info
+              </CardTitle>
+              <GstVerifiedBadge
+                gstin={buyer.gstin}
+                gstVerifiedAt={buyer.gstVerifiedAt}
+              />
+            </div>
           </CardHeader>
           <CardContent className="grow space-y-2">
             <p className="text-sm text-muted-foreground text-left">
@@ -150,6 +157,18 @@ export default function BuyerDetailPage() {
             <p className="text-sm text-muted-foreground text-left">
               <strong>Phone:</strong> {buyer.phone || "—"}
             </p>
+            {buyer.gstin && !buyer.gstVerifiedAt && (
+              <p className="text-sm text-amber-700 dark:text-amber-500 text-left">
+                Not verified against GST records yet — e-way bills can't be
+                generated for this buyer until it is. Run{" "}
+                <code className="text-xs">scripts/gstin-lookup</code>.
+              </p>
+            )}
+            {buyer.gstVerifiedAt && buyer.gstLegalName && buyer.gstLegalName !== buyer.name && (
+              <p className="text-sm text-muted-foreground text-left">
+                <strong>GST legal name:</strong> {buyer.gstLegalName}
+              </p>
+            )}
           </CardContent>
           <CardFooter className="flex justify-end gap-2 pt-0">
             <Button size="sm" onClick={() => setEditOpen(true)}>

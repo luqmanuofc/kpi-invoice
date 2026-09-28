@@ -23,6 +23,18 @@ model Buyer {
   pincode   Int?
   stateCode Int?
 
+  // GST verification: set only by scripts/gstin-lookup (never by the normal
+  // buyer create/update form -- see netlify/functions/updateBuyer.ts) when it
+  // successfully looks the GSTIN up on the government's public Search
+  // Taxpayer tool. gstVerifiedAt non-null is what "verified" means; the app
+  // only offers e-way bill bulk-JSON generation for verified buyers.
+  // updateBuyer.ts clears gstVerifiedAt whenever gstin is edited, since a
+  // verification is only valid for the GSTIN it was run against.
+  gstVerifiedAt DateTime?
+  gstLegalName  String?
+  gstTradeName  String?
+  gstAddress    String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

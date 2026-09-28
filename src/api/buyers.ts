@@ -8,8 +8,33 @@ export interface Buyer {
   phone: string | null;
   pincode: number | null;
   stateCode: number | null;
+  // Set only by scripts/gstin-lookup, never by the buyer form -- see that
+  // script and netlify/functions/updateBuyer.ts. gstVerifiedAt non-null is
+  // what "verified" means (gate for e-way bill bulk-JSON generation).
+  gstVerifiedAt: string | null;
+  gstLegalName: string | null;
+  gstTradeName: string | null;
+  gstAddress: string | null;
   createdAt: string;
   updatedAt: string;
+}
+
+/** True once a buyer's GSTIN has been confirmed against the government's own data. */
+export function isBuyerGstVerified(buyer: Pick<Buyer, "gstVerifiedAt">): boolean {
+  return buyer.gstVerifiedAt !== null;
+}
+
+/**
+ * True when an invoice needs an e-way bill and its buyer has a GSTIN that
+ * hasn't been verified yet -- e-way bill generation is blocked until then
+ * (see EWAY_BILL.md). Buyers with no GSTIN (URP) aren't gated: there's no
+ * registration to verify against.
+ */
+export function blockedByGstVerification(
+  ewayRequired: boolean,
+  buyer: Pick<Buyer, "gstin" | "gstVerifiedAt"> | undefined
+): boolean {
+  return ewayRequired && !!buyer?.gstin && !isBuyerGstVerified(buyer);
 }
 
 export interface BuyerFormData {

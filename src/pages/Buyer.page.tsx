@@ -2,6 +2,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState, useMemo } from "react";
 import { Loader2 } from "lucide-react";
 import BuyerDrawer from "../buyer/BuyerDrawer";
+import GstVerifiedBadge from "../buyer/GstVerifiedBadge";
 import { useBuyers } from "../hooks/useBuyers";
 import { Button } from "@/components/ui/button";
 import { Alert } from "@/components/ui/alert";
@@ -100,7 +101,13 @@ export default function BuyerPage() {
             onClick={() => handleViewClick(buyer.id)}
           >
             <CardHeader>
-              <CardTitle>{buyer.name}</CardTitle>
+              <div className="flex items-center justify-between gap-2">
+                <CardTitle>{buyer.name}</CardTitle>
+                <GstVerifiedBadge
+                  gstin={buyer.gstin}
+                  gstVerifiedAt={buyer.gstVerifiedAt}
+                />
+              </div>
             </CardHeader>
             <CardContent className="grow space-y-2">
               <p className="text-sm text-muted-foreground text-left">

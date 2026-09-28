@@ -180,6 +180,10 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
         phone: invoice.buyerPhoneSnapshot,
         pincode: null, // Not in the invoice snapshot; re-fetched from the buyer if needed
         stateCode: null,
+        gstVerifiedAt: null,
+        gstLegalName: null,
+        gstTradeName: null,
+        gstAddress: null,
         createdAt: "", // Not needed for form
         updatedAt: "", // Not needed for form
       },
