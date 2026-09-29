@@ -25,15 +25,19 @@ Claude to read it, retry up to 3 times) — see
 
 ## Status
 
-Selectors confirmed working against the real page (2026-09-29) — see the
+Selectors confirmed working against the real page (2026-09-29/30) — see the
 comment block at the top of `lookup-and-store.mjs` for the two non-obvious
 things found running it live (the captcha only appears on real keystrokes,
 not `.fill()`; a watermark occasionally obscures a character, handled by the
 retry+refresh loop already in place). First real run verified an actual
 buyer (`Raheek Multinational Sarai`, GSTIN `01CHMPB4308R1ZA`) against
-staging. If the portal changes its markup and this starts failing, redo the
-affected selector by hand (`headless: false` temporarily, or screenshot each
-step) rather than guessing.
+staging; its full detail (jurisdiction, business activity, HSN/SAC goods it
+deals in) was backfilled into `GstVerification` by hand from that same
+session, since the table didn't exist yet when the lookup ran -- every
+lookup from here on writes it automatically. If the portal changes its
+markup and this starts failing, redo the affected selector by hand
+(`headless: false` temporarily, or screenshot each step) rather than
+guessing.
 
 ## Setup
 
@@ -64,19 +68,31 @@ with the before → after PIN and state for anything it wrote).
 
 ## What it writes
 
-`Buyer.pincode`, `Buyer.stateCode`, `Buyer.gstVerifiedAt` (set to the time of
-the successful lookup — this is what "verified" means), and the raw values
-the portal returned for reference: `Buyer.gstLegalName`, `Buyer.gstTradeName`,
-`Buyer.gstAddress`.
+Two places, in one transaction:
+
+- **`Buyer`** (the "current best known" summary, cheap to read without a
+  join): `pincode`, `stateCode`, `gstVerifiedAt` (set to the time of the
+  successful lookup — this is what "verified" means), `gstLegalName`,
+  `gstTradeName`, `gstAddress`.
+- **`GstVerification`** (one row per lookup, full detail, never overwritten
+  — a history table, not a cache): everything above again as its own row
+  (so it survives even if the buyer is later re-verified or its GSTIN
+  changes), plus `registrationDate`, `constitutionOfBusiness`,
+  `gstinStatus`, `taxpayerType`, and a `raw` JSON blob holding the rest of
+  what the portal shows that isn't worth its own typed column —
+  jurisdiction (administrative + state office), nature of core business
+  activity, nature of business activities, the HSN/SAC goods & services
+  table, and a full plain-text dump of the results panel as a catch-all.
+  Not surfaced in the UI yet; query the table directly if you need it.
 
 **Never** `Buyer.name` or `Buyer.address`, even though the portal also
 returns a legal/trade name and a full address that could fill those.
 Deliberate: your working `name`/`address` might intentionally differ from
 GST's registered legal name (how you refer to a customer isn't necessarily
 their GST paperwork name), so this only surfaces the official values
-(console output, and now `gstLegalName`/`gstAddress` on the row) for you to
-compare, rather than silently overwriting what you're already using. Say so
-if you'd rather it did.
+(console output, and `gstLegalName`/`gstAddress`/`GstVerification` rows) for
+you to compare, rather than silently overwriting what you're already using.
+Say so if you'd rather it did.
 
 A verification is only valid for the GSTIN it ran against —
 `netlify/functions/updateBuyer.ts` clears `gstVerifiedAt` automatically if
@@ -88,6 +104,13 @@ under a changed GSTIN. Re-run this script to re-verify.
 - No session/rate-limit awareness — if the public tool starts throttling or
   captcha-walling after N lookups in a row, this doesn't detect or back off
   from that beyond the fixed 4s gap between buyers.
+- The extra fields feeding `GstVerification` (jurisdiction lines, nature of
+  business activity, the goods/services HSN table, `fieldByLabel`'s switch to
+  `:has-text()`) were built against the real saved HTML from the 2026-09-29
+  session, not re-run live afterward — high confidence since it's the actual
+  markup, but the *next* run is the first live exercise of that code path.
+  Check its output against what the portal shows for that GSTIN the first
+  time.
 - The automated captcha-solving path (`solveCaptcha.mjs` calling Claude via
   `@anthropic-ai/sdk`) hasn't been run end-to-end yet — the live verification
   above was done by reading each captcha screenshot directly rather than

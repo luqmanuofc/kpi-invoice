@@ -23,6 +23,11 @@ export * from './enums';
  */
 export type Buyer = Prisma.BuyerModel
 /**
+ * Model GstVerification
+ * 
+ */
+export type GstVerification = Prisma.GstVerificationModel
+/**
  * Model Product
  * 
  */

@@ -26,10 +26,13 @@ model Buyer {
   // GST verification: set only by scripts/gstin-lookup (never by the normal
   // buyer create/update form -- see netlify/functions/updateBuyer.ts) when it
   // successfully looks the GSTIN up on the government's public Search
-  // Taxpayer tool. gstVerifiedAt non-null is what "verified" means; the app
-  // only offers e-way bill bulk-JSON generation for verified buyers.
-  // updateBuyer.ts clears gstVerifiedAt whenever gstin is edited, since a
-  // verification is only valid for the GSTIN it was run against.
+  // Taxpayer tool. gstVerifiedAt non-null is what "verified" means --
+  // informational (shown on the buyer detail page), not a gate on e-way bill
+  // generation. These four are the "current best known" snapshot, kept here
+  // for cheap access without a join; the full detail behind each lookup
+  // (including past ones) lives in GstVerification below. updateBuyer.ts
+  // clears gstVerifiedAt whenever gstin is edited, since a verification is
+  // only valid for the GSTIN it was run against.
   gstVerifiedAt DateTime?
   gstLegalName  String?
   gstTradeName  String?
@@ -38,7 +41,49 @@ model Buyer {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  invoices Invoice[]
+  invoices         Invoice[]
+  gstVerifications GstVerification[]
+}
+
+//
+// GST VERIFICATION (one row per scripts/gstin-lookup run -- full detail +
+// history, vs. the summary snapshot cached directly on Buyer above)
+//
+model GstVerification {
+  id String @id @default(cuid())
+
+  buyerId String
+  buyer   Buyer  @relation(fields: [buyerId], references: [id], onDelete: Cascade)
+
+  // Snapshot of the GSTIN this row was verified against -- Buyer.gstin can
+  // change later; this row still records what it was checked against.
+  gstin String
+
+  verifiedAt DateTime @default(now())
+
+  // Headline fields, typed for easy display/querying.
+  legalName              String?
+  tradeName              String?
+  registrationDate       String? // as shown by the portal, dd/mm/yyyy text -- not parsed, to avoid a scrape bug silently corrupting a DateTime
+  constitutionOfBusiness String?
+  gstinStatus            String? // e.g. "Active"
+  taxpayerType           String? // e.g. "Regular"
+  principalAddress       String?
+  pincode                Int?
+  stateCode              Int?
+
+  // Everything else the portal returns -- jurisdiction (administrative +
+  // state office lines), Aadhaar/e-KYC verification status, nature of core
+  // business activity, nature of business activities, and the HSN/SAC goods
+  // & services table -- kept as JSON rather than modelled field-by-field so
+  // a portal layout change doesn't silently drop data or need a migration
+  // just to keep capturing it. See scripts/gstin-lookup for the shape.
+  raw Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([buyerId])
+  @@index([gstin])
 }
 
 //

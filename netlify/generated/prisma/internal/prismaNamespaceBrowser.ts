@@ -52,6 +52,7 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   Buyer: 'Buyer',
+  GstVerification: 'GstVerification',
   Product: 'Product',
   Invoice: 'Invoice',
   InvoiceItem: 'InvoiceItem',
@@ -94,6 +95,27 @@ export const BuyerScalarFieldEnum = {
 } as const
 
 export type BuyerScalarFieldEnum = (typeof BuyerScalarFieldEnum)[keyof typeof BuyerScalarFieldEnum]
+
+
+export const GstVerificationScalarFieldEnum = {
+  id: 'id',
+  buyerId: 'buyerId',
+  gstin: 'gstin',
+  verifiedAt: 'verifiedAt',
+  legalName: 'legalName',
+  tradeName: 'tradeName',
+  registrationDate: 'registrationDate',
+  constitutionOfBusiness: 'constitutionOfBusiness',
+  gstinStatus: 'gstinStatus',
+  taxpayerType: 'taxpayerType',
+  principalAddress: 'principalAddress',
+  pincode: 'pincode',
+  stateCode: 'stateCode',
+  raw: 'raw',
+  createdAt: 'createdAt'
+} as const
+
+export type GstVerificationScalarFieldEnum = (typeof GstVerificationScalarFieldEnum)[keyof typeof GstVerificationScalarFieldEnum]
 
 
 export const ProductScalarFieldEnum = {
@@ -210,6 +232,14 @@ export const SortOrder = {
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const NullableJsonNullValueInput = {
+  DbNull: 'DbNull',
+  JsonNull: 'JsonNull'
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
 export const JsonNullValueInput = {

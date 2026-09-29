@@ -285,6 +285,7 @@ export type BuyerWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Buyer"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Buyer"> | Date | string
   invoices?: Prisma.InvoiceListRelationFilter
+  gstVerifications?: Prisma.GstVerificationListRelationFilter
 }
 
 export type BuyerOrderByWithRelationInput = {
@@ -302,6 +303,7 @@ export type BuyerOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   invoices?: Prisma.InvoiceOrderByRelationAggregateInput
+  gstVerifications?: Prisma.GstVerificationOrderByRelationAggregateInput
 }
 
 export type BuyerWhereUniqueInput = Prisma.AtLeast<{
@@ -322,6 +324,7 @@ export type BuyerWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"Buyer"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Buyer"> | Date | string
   invoices?: Prisma.InvoiceListRelationFilter
+  gstVerifications?: Prisma.GstVerificationListRelationFilter
 }, "id" | "name">
 
 export type BuyerOrderByWithAggregationInput = {
@@ -379,6 +382,7 @@ export type BuyerCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   invoices?: Prisma.InvoiceCreateNestedManyWithoutBuyerInput
+  gstVerifications?: Prisma.GstVerificationCreateNestedManyWithoutBuyerInput
 }
 
 export type BuyerUncheckedCreateInput = {
@@ -396,6 +400,7 @@ export type BuyerUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutBuyerInput
+  gstVerifications?: Prisma.GstVerificationUncheckedCreateNestedManyWithoutBuyerInput
 }
 
 export type BuyerUpdateInput = {
@@ -413,6 +418,7 @@ export type BuyerUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   invoices?: Prisma.InvoiceUpdateManyWithoutBuyerNestedInput
+  gstVerifications?: Prisma.GstVerificationUpdateManyWithoutBuyerNestedInput
 }
 
 export type BuyerUncheckedUpdateInput = {
@@ -430,6 +436,7 @@ export type BuyerUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutBuyerNestedInput
+  gstVerifications?: Prisma.GstVerificationUncheckedUpdateManyWithoutBuyerNestedInput
 }
 
 export type BuyerCreateManyInput = {
@@ -567,6 +574,20 @@ export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }
 
+export type BuyerCreateNestedOneWithoutGstVerificationsInput = {
+  create?: Prisma.XOR<Prisma.BuyerCreateWithoutGstVerificationsInput, Prisma.BuyerUncheckedCreateWithoutGstVerificationsInput>
+  connectOrCreate?: Prisma.BuyerCreateOrConnectWithoutGstVerificationsInput
+  connect?: Prisma.BuyerWhereUniqueInput
+}
+
+export type BuyerUpdateOneRequiredWithoutGstVerificationsNestedInput = {
+  create?: Prisma.XOR<Prisma.BuyerCreateWithoutGstVerificationsInput, Prisma.BuyerUncheckedCreateWithoutGstVerificationsInput>
+  connectOrCreate?: Prisma.BuyerCreateOrConnectWithoutGstVerificationsInput
+  upsert?: Prisma.BuyerUpsertWithoutGstVerificationsInput
+  connect?: Prisma.BuyerWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.BuyerUpdateToOneWithWhereWithoutGstVerificationsInput, Prisma.BuyerUpdateWithoutGstVerificationsInput>, Prisma.BuyerUncheckedUpdateWithoutGstVerificationsInput>
+}
+
 export type BuyerCreateNestedOneWithoutInvoicesInput = {
   create?: Prisma.XOR<Prisma.BuyerCreateWithoutInvoicesInput, Prisma.BuyerUncheckedCreateWithoutInvoicesInput>
   connectOrCreate?: Prisma.BuyerCreateOrConnectWithoutInvoicesInput
@@ -579,6 +600,90 @@ export type BuyerUpdateOneRequiredWithoutInvoicesNestedInput = {
   upsert?: Prisma.BuyerUpsertWithoutInvoicesInput
   connect?: Prisma.BuyerWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.BuyerUpdateToOneWithWhereWithoutInvoicesInput, Prisma.BuyerUpdateWithoutInvoicesInput>, Prisma.BuyerUncheckedUpdateWithoutInvoicesInput>
+}
+
+export type BuyerCreateWithoutGstVerificationsInput = {
+  id?: string
+  name: string
+  address: string
+  gstin?: string | null
+  phone?: string | null
+  pincode?: number | null
+  stateCode?: number | null
+  gstVerifiedAt?: Date | string | null
+  gstLegalName?: string | null
+  gstTradeName?: string | null
+  gstAddress?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  invoices?: Prisma.InvoiceCreateNestedManyWithoutBuyerInput
+}
+
+export type BuyerUncheckedCreateWithoutGstVerificationsInput = {
+  id?: string
+  name: string
+  address: string
+  gstin?: string | null
+  phone?: string | null
+  pincode?: number | null
+  stateCode?: number | null
+  gstVerifiedAt?: Date | string | null
+  gstLegalName?: string | null
+  gstTradeName?: string | null
+  gstAddress?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutBuyerInput
+}
+
+export type BuyerCreateOrConnectWithoutGstVerificationsInput = {
+  where: Prisma.BuyerWhereUniqueInput
+  create: Prisma.XOR<Prisma.BuyerCreateWithoutGstVerificationsInput, Prisma.BuyerUncheckedCreateWithoutGstVerificationsInput>
+}
+
+export type BuyerUpsertWithoutGstVerificationsInput = {
+  update: Prisma.XOR<Prisma.BuyerUpdateWithoutGstVerificationsInput, Prisma.BuyerUncheckedUpdateWithoutGstVerificationsInput>
+  create: Prisma.XOR<Prisma.BuyerCreateWithoutGstVerificationsInput, Prisma.BuyerUncheckedCreateWithoutGstVerificationsInput>
+  where?: Prisma.BuyerWhereInput
+}
+
+export type BuyerUpdateToOneWithWhereWithoutGstVerificationsInput = {
+  where?: Prisma.BuyerWhereInput
+  data: Prisma.XOR<Prisma.BuyerUpdateWithoutGstVerificationsInput, Prisma.BuyerUncheckedUpdateWithoutGstVerificationsInput>
+}
+
+export type BuyerUpdateWithoutGstVerificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.StringFieldUpdateOperationsInput | string
+  gstin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pincode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  stateCode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  gstVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  gstLegalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gstTradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gstAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  invoices?: Prisma.InvoiceUpdateManyWithoutBuyerNestedInput
+}
+
+export type BuyerUncheckedUpdateWithoutGstVerificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.StringFieldUpdateOperationsInput | string
+  gstin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pincode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  stateCode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  gstVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  gstLegalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gstTradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gstAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutBuyerNestedInput
 }
 
 export type BuyerCreateWithoutInvoicesInput = {
@@ -595,6 +700,7 @@ export type BuyerCreateWithoutInvoicesInput = {
   gstAddress?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  gstVerifications?: Prisma.GstVerificationCreateNestedManyWithoutBuyerInput
 }
 
 export type BuyerUncheckedCreateWithoutInvoicesInput = {
@@ -611,6 +717,7 @@ export type BuyerUncheckedCreateWithoutInvoicesInput = {
   gstAddress?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  gstVerifications?: Prisma.GstVerificationUncheckedCreateNestedManyWithoutBuyerInput
 }
 
 export type BuyerCreateOrConnectWithoutInvoicesInput = {
@@ -643,6 +750,7 @@ export type BuyerUpdateWithoutInvoicesInput = {
   gstAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  gstVerifications?: Prisma.GstVerificationUpdateManyWithoutBuyerNestedInput
 }
 
 export type BuyerUncheckedUpdateWithoutInvoicesInput = {
@@ -659,6 +767,7 @@ export type BuyerUncheckedUpdateWithoutInvoicesInput = {
   gstAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  gstVerifications?: Prisma.GstVerificationUncheckedUpdateManyWithoutBuyerNestedInput
 }
 
 
@@ -668,10 +777,12 @@ export type BuyerUncheckedUpdateWithoutInvoicesInput = {
 
 export type BuyerCountOutputType = {
   invoices: number
+  gstVerifications: number
 }
 
 export type BuyerCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   invoices?: boolean | BuyerCountOutputTypeCountInvoicesArgs
+  gstVerifications?: boolean | BuyerCountOutputTypeCountGstVerificationsArgs
 }
 
 /**
@@ -691,6 +802,13 @@ export type BuyerCountOutputTypeCountInvoicesArgs<ExtArgs extends runtime.Types.
   where?: Prisma.InvoiceWhereInput
 }
 
+/**
+ * BuyerCountOutputType without action
+ */
+export type BuyerCountOutputTypeCountGstVerificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.GstVerificationWhereInput
+}
+
 
 export type BuyerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -707,6 +825,7 @@ export type BuyerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   createdAt?: boolean
   updatedAt?: boolean
   invoices?: boolean | Prisma.Buyer$invoicesArgs<ExtArgs>
+  gstVerifications?: boolean | Prisma.Buyer$gstVerificationsArgs<ExtArgs>
   _count?: boolean | Prisma.BuyerCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["buyer"]>
 
@@ -761,6 +880,7 @@ export type BuyerSelectScalar = {
 export type BuyerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "address" | "gstin" | "phone" | "pincode" | "stateCode" | "gstVerifiedAt" | "gstLegalName" | "gstTradeName" | "gstAddress" | "createdAt" | "updatedAt", ExtArgs["result"]["buyer"]>
 export type BuyerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   invoices?: boolean | Prisma.Buyer$invoicesArgs<ExtArgs>
+  gstVerifications?: boolean | Prisma.Buyer$gstVerificationsArgs<ExtArgs>
   _count?: boolean | Prisma.BuyerCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type BuyerIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -770,6 +890,7 @@ export type $BuyerPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   name: "Buyer"
   objects: {
     invoices: Prisma.$InvoicePayload<ExtArgs>[]
+    gstVerifications: Prisma.$GstVerificationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1180,6 +1301,7 @@ readonly fields: BuyerFieldRefs;
 export interface Prisma__BuyerClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   invoices<T extends Prisma.Buyer$invoicesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Buyer$invoicesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  gstVerifications<T extends Prisma.Buyer$gstVerificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Buyer$gstVerificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$GstVerificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1631,6 +1753,30 @@ export type Buyer$invoicesArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   distinct?: Prisma.InvoiceScalarFieldEnum | Prisma.InvoiceScalarFieldEnum[]
+}
+
+/**
+ * Buyer.gstVerifications
+ */
+export type Buyer$gstVerificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the GstVerification
+   */
+  select?: Prisma.GstVerificationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the GstVerification
+   */
+  omit?: Prisma.GstVerificationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.GstVerificationInclude<ExtArgs> | null
+  where?: Prisma.GstVerificationWhereInput
+  orderBy?: Prisma.GstVerificationOrderByWithRelationInput | Prisma.GstVerificationOrderByWithRelationInput[]
+  cursor?: Prisma.GstVerificationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.GstVerificationScalarFieldEnum | Prisma.GstVerificationScalarFieldEnum[]
 }
 
 /**

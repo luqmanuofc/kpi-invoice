@@ -385,6 +385,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   Buyer: 'Buyer',
+  GstVerification: 'GstVerification',
   Product: 'Product',
   Invoice: 'Invoice',
   InvoiceItem: 'InvoiceItem',
@@ -407,7 +408,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "buyer" | "product" | "invoice" | "invoiceItem" | "invoiceStatusLog" | "settings" | "epsonConnection" | "epsonPrintJob"
+    modelProps: "buyer" | "gstVerification" | "product" | "invoice" | "invoiceItem" | "invoiceStatusLog" | "settings" | "epsonConnection" | "epsonPrintJob"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -482,6 +483,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.BuyerCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.BuyerCountAggregateOutputType> | number
+        }
+      }
+    }
+    GstVerification: {
+      payload: Prisma.$GstVerificationPayload<ExtArgs>
+      fields: Prisma.GstVerificationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.GstVerificationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GstVerificationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.GstVerificationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GstVerificationPayload>
+        }
+        findFirst: {
+          args: Prisma.GstVerificationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GstVerificationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.GstVerificationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GstVerificationPayload>
+        }
+        findMany: {
+          args: Prisma.GstVerificationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GstVerificationPayload>[]
+        }
+        create: {
+          args: Prisma.GstVerificationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GstVerificationPayload>
+        }
+        createMany: {
+          args: Prisma.GstVerificationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.GstVerificationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GstVerificationPayload>[]
+        }
+        delete: {
+          args: Prisma.GstVerificationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GstVerificationPayload>
+        }
+        update: {
+          args: Prisma.GstVerificationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GstVerificationPayload>
+        }
+        deleteMany: {
+          args: Prisma.GstVerificationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.GstVerificationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.GstVerificationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GstVerificationPayload>[]
+        }
+        upsert: {
+          args: Prisma.GstVerificationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GstVerificationPayload>
+        }
+        aggregate: {
+          args: Prisma.GstVerificationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateGstVerification>
+        }
+        groupBy: {
+          args: Prisma.GstVerificationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GstVerificationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.GstVerificationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GstVerificationCountAggregateOutputType> | number
         }
       }
     }
@@ -1061,6 +1136,27 @@ export const BuyerScalarFieldEnum = {
 export type BuyerScalarFieldEnum = (typeof BuyerScalarFieldEnum)[keyof typeof BuyerScalarFieldEnum]
 
 
+export const GstVerificationScalarFieldEnum = {
+  id: 'id',
+  buyerId: 'buyerId',
+  gstin: 'gstin',
+  verifiedAt: 'verifiedAt',
+  legalName: 'legalName',
+  tradeName: 'tradeName',
+  registrationDate: 'registrationDate',
+  constitutionOfBusiness: 'constitutionOfBusiness',
+  gstinStatus: 'gstinStatus',
+  taxpayerType: 'taxpayerType',
+  principalAddress: 'principalAddress',
+  pincode: 'pincode',
+  stateCode: 'stateCode',
+  raw: 'raw',
+  createdAt: 'createdAt'
+} as const
+
+export type GstVerificationScalarFieldEnum = (typeof GstVerificationScalarFieldEnum)[keyof typeof GstVerificationScalarFieldEnum]
+
+
 export const ProductScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -1177,6 +1273,14 @@ export const SortOrder = {
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
 export const JsonNullValueInput = {
   JsonNull: JsonNull
 } as const
@@ -1258,6 +1362,20 @@ export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaM
 
 
 /**
+ * Reference to a field of type 'Json'
+ */
+export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+/**
+ * Reference to a field of type 'QueryMode'
+ */
+export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+/**
  * Reference to a field of type 'Decimal'
  */
 export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
@@ -1296,20 +1414,6 @@ export type EnumInvoiceStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$Pr
  * Reference to a field of type 'InvoiceStatus[]'
  */
 export type ListEnumInvoiceStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InvoiceStatus[]'>
-    
-
-
-/**
- * Reference to a field of type 'Json'
- */
-export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
-    
-
-
-/**
- * Reference to a field of type 'QueryMode'
- */
-export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -1422,6 +1526,7 @@ export type PrismaClientOptions = ({
 }
 export type GlobalOmitConfig = {
   buyer?: Prisma.BuyerOmit
+  gstVerification?: Prisma.GstVerificationOmit
   product?: Prisma.ProductOmit
   invoice?: Prisma.InvoiceOmit
   invoiceItem?: Prisma.InvoiceItemOmit

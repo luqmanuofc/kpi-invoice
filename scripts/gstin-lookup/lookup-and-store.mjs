@@ -1,6 +1,7 @@
 // One-time-per-buyer automation: look a buyer's GSTIN up on the GST
-// portal's free, public "Search Taxpayer" tool and store the resulting
-// PIN code / state code on that Buyer row.
+// portal's free, public "Search Taxpayer" tool, store the summary (PIN
+// code / state code / verified flag) on the Buyer row, and keep a full
+// GstVerification row with everything the portal returned.
 //
 // This is the automation EWAY_BILL.md and the eway-poc README distinguish
 // from the actual e-way bill submission: services.gst.gov.in/services/searchtp
@@ -14,7 +15,7 @@
 // Do not point this at prod without deciding to.
 //
 // -----------------------------------------------------------------------
-// Selectors confirmed against the real page on 2026-09-29 (Angular SPA --
+// Selectors confirmed against the real page on 2026-09-29/30 (Angular SPA --
 // static HTML fetches won't show these; they only exist after the JS app
 // renders). If the portal changes its markup and this starts failing, redo
 // this by hand: `node scripts/gstin-lookup/lookup-and-store.mjs --buyer <id>`
@@ -31,6 +32,7 @@
 // -----------------------------------------------------------------------
 
 import "dotenv/config";
+import { randomUUID } from "node:crypto";
 import pg from "pg";
 import { chromium } from "playwright";
 import { solveCaptcha } from "../lib/solveCaptcha.mjs";
@@ -44,10 +46,9 @@ const SELECTORS = {
   captchaInput: "#fo-captcha",
   refreshCaptcha: 'button[ng-click="refreshCaptcha()"]',
   submit: "#lotsearch",
-  // Legal/trade name have no id -- located by their <strong> label, which is
-  // more stable across markup tweaks than a generated class name.
   captchaError: "text=/enter valid letters shown/i",
   resultAddress: '[data-ng-bind="searchTaxpre_Payload.pradr.adr"]', // "Principal Place of Business"
+  resultsPanel: ".tbl-format", // the whole results block -- see rawFullText()
 };
 
 const MAX_CAPTCHA_ATTEMPTS = 3;
@@ -68,13 +69,49 @@ function parseAddress(address) {
   return { pincode, stateCode };
 }
 
+// :has-text() does substring + whitespace-normalized matching, unlike
+// :text-is() -- more robust against label text like "GSTIN / UIN  Status"
+// (the portal's own markup has a double space in there).
 async function fieldByLabel(page, label) {
   const value = await page
-    .locator(`.col-sm-4:has(strong:text-is("${label}")) p`)
+    .locator(`.col-sm-4:has(strong:has-text("${label}"))`)
+    .locator("p")
     .nth(1)
     .innerText()
     .catch(() => null);
   return value?.trim() ?? null;
+}
+
+/** The Administrative Office / Other Office jurisdiction blocks are <ul><li>
+ * lists (e.g. ["(JURISDICTION - STATE)", "State - Jammu and Kashmir", ...]),
+ * not a single value -- fieldByLabel doesn't fit these. */
+async function jurisdictionLines(page, label) {
+  const items = await page
+    .locator(`.col-sm-4:has(strong:has-text("${label}")) li`)
+    .allInnerTexts()
+    .catch(() => []);
+  return items.map((s) => s.trim()).filter(Boolean);
+}
+
+async function textOrNull(page, selector) {
+  const value = await page.locator(selector).innerText().catch(() => null);
+  return value?.trim() ?? null;
+}
+
+/** "Dealing In Goods and Services" table -> [{hsn, description, type}]. */
+async function goodsServicesTable(page) {
+  const rows = await page
+    .locator('table.tbl.inv.exp tbody tr[data-ng-repeat]')
+    .evaluateAll((trs) =>
+      trs.map((tr) => Array.from(tr.querySelectorAll("td")).map((td) => td.textContent?.trim() ?? ""))
+    )
+    .catch(() => []);
+  const out = [];
+  for (const [goodsHsn, goodsDesc, svcHsn, svcDesc] of rows) {
+    if (goodsHsn) out.push({ hsn: goodsHsn, description: goodsDesc, type: "goods" });
+    if (svcHsn) out.push({ hsn: svcHsn, description: svcDesc, type: "service" });
+  }
+  return out;
 }
 
 async function lookupOne(page, gstin) {
@@ -112,10 +149,37 @@ async function lookupOne(page, gstin) {
 
   const legalName = await fieldByLabel(page, "Legal Name of Business");
   const tradeName = await fieldByLabel(page, "Trade Name");
-  const address = await page.locator(SELECTORS.resultAddress).innerText().catch(() => null);
+  const registrationDate = await fieldByLabel(page, "Effective Date of registration");
+  const constitutionOfBusiness = await fieldByLabel(page, "Constitution of Business");
+  const gstinStatus = await fieldByLabel(page, "GSTIN / UIN");
+  const taxpayerType = await fieldByLabel(page, "Taxpayer Type");
+  const address = await textOrNull(page, SELECTORS.resultAddress);
   const { pincode, stateCode } = parseAddress(address);
 
-  return { legalName, tradeName, address: address?.trim() ?? null, pincode, stateCode };
+  // Everything else: captured but not individually typed, so a portal
+  // layout tweak doesn't silently drop data (see the `raw` column comment
+  // in schema.prisma).
+  const adminOffice = await jurisdictionLines(page, "Administrative Office");
+  const otherOffice = await jurisdictionLines(page, "Other Office");
+  const natureOfCoreBusinessActivity = await textOrNull(page, "#ntcrbs span[data-ng-bind]");
+  const natureOfBusinessActivities = (await page.locator(".list-child-inline li").allInnerTexts().catch(() => []))
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const goodsServices = await goodsServicesTable(page);
+  const fullText = await textOrNull(page, SELECTORS.resultsPanel);
+
+  return {
+    legalName,
+    tradeName,
+    registrationDate,
+    constitutionOfBusiness,
+    gstinStatus,
+    taxpayerType,
+    address,
+    pincode,
+    stateCode,
+    raw: { adminOffice, otherOffice, natureOfCoreBusinessActivity, natureOfBusinessActivities, goodsServices, fullText },
+  };
 }
 
 const BUYER_COLS = `id, name, gstin, pincode, "stateCode", "gstVerifiedAt"`;
@@ -149,6 +213,46 @@ function parseArgs() {
     process.exit(1);
   }
   return args;
+}
+
+async function saveResult(db, buyer, found) {
+  await db.query("BEGIN");
+  try {
+    await db.query(
+      `update "Buyer"
+       set pincode = $1, "stateCode" = $2, "gstVerifiedAt" = now(),
+           "gstLegalName" = $3, "gstTradeName" = $4, "gstAddress" = $5
+       where id = $6`,
+      [found.pincode, found.stateCode, found.legalName, found.tradeName, found.address, buyer.id]
+    );
+    await db.query(
+      `insert into "GstVerification"
+         (id, "buyerId", gstin, "legalName", "tradeName", "registrationDate",
+          "constitutionOfBusiness", "gstinStatus", "taxpayerType",
+          "principalAddress", pincode, "stateCode", raw)
+       values
+         ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
+      [
+        randomUUID(),
+        buyer.id,
+        buyer.gstin,
+        found.legalName,
+        found.tradeName,
+        found.registrationDate,
+        found.constitutionOfBusiness,
+        found.gstinStatus,
+        found.taxpayerType,
+        found.address,
+        found.pincode,
+        found.stateCode,
+        JSON.stringify(found.raw),
+      ]
+    );
+    await db.query("COMMIT");
+  } catch (err) {
+    await db.query("ROLLBACK");
+    throw err;
+  }
 }
 
 async function main() {
@@ -188,8 +292,10 @@ async function main() {
     try {
       const found = await lookupOne(page, buyer.gstin);
       console.log(`  legal name: ${found.legalName ?? "?"}  trade name: ${found.tradeName ?? "?"}`);
+      console.log(`  status: ${found.gstinStatus ?? "?"}  type: ${found.taxpayerType ?? "?"}  constitution: ${found.constitutionOfBusiness ?? "?"}`);
       console.log(`  address: ${found.address ?? "?"}`);
       console.log(`  pincode=${found.pincode} stateCode=${found.stateCode}`);
+      console.log(`  goods/services: ${found.raw.goodsServices.length} HSN/SAC rows captured`);
       if (buyer.name !== (found.legalName ?? found.tradeName)) {
         console.log(`  note: buyer is saved as "${buyer.name}" here, GST shows a different name -- compare above, not auto-applied.`);
       }
@@ -202,13 +308,7 @@ async function main() {
         continue;
       }
 
-      await db.query(
-        `update "Buyer"
-         set pincode = $1, "stateCode" = $2, "gstVerifiedAt" = now(),
-             "gstLegalName" = $3, "gstTradeName" = $4, "gstAddress" = $5
-         where id = $6`,
-        [found.pincode, found.stateCode, found.legalName, found.tradeName, found.address, buyer.id]
-      );
+      await saveResult(db, buyer, found);
       results.push({
         buyer: buyer.name,
         status: "verified",
