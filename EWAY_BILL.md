@@ -138,16 +138,22 @@ the buyer form does **not** count as verified, even though the same fields
 get set either way — verified specifically means the values came from the
 government lookup, not from someone typing them in.
 
-Verification status is shown only on the buyer's own detail page, in a
-dedicated read-only **GST Information** card (legal/trade name, registered
-address, ship-to PIN/state, verified date when verified; a plain "not
-verified yet" state otherwise). It does not appear on the buyer list, and it
-does not block anything: **e-way bill generation is available on any
-eligible invoice regardless of verification status** — the only real gate is
-the invoice's own data being valid (a missing PIN/state still shows up as a
-normal validation error in the generation dialog, same as a bad HSN code
-would; it's just not treated as a special "go verify this buyer" case
-anymore).
+Verification status isn't shown as a standalone card — a niche, read-only
+thing didn't deserve a full page row. It lives inside `BuyerDrawer` (the same
+drawer used to create/edit a buyer): a "View GST Info" button on the buyer
+detail page's Buyer Info card opens it, same as "Edit" does, landing on a
+"GST Verification" section below the form fields (legal/trade name,
+registered address, verified date, and a "More GST details" accordion for
+jurisdiction/business activity/HSN — see `GstVerification` below). Reusing
+the edit drawer is deliberate, not just economical: phase 1.2 (auto-running
+the lookup the moment a GSTIN is typed in) lands in this same surface later,
+so building the display here now means that automation has somewhere to show
+its result without a new UI. Doesn't appear on the buyer list, and doesn't
+block anything: **e-way bill generation is available on any eligible invoice
+regardless of verification status** — the only real gate is the invoice's
+own data being valid (a missing PIN/state still shows up as a normal
+validation error in the generation dialog, same as a bad HSN code would;
+it's just not treated as a special "go verify this buyer" case anymore).
 
 Editing a buyer's GSTIN still clears `gstVerifiedAt` (`updateBuyer.ts`) — a
 verification is only valid for the GSTIN it was run against, so changing it
