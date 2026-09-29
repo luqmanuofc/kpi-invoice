@@ -10,12 +10,13 @@ from the buyer's GSTIN as you type, bulk processing does no live lookup and
 just rejects a row with a missing/wrong one (confirmed against NIC's
 `generate-eway-bill` API docs, which describe the same underlying generation
 engine bulk upload uses). For a buyer with a GSTIN, PIN/state are **not**
-manually editable — `BuyerDrawer`'s Details tab hides those fields once a
-GSTIN is on file and points at the GST Info tab instead, since the whole
-point is that the value came from the government, not from someone typing
-it in; only `scripts/gstin-lookup` sets them. A buyer with no GSTIN (URP)
-has no GST Info tab at all, so their PIN/state stay manually editable on
-Details — there's no automated source for them.
+manually editable and are **not** stored on `Buyer` at all — they live only
+on the matching `GstVerification` row (see below), and `BuyerDrawer`'s
+Details tab hides those fields once a GSTIN is on file, pointing at the GST
+Info tab instead. A buyer with no GSTIN (URP) has no GST Info tab at all, so
+`Buyer.pincode`/`Buyer.stateCode` stay manually editable on Details — that's
+the one case those columns are still for, since there's no automated source
+for them.
 
 UI: on the invoice's own page (`/invoice/:id`), next to Download/Print — an
 **E-way Bill** button appears for any invoice whose value puts it over the
@@ -42,13 +43,15 @@ API later.
 | `fromInvoice.ts` | app `Invoice` (+ `Buyer`) → `EwayInput` (discount spread over items, unit mapping) |
 | `config.ts` | seller PIN code (190017, confirmed against a real accepted bill) |
 
-Buyer ship-to PIN/state live on the `Buyer` model (`pincode`, `stateCode`) —
-set by `scripts/gstin-lookup` for a GSTIN buyer, or manually via
-`BuyerDrawer`'s Details tab for a URP buyer (see above). For a buyer without
-them set yet, `fromInvoice.ts` falls back to guessing a PIN from the
-free-text address snapshot — good enough to flag "needs an e-way bill" but
-not reliable enough to export without a warning (surfaced as a normal
-validation error in the generation dialog on the invoice page).
+Buyer ship-to PIN/state come from `latestGstVerification()` (`src/api/buyers.ts`)
+for a GSTIN buyer — the newest `GstVerification` row whose `gstin` still
+matches the buyer's current `gstin` — or from `Buyer.pincode`/`stateCode`
+directly for a URP buyer (see above). `fromInvoice.ts`'s `buyerParty()`
+resolves them in that order and falls back to guessing a PIN from the
+free-text address snapshot when neither is available — good enough to flag
+"needs an e-way bill" but not reliable enough to export without a warning
+(surfaced as a normal validation error in the generation dialog on the
+invoice page).
 
 Tests: `npm test`.
 
@@ -124,11 +127,11 @@ Split deliberately into two pieces, and only the first is the actual plan:
 **One piece of automation is adopted, and it's neither of the above:**
 `scripts/gstin-lookup/` looks a buyer's GSTIN up on the GST portal's free
 *public* Search Taxpayer tool (no login, no OTP — a public registry lookup,
-not a filing action) and stores the resulting PIN/state on that buyer's row,
-one time, instead of typing it in by hand. It never touches the actual e-way
-bill portal or generates any compliance document — see the script's own
-README. Confirmed working end to end against the real page (2026-09-29,
-verified an actual buyer on staging).
+not a filing action) and inserts one `GstVerification` row with everything it
+returns, one time, instead of typing it in by hand. It never writes to
+`Buyer` and never touches the actual e-way bill portal or generates any
+compliance document — see the script's own README. Confirmed working end to
+end against the real page (2026-09-29, verified an actual buyer on staging).
 
 Phase 1.2 (not built): trigger that lookup automatically from the app the
 moment a GSTIN is entered on the buyer form, instead of running the script
@@ -138,10 +141,15 @@ by hand. For now, verification is a manual, deliberate step.
 
 A buyer only counts as **verified** once `scripts/gstin-lookup` has
 successfully confirmed their GSTIN against the government's own Search
-Taxpayer data — tracked by `Buyer.gstVerifiedAt` (non-null = verified;
-`isBuyerGstVerified` in `src/api/buyers.ts`). Since PIN/state are no longer
-manually editable once a buyer has a GSTIN (see above), verified now means
-exactly what it says: the value came from the government lookup, full stop.
+Taxpayer data. There's no stored flag for this — `Buyer` doesn't cache any
+GST-sourced field at all. "Verified" is derived at read time: a buyer is
+verified if `latestGstVerification()` finds a `GstVerification` row whose
+`gstin` still equals the buyer's current `gstin` (`isBuyerGstVerified` in
+`src/api/buyers.ts`). Editing a buyer's GSTIN doesn't need to explicitly
+un-verify anything — the old row's `gstin` simply stops matching, so it
+self-heals with no invalidation code. Since PIN/state are no longer manually
+editable once a buyer has a GSTIN (see above), verified now means exactly
+what it says: the value came from the government lookup, full stop.
 
 Verification status isn't shown as a standalone card — a niche, read-only
 thing didn't deserve a full page row. It lives inside `BuyerDrawer` (the same
@@ -168,9 +176,9 @@ valid (a missing PIN/state still shows up as a normal validation error in
 the generation dialog, same as a bad HSN code would; it's just not treated
 as a special "go verify this buyer" case anymore).
 
-Editing a buyer's GSTIN still clears `gstVerifiedAt` (`updateBuyer.ts`) — a
-verification is only valid for the GSTIN it was run against, so changing it
-un-verifies the buyer until `scripts/gstin-lookup` is re-run. That stays
-true even though verification no longer gates anything, since a stale
-"verified" badge showing GST details for the wrong GSTIN would be actively
-misleading on the buyer page.
+A verification is only valid for the GSTIN it was run against, so editing a
+buyer's GSTIN un-verifies them (via the gstin-match check above, not an
+explicit write) until `scripts/gstin-lookup` is re-run. That stays true even
+though verification no longer gates anything, since a stale "verified" badge
+showing GST details for the wrong GSTIN would be actively misleading on the
+buyer page.

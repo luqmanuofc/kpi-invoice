@@ -86,10 +86,6 @@ export const BuyerScalarFieldEnum = {
   phone: 'phone',
   pincode: 'pincode',
   stateCode: 'stateCode',
-  gstVerifiedAt: 'gstVerifiedAt',
-  gstLegalName: 'gstLegalName',
-  gstTradeName: 'gstTradeName',
-  gstAddress: 'gstAddress',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

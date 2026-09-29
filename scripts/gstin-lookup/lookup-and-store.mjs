@@ -1,7 +1,9 @@
 // One-time-per-buyer automation: look a buyer's GSTIN up on the GST
-// portal's free, public "Search Taxpayer" tool, store the summary (PIN
-// code / state code / verified flag) on the Buyer row, and keep a full
-// GstVerification row with everything the portal returned.
+// portal's free, public "Search Taxpayer" tool and store everything it
+// returns as a new GstVerification row. Buyer itself is never written to --
+// "verified" is derived at read time by matching GstVerification.gstin
+// against the buyer's current gstin (see latestGstVerification in
+// src/api/buyers.ts), so there's nothing to keep in sync here.
 //
 // This is the automation EWAY_BILL.md and the eway-poc README distinguish
 // from the actual e-way bill submission: services.gst.gov.in/services/searchtp
@@ -182,7 +184,7 @@ async function lookupOne(page, gstin) {
   };
 }
 
-const BUYER_COLS = `id, name, gstin, pincode, "stateCode", "gstVerifiedAt"`;
+const BUYER_COLS = `id, name, gstin`;
 
 async function fetchBuyers(client, args) {
   if (args.buyerId) {
@@ -192,10 +194,15 @@ async function fetchBuyers(client, args) {
     if (rows.length === 0) throw new Error(`No buyer with id ${args.buyerId}`);
     return rows;
   }
-  // --all-missing: every buyer with a GSTIN that hasn't been verified yet
+  // --all-missing: every buyer with a GSTIN that has no GstVerification row
+  // matching their current gstin yet (see latestGstVerification).
   const { rows } = await client.query(
-    `select ${BUYER_COLS} from "Buyer"
-     where gstin is not null and gstin <> '' and "gstVerifiedAt" is null
+    `select ${BUYER_COLS} from "Buyer" b
+     where gstin is not null and gstin <> ''
+       and not exists (
+         select 1 from "GstVerification" gv
+         where gv."buyerId" = b.id and gv.gstin = b.gstin
+       )
      order by name`
   );
   return rows;
@@ -216,43 +223,29 @@ function parseArgs() {
 }
 
 async function saveResult(db, buyer, found) {
-  await db.query("BEGIN");
-  try {
-    await db.query(
-      `update "Buyer"
-       set pincode = $1, "stateCode" = $2, "gstVerifiedAt" = now(),
-           "gstLegalName" = $3, "gstTradeName" = $4, "gstAddress" = $5
-       where id = $6`,
-      [found.pincode, found.stateCode, found.legalName, found.tradeName, found.address, buyer.id]
-    );
-    await db.query(
-      `insert into "GstVerification"
-         (id, "buyerId", gstin, "legalName", "tradeName", "registrationDate",
-          "constitutionOfBusiness", "gstinStatus", "taxpayerType",
-          "principalAddress", pincode, "stateCode", raw)
-       values
-         ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
-      [
-        randomUUID(),
-        buyer.id,
-        buyer.gstin,
-        found.legalName,
-        found.tradeName,
-        found.registrationDate,
-        found.constitutionOfBusiness,
-        found.gstinStatus,
-        found.taxpayerType,
-        found.address,
-        found.pincode,
-        found.stateCode,
-        JSON.stringify(found.raw),
-      ]
-    );
-    await db.query("COMMIT");
-  } catch (err) {
-    await db.query("ROLLBACK");
-    throw err;
-  }
+  await db.query(
+    `insert into "GstVerification"
+       (id, "buyerId", gstin, "legalName", "tradeName", "registrationDate",
+        "constitutionOfBusiness", "gstinStatus", "taxpayerType",
+        "principalAddress", pincode, "stateCode", raw)
+     values
+       ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
+    [
+      randomUUID(),
+      buyer.id,
+      buyer.gstin,
+      found.legalName,
+      found.tradeName,
+      found.registrationDate,
+      found.constitutionOfBusiness,
+      found.gstinStatus,
+      found.taxpayerType,
+      found.address,
+      found.pincode,
+      found.stateCode,
+      JSON.stringify(found.raw),
+    ]
+  );
 }
 
 async function main() {
@@ -301,9 +294,9 @@ async function main() {
       }
 
       if (!found.pincode || !found.stateCode) {
-        // Deliberately not marking gstVerifiedAt here -- an incomplete result
-        // isn't a verification, it's a failed one. Re-run once selectors/the
-        // page layout are confirmed correct.
+        // Deliberately not inserting a GstVerification row here -- an
+        // incomplete result isn't a verification, it's a failed one. Re-run
+        // once selectors/the page layout are confirmed correct.
         results.push({ buyer: buyer.name, status: "incomplete result, not saved", detail: JSON.stringify(found) });
         continue;
       }
@@ -312,7 +305,7 @@ async function main() {
       results.push({
         buyer: buyer.name,
         status: "verified",
-        detail: `pincode ${buyer.pincode ?? "∅"} -> ${found.pincode}, state ${buyer.stateCode ?? "∅"} -> ${found.stateCode}`,
+        detail: `pincode ${found.pincode}, state ${found.stateCode}`,
       });
     } catch (err) {
       console.error(`  failed: ${err.message}`);

@@ -22,18 +22,11 @@ export default async function handler(request: Request) {
       });
     }
 
-    const newGstin = data.gstin || null;
-
-    // A GST verification is only valid for the GSTIN it was run against --
-    // if the GSTIN changes, un-verify rather than leave a stale "verified"
-    // badge pointing at another business's confirmed data. Re-run
-    // scripts/gstin-lookup to re-verify.
-    const existing = await prisma.buyer.findUnique({
-      where: { id: data.id },
-      select: { gstin: true },
-    });
-    const gstinChanged = existing !== null && existing.gstin !== newGstin;
-
+    // No GST-verification bookkeeping needed here: GstVerification rows are
+    // never touched by this endpoint, and "verified" is derived at read time
+    // by comparing a buyer's current gstin against its latest
+    // GstVerification.gstin (see isBuyerGstVerified in src/api/buyers.ts) --
+    // so an edited GSTIN can't leave a stale "verified" status behind.
     const buyer = await prisma.buyer.update({
       where: {
         id: data.id,
@@ -41,11 +34,10 @@ export default async function handler(request: Request) {
       data: {
         name: data.name,
         address: data.address,
-        gstin: newGstin,
+        gstin: data.gstin || null,
         phone: data.phone || null,
         pincode: data.pincode ?? null,
         stateCode: data.stateCode ?? null,
-        ...(gstinChanged ? { gstVerifiedAt: null } : {}),
       },
     });
 

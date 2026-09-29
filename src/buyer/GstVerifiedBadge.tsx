@@ -4,7 +4,11 @@ import dayjs from "dayjs";
 
 interface GstVerifiedBadgeProps {
   gstin: string | null;
-  gstVerifiedAt: string | null;
+  // The matched GstVerification's verifiedAt (see latestGstVerification in
+  // src/api/buyers.ts) -- null for "not verified", including a stale
+  // verification left over from a since-changed GSTIN. This component just
+  // renders what it's given; the gstin-match check happens at the caller.
+  verifiedAt: string | null;
   className?: string;
 }
 
@@ -15,17 +19,17 @@ interface GstVerifiedBadgeProps {
  */
 export default function GstVerifiedBadge({
   gstin,
-  gstVerifiedAt,
+  verifiedAt,
   className,
 }: GstVerifiedBadgeProps) {
   if (!gstin) return null;
 
-  if (gstVerifiedAt) {
+  if (verifiedAt) {
     return (
       <Badge
         variant="outline"
         className={`text-green-700 dark:text-green-500 border-green-600/30 bg-green-600/10 ${className ?? ""}`}
-        title={`GST details verified ${dayjs(gstVerifiedAt).format("DD/MM/YYYY")}`}
+        title={`GST details verified ${dayjs(verifiedAt).format("DD/MM/YYYY")}`}
       >
         <BadgeCheck className="h-3 w-3" />
         GST Verified

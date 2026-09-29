@@ -44,10 +44,6 @@ export type BuyerMinAggregateOutputType = {
   phone: string | null
   pincode: number | null
   stateCode: number | null
-  gstVerifiedAt: Date | null
-  gstLegalName: string | null
-  gstTradeName: string | null
-  gstAddress: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -60,10 +56,6 @@ export type BuyerMaxAggregateOutputType = {
   phone: string | null
   pincode: number | null
   stateCode: number | null
-  gstVerifiedAt: Date | null
-  gstLegalName: string | null
-  gstTradeName: string | null
-  gstAddress: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -76,10 +68,6 @@ export type BuyerCountAggregateOutputType = {
   phone: number
   pincode: number
   stateCode: number
-  gstVerifiedAt: number
-  gstLegalName: number
-  gstTradeName: number
-  gstAddress: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -104,10 +92,6 @@ export type BuyerMinAggregateInputType = {
   phone?: true
   pincode?: true
   stateCode?: true
-  gstVerifiedAt?: true
-  gstLegalName?: true
-  gstTradeName?: true
-  gstAddress?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -120,10 +104,6 @@ export type BuyerMaxAggregateInputType = {
   phone?: true
   pincode?: true
   stateCode?: true
-  gstVerifiedAt?: true
-  gstLegalName?: true
-  gstTradeName?: true
-  gstAddress?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -136,10 +116,6 @@ export type BuyerCountAggregateInputType = {
   phone?: true
   pincode?: true
   stateCode?: true
-  gstVerifiedAt?: true
-  gstLegalName?: true
-  gstTradeName?: true
-  gstAddress?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -239,10 +215,6 @@ export type BuyerGroupByOutputType = {
   phone: string | null
   pincode: number | null
   stateCode: number | null
-  gstVerifiedAt: Date | null
-  gstLegalName: string | null
-  gstTradeName: string | null
-  gstAddress: string | null
   createdAt: Date
   updatedAt: Date
   _count: BuyerCountAggregateOutputType | null
@@ -278,10 +250,6 @@ export type BuyerWhereInput = {
   phone?: Prisma.StringNullableFilter<"Buyer"> | string | null
   pincode?: Prisma.IntNullableFilter<"Buyer"> | number | null
   stateCode?: Prisma.IntNullableFilter<"Buyer"> | number | null
-  gstVerifiedAt?: Prisma.DateTimeNullableFilter<"Buyer"> | Date | string | null
-  gstLegalName?: Prisma.StringNullableFilter<"Buyer"> | string | null
-  gstTradeName?: Prisma.StringNullableFilter<"Buyer"> | string | null
-  gstAddress?: Prisma.StringNullableFilter<"Buyer"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Buyer"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Buyer"> | Date | string
   invoices?: Prisma.InvoiceListRelationFilter
@@ -296,10 +264,6 @@ export type BuyerOrderByWithRelationInput = {
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
   pincode?: Prisma.SortOrderInput | Prisma.SortOrder
   stateCode?: Prisma.SortOrderInput | Prisma.SortOrder
-  gstVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  gstLegalName?: Prisma.SortOrderInput | Prisma.SortOrder
-  gstTradeName?: Prisma.SortOrderInput | Prisma.SortOrder
-  gstAddress?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   invoices?: Prisma.InvoiceOrderByRelationAggregateInput
@@ -317,10 +281,6 @@ export type BuyerWhereUniqueInput = Prisma.AtLeast<{
   phone?: Prisma.StringNullableFilter<"Buyer"> | string | null
   pincode?: Prisma.IntNullableFilter<"Buyer"> | number | null
   stateCode?: Prisma.IntNullableFilter<"Buyer"> | number | null
-  gstVerifiedAt?: Prisma.DateTimeNullableFilter<"Buyer"> | Date | string | null
-  gstLegalName?: Prisma.StringNullableFilter<"Buyer"> | string | null
-  gstTradeName?: Prisma.StringNullableFilter<"Buyer"> | string | null
-  gstAddress?: Prisma.StringNullableFilter<"Buyer"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Buyer"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Buyer"> | Date | string
   invoices?: Prisma.InvoiceListRelationFilter
@@ -335,10 +295,6 @@ export type BuyerOrderByWithAggregationInput = {
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
   pincode?: Prisma.SortOrderInput | Prisma.SortOrder
   stateCode?: Prisma.SortOrderInput | Prisma.SortOrder
-  gstVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  gstLegalName?: Prisma.SortOrderInput | Prisma.SortOrder
-  gstTradeName?: Prisma.SortOrderInput | Prisma.SortOrder
-  gstAddress?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.BuyerCountOrderByAggregateInput
@@ -359,10 +315,6 @@ export type BuyerScalarWhereWithAggregatesInput = {
   phone?: Prisma.StringNullableWithAggregatesFilter<"Buyer"> | string | null
   pincode?: Prisma.IntNullableWithAggregatesFilter<"Buyer"> | number | null
   stateCode?: Prisma.IntNullableWithAggregatesFilter<"Buyer"> | number | null
-  gstVerifiedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Buyer"> | Date | string | null
-  gstLegalName?: Prisma.StringNullableWithAggregatesFilter<"Buyer"> | string | null
-  gstTradeName?: Prisma.StringNullableWithAggregatesFilter<"Buyer"> | string | null
-  gstAddress?: Prisma.StringNullableWithAggregatesFilter<"Buyer"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Buyer"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Buyer"> | Date | string
 }
@@ -375,10 +327,6 @@ export type BuyerCreateInput = {
   phone?: string | null
   pincode?: number | null
   stateCode?: number | null
-  gstVerifiedAt?: Date | string | null
-  gstLegalName?: string | null
-  gstTradeName?: string | null
-  gstAddress?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   invoices?: Prisma.InvoiceCreateNestedManyWithoutBuyerInput
@@ -393,10 +341,6 @@ export type BuyerUncheckedCreateInput = {
   phone?: string | null
   pincode?: number | null
   stateCode?: number | null
-  gstVerifiedAt?: Date | string | null
-  gstLegalName?: string | null
-  gstTradeName?: string | null
-  gstAddress?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutBuyerInput
@@ -411,10 +355,6 @@ export type BuyerUpdateInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pincode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   stateCode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  gstVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  gstLegalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  gstTradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  gstAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   invoices?: Prisma.InvoiceUpdateManyWithoutBuyerNestedInput
@@ -429,10 +369,6 @@ export type BuyerUncheckedUpdateInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pincode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   stateCode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  gstVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  gstLegalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  gstTradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  gstAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutBuyerNestedInput
@@ -447,10 +383,6 @@ export type BuyerCreateManyInput = {
   phone?: string | null
   pincode?: number | null
   stateCode?: number | null
-  gstVerifiedAt?: Date | string | null
-  gstLegalName?: string | null
-  gstTradeName?: string | null
-  gstAddress?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -463,10 +395,6 @@ export type BuyerUpdateManyMutationInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pincode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   stateCode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  gstVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  gstLegalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  gstTradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  gstAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -479,10 +407,6 @@ export type BuyerUncheckedUpdateManyInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pincode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   stateCode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  gstVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  gstLegalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  gstTradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  gstAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -495,10 +419,6 @@ export type BuyerCountOrderByAggregateInput = {
   phone?: Prisma.SortOrder
   pincode?: Prisma.SortOrder
   stateCode?: Prisma.SortOrder
-  gstVerifiedAt?: Prisma.SortOrder
-  gstLegalName?: Prisma.SortOrder
-  gstTradeName?: Prisma.SortOrder
-  gstAddress?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -516,10 +436,6 @@ export type BuyerMaxOrderByAggregateInput = {
   phone?: Prisma.SortOrder
   pincode?: Prisma.SortOrder
   stateCode?: Prisma.SortOrder
-  gstVerifiedAt?: Prisma.SortOrder
-  gstLegalName?: Prisma.SortOrder
-  gstTradeName?: Prisma.SortOrder
-  gstAddress?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -532,10 +448,6 @@ export type BuyerMinOrderByAggregateInput = {
   phone?: Prisma.SortOrder
   pincode?: Prisma.SortOrder
   stateCode?: Prisma.SortOrder
-  gstVerifiedAt?: Prisma.SortOrder
-  gstLegalName?: Prisma.SortOrder
-  gstTradeName?: Prisma.SortOrder
-  gstAddress?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -564,10 +476,6 @@ export type NullableIntFieldUpdateOperationsInput = {
   decrement?: number
   multiply?: number
   divide?: number
-}
-
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
 }
 
 export type DateTimeFieldUpdateOperationsInput = {
@@ -610,10 +518,6 @@ export type BuyerCreateWithoutGstVerificationsInput = {
   phone?: string | null
   pincode?: number | null
   stateCode?: number | null
-  gstVerifiedAt?: Date | string | null
-  gstLegalName?: string | null
-  gstTradeName?: string | null
-  gstAddress?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   invoices?: Prisma.InvoiceCreateNestedManyWithoutBuyerInput
@@ -627,10 +531,6 @@ export type BuyerUncheckedCreateWithoutGstVerificationsInput = {
   phone?: string | null
   pincode?: number | null
   stateCode?: number | null
-  gstVerifiedAt?: Date | string | null
-  gstLegalName?: string | null
-  gstTradeName?: string | null
-  gstAddress?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutBuyerInput
@@ -660,10 +560,6 @@ export type BuyerUpdateWithoutGstVerificationsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pincode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   stateCode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  gstVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  gstLegalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  gstTradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  gstAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   invoices?: Prisma.InvoiceUpdateManyWithoutBuyerNestedInput
@@ -677,10 +573,6 @@ export type BuyerUncheckedUpdateWithoutGstVerificationsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pincode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   stateCode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  gstVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  gstLegalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  gstTradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  gstAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutBuyerNestedInput
@@ -694,10 +586,6 @@ export type BuyerCreateWithoutInvoicesInput = {
   phone?: string | null
   pincode?: number | null
   stateCode?: number | null
-  gstVerifiedAt?: Date | string | null
-  gstLegalName?: string | null
-  gstTradeName?: string | null
-  gstAddress?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   gstVerifications?: Prisma.GstVerificationCreateNestedManyWithoutBuyerInput
@@ -711,10 +599,6 @@ export type BuyerUncheckedCreateWithoutInvoicesInput = {
   phone?: string | null
   pincode?: number | null
   stateCode?: number | null
-  gstVerifiedAt?: Date | string | null
-  gstLegalName?: string | null
-  gstTradeName?: string | null
-  gstAddress?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   gstVerifications?: Prisma.GstVerificationUncheckedCreateNestedManyWithoutBuyerInput
@@ -744,10 +628,6 @@ export type BuyerUpdateWithoutInvoicesInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pincode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   stateCode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  gstVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  gstLegalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  gstTradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  gstAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   gstVerifications?: Prisma.GstVerificationUpdateManyWithoutBuyerNestedInput
@@ -761,10 +641,6 @@ export type BuyerUncheckedUpdateWithoutInvoicesInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pincode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   stateCode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  gstVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  gstLegalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  gstTradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  gstAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   gstVerifications?: Prisma.GstVerificationUncheckedUpdateManyWithoutBuyerNestedInput
@@ -818,10 +694,6 @@ export type BuyerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   phone?: boolean
   pincode?: boolean
   stateCode?: boolean
-  gstVerifiedAt?: boolean
-  gstLegalName?: boolean
-  gstTradeName?: boolean
-  gstAddress?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   invoices?: boolean | Prisma.Buyer$invoicesArgs<ExtArgs>
@@ -837,10 +709,6 @@ export type BuyerSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   phone?: boolean
   pincode?: boolean
   stateCode?: boolean
-  gstVerifiedAt?: boolean
-  gstLegalName?: boolean
-  gstTradeName?: boolean
-  gstAddress?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["buyer"]>
@@ -853,10 +721,6 @@ export type BuyerSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   phone?: boolean
   pincode?: boolean
   stateCode?: boolean
-  gstVerifiedAt?: boolean
-  gstLegalName?: boolean
-  gstTradeName?: boolean
-  gstAddress?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["buyer"]>
@@ -869,15 +733,11 @@ export type BuyerSelectScalar = {
   phone?: boolean
   pincode?: boolean
   stateCode?: boolean
-  gstVerifiedAt?: boolean
-  gstLegalName?: boolean
-  gstTradeName?: boolean
-  gstAddress?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type BuyerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "address" | "gstin" | "phone" | "pincode" | "stateCode" | "gstVerifiedAt" | "gstLegalName" | "gstTradeName" | "gstAddress" | "createdAt" | "updatedAt", ExtArgs["result"]["buyer"]>
+export type BuyerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "address" | "gstin" | "phone" | "pincode" | "stateCode" | "createdAt" | "updatedAt", ExtArgs["result"]["buyer"]>
 export type BuyerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   invoices?: boolean | Prisma.Buyer$invoicesArgs<ExtArgs>
   gstVerifications?: boolean | Prisma.Buyer$gstVerificationsArgs<ExtArgs>
@@ -900,10 +760,6 @@ export type $BuyerPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     phone: string | null
     pincode: number | null
     stateCode: number | null
-    gstVerifiedAt: Date | null
-    gstLegalName: string | null
-    gstTradeName: string | null
-    gstAddress: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["buyer"]>
@@ -1338,10 +1194,6 @@ export interface BuyerFieldRefs {
   readonly phone: Prisma.FieldRef<"Buyer", 'String'>
   readonly pincode: Prisma.FieldRef<"Buyer", 'Int'>
   readonly stateCode: Prisma.FieldRef<"Buyer", 'Int'>
-  readonly gstVerifiedAt: Prisma.FieldRef<"Buyer", 'DateTime'>
-  readonly gstLegalName: Prisma.FieldRef<"Buyer", 'String'>
-  readonly gstTradeName: Prisma.FieldRef<"Buyer", 'String'>
-  readonly gstAddress: Prisma.FieldRef<"Buyer", 'String'>
   readonly createdAt: Prisma.FieldRef<"Buyer", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Buyer", 'DateTime'>
 }

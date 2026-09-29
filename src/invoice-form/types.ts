@@ -6,10 +6,6 @@ export interface Buyer {
   phone: string | null;
   pincode: number | null;
   stateCode: number | null;
-  gstVerifiedAt: string | null;
-  gstLegalName: string | null;
-  gstTradeName: string | null;
-  gstAddress: string | null;
   createdAt: string;
   updatedAt: string;
 }

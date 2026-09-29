@@ -41,17 +41,12 @@ export interface Buyer {
   address: string;
   gstin: string | null;
   phone: string | null;
+  // Manual entry, meaningful only for a buyer with no GSTIN (URP) -- see
+  // the field comment in schema.prisma. For a GSTIN buyer, ignore these
+  // and use gstVerification's pincode/stateCode instead (via
+  // latestGstVerification below).
   pincode: number | null;
   stateCode: number | null;
-  // Set only by scripts/gstin-lookup, never by the buyer form -- see that
-  // script and netlify/functions/updateBuyer.ts. gstVerifiedAt non-null is
-  // what "verified" means -- shown on the buyer detail page's GST Info card.
-  // Informational only: e-way bill generation isn't gated on this (see
-  // EWAY_BILL.md), just on the invoice's own data being valid.
-  gstVerifiedAt: string | null;
-  gstLegalName: string | null;
-  gstTradeName: string | null;
-  gstAddress: string | null;
   // Only populated by getBuyerById (a join); the buyer list doesn't fetch
   // this. Latest verification only -- full history lives in the table.
   gstVerifications?: GstVerificationDetail[];
@@ -59,9 +54,26 @@ export interface Buyer {
   updatedAt: string;
 }
 
-/** True once a buyer's GSTIN has been confirmed against the government's own data. */
-export function isBuyerGstVerified(buyer: Pick<Buyer, "gstVerifiedAt">): boolean {
-  return buyer.gstVerifiedAt !== null;
+/**
+ * The latest GstVerification row, but only if it's still for the buyer's
+ * current GSTIN -- editing a buyer's GSTIN doesn't touch GstVerification,
+ * so a stale row for an old GSTIN must not be mistaken for current data.
+ * This is the single source of truth for a GSTIN buyer's legal/trade name,
+ * address, and ship-to PIN/state; nothing GST-related is cached on Buyer.
+ */
+export function latestGstVerification(
+  buyer: Pick<Buyer, "gstin" | "gstVerifications">
+): GstVerificationDetail | undefined {
+  const latest = buyer.gstVerifications?.[0];
+  return latest && latest.gstin === buyer.gstin ? latest : undefined;
+}
+
+/** True once a buyer's *current* GSTIN has been confirmed against the
+ * government's own data (see latestGstVerification for the GSTIN-match rule). */
+export function isBuyerGstVerified(
+  buyer: Pick<Buyer, "gstin" | "gstVerifications">
+): boolean {
+  return !!latestGstVerification(buyer);
 }
 
 export interface BuyerFormData {

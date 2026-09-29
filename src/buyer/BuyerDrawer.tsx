@@ -5,6 +5,7 @@ import { Loader2, BadgeCheck, ShieldAlert } from "lucide-react";
 import {
   createBuyer,
   updateBuyer,
+  latestGstVerification,
   type Buyer,
   type BuyerFormData,
 } from "../api/buyers";
@@ -178,10 +179,12 @@ export default function BuyerDrawer({
   const submitButtonText = mode === "create" ? "Create" : "Update";
   const loadingButtonText = mode === "create" ? "Creating..." : "Updating...";
 
-  // Full detail behind the latest scripts/gstin-lookup run, if any --
-  // getBuyer only ever returns the single most recent one. Edit mode only:
-  // a not-yet-created buyer can't have been verified against anything.
-  const gstDetail = buyer?.gstVerifications?.[0];
+  // The latest scripts/gstin-lookup run, but only if it's still for this
+  // buyer's current GSTIN (see latestGstVerification) -- a stale
+  // verification from a since-changed GSTIN counts as not verified and its
+  // data isn't shown. Edit mode only: a not-yet-created buyer can't have
+  // been verified against anything.
+  const gstDetail = buyer ? latestGstVerification(buyer) : undefined;
   const gstRaw = gstDetail?.raw;
   const showGstTab = mode === "edit" && !!buyer?.gstin;
 
@@ -360,37 +363,37 @@ export default function BuyerDrawer({
       <div className="flex items-center justify-end">
         <GstVerifiedBadge
           gstin={buyer.gstin}
-          gstVerifiedAt={buyer.gstVerifiedAt}
+          verifiedAt={gstDetail?.verifiedAt ?? null}
         />
       </div>
 
-      <div className="space-y-1.5">
-        <p className="text-sm text-muted-foreground text-left">
-          <strong>Legal Name:</strong> {buyer.gstLegalName || "—"}
-        </p>
-        <p className="text-sm text-muted-foreground text-left">
-          <strong>Trade Name:</strong> {buyer.gstTradeName || "—"}
-        </p>
-        <p className="text-sm text-muted-foreground text-left">
-          <strong>Registered Address:</strong> {buyer.gstAddress || "—"}
-        </p>
-        <p className="text-sm text-muted-foreground text-left">
-          <strong>Ship-to PIN code:</strong> {buyer.pincode ?? "Not set"}
-        </p>
-        <p className="text-sm text-muted-foreground text-left">
-          <strong>Ship-to State:</strong> {stateName(buyer.stateCode)}
-        </p>
-        {buyer.gstVerifiedAt && (
+      {gstDetail ? (
+        <div className="space-y-1.5">
+          <p className="text-sm text-muted-foreground text-left">
+            <strong>Legal Name:</strong> {gstDetail.legalName || "—"}
+          </p>
+          <p className="text-sm text-muted-foreground text-left">
+            <strong>Trade Name:</strong> {gstDetail.tradeName || "—"}
+          </p>
+          <p className="text-sm text-muted-foreground text-left">
+            <strong>Registered Address:</strong>{" "}
+            {gstDetail.principalAddress || "—"}
+          </p>
+          <p className="text-sm text-muted-foreground text-left">
+            <strong>Ship-to PIN code:</strong> {gstDetail.pincode ?? "Not set"}
+          </p>
+          <p className="text-sm text-muted-foreground text-left">
+            <strong>Ship-to State:</strong> {stateName(gstDetail.stateCode)}
+          </p>
           <p className="text-sm text-muted-foreground text-left">
             <strong>Verified:</strong>{" "}
-            {dayjs(buyer.gstVerifiedAt).format("DD/MM/YYYY")}
+            {dayjs(gstDetail.verifiedAt).format("DD/MM/YYYY")}
           </p>
-        )}
-      </div>
-
-      {!buyer.gstVerifiedAt && (
+        </div>
+      ) : (
         <p className="text-sm text-amber-700 dark:text-amber-500 text-left">
-          Not verified against the government's GST records yet. Run{" "}
+          Not verified against the government's GST records yet — no
+          ship-to PIN/state available for this buyer until it is. Run{" "}
           <code>scripts/gstin-lookup</code> to verify this buyer against
           GST's own Search Taxpayer records.
         </p>
@@ -550,7 +553,7 @@ export default function BuyerDrawer({
               <TabsList className="mb-4 w-full">
                 <TabsTrigger value="details">Details</TabsTrigger>
                 <TabsTrigger value="gst">
-                  {buyer?.gstVerifiedAt ? (
+                  {gstDetail ? (
                     <BadgeCheck className="text-green-600 dark:text-green-500" />
                   ) : (
                     <ShieldAlert className="text-amber-600 dark:text-amber-500" />

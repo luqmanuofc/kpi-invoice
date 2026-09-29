@@ -22,6 +22,7 @@ import { useBuyer, useBuyerAnalytics, BUYERS_QUERY_KEY } from "@/hooks/useBuyers
 import { useBuyerInvoices, buyerInvoicesQueryKey } from "@/hooks/useInvoices";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import type { Invoice } from "@/api/invoices";
+import { isBuyerGstVerified } from "@/api/buyers";
 import BuyerDrawer from "@/buyer/BuyerDrawer";
 import {
   BuyerAnalyticsSummaryCards,
@@ -169,7 +170,7 @@ export default function BuyerDetailPage() {
                   setEditOpen(true);
                 }}
               >
-                {buyer.gstVerifiedAt ? (
+                {isBuyerGstVerified(buyer) ? (
                   <BadgeCheck className="h-4 w-4 text-green-600 dark:text-green-500" />
                 ) : (
                   <ShieldAlert className="h-4 w-4 text-amber-600 dark:text-amber-500" />

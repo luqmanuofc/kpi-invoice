@@ -17,26 +17,15 @@ model Buyer {
   gstin   String?
   phone   String?
 
-  // Ship-to details for e-way bills. The portal validates these against the
-  // GSTIN's registered state, so they're entered once here instead of on
-  // every invoice.
+  // Ship-to PIN/state for e-way bills -- manual entry, and *only* meaningful
+  // for a buyer with no GSTIN (URP). A buyer with a GSTIN has no use for
+  // these: their PIN/state always come from the latest matching row in
+  // GstVerification below instead (never cached here -- there is nowhere
+  // for a stale duplicate to hide). scripts/gstin-lookup never writes to
+  // these columns; only the buyer create/update form does, and only when
+  // the buyer has no GSTIN (see BuyerDrawer.tsx).
   pincode   Int?
   stateCode Int?
-
-  // GST verification: set only by scripts/gstin-lookup (never by the normal
-  // buyer create/update form -- see netlify/functions/updateBuyer.ts) when it
-  // successfully looks the GSTIN up on the government's public Search
-  // Taxpayer tool. gstVerifiedAt non-null is what "verified" means --
-  // informational (shown on the buyer detail page), not a gate on e-way bill
-  // generation. These four are the "current best known" snapshot, kept here
-  // for cheap access without a join; the full detail behind each lookup
-  // (including past ones) lives in GstVerification below. updateBuyer.ts
-  // clears gstVerifiedAt whenever gstin is edited, since a verification is
-  // only valid for the GSTIN it was run against.
-  gstVerifiedAt DateTime?
-  gstLegalName  String?
-  gstTradeName  String?
-  gstAddress    String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -46,8 +35,9 @@ model Buyer {
 }
 
 //
-// GST VERIFICATION (one row per scripts/gstin-lookup run -- full detail +
-// history, vs. the summary snapshot cached directly on Buyer above)
+// GST VERIFICATION (one row per scripts/gstin-lookup run -- the only place
+// a GSTIN buyer's legal name/trade name/address/pincode/stateCode live;
+// nothing here is cached back onto Buyer)
 //
 model GstVerification {
   id String @id @default(cuid())
@@ -56,7 +46,10 @@ model GstVerification {
   buyer   Buyer  @relation(fields: [buyerId], references: [id], onDelete: Cascade)
 
   // Snapshot of the GSTIN this row was verified against -- Buyer.gstin can
-  // change later; this row still records what it was checked against.
+  // change later. "Verified" is derived at read time by checking this
+  // still equals the buyer's current gstin (see isBuyerGstVerified in
+  // src/api/buyers.ts) rather than tracked with its own flag/column, so a
+  // changed GSTIN can't leave a stale "verified" status lying around.
   gstin String
 
   verifiedAt DateTime @default(now())

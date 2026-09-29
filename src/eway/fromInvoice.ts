@@ -1,4 +1,4 @@
-import type { Buyer } from "../api/buyers";
+import { latestGstVerification, type Buyer } from "../api/buyers";
 import type { Invoice } from "../api/invoices";
 import { round2 } from "./build";
 import { EWAY_SELLER } from "./config";
@@ -9,10 +9,11 @@ import { assessEwayRequirement, type EwayRequirement } from "./requirement";
 import type { EwayInput, EwayParty, EwayTransport } from "./types";
 
 /**
- * Per-shipment transport details, entered on the E-way Bills page. Everything
- * about the parties (PIN, state) comes from the Buyer record instead, since
- * bulk upload needs it correct in the file up front and it rarely changes
- * per invoice -- see [[EWAY_BILL.md]].
+ * Per-shipment transport details, entered in GenerateEwayBillDialog on the
+ * invoice page. Everything about the parties (PIN, state) comes from the
+ * buyer record instead (see buyerParty below), since bulk upload needs it
+ * correct in the file up front and it rarely changes per invoice -- see
+ * [[EWAY_BILL.md]].
  */
 export type TransportOverrides = Partial<EwayTransport>;
 
@@ -31,17 +32,24 @@ function guessPlace(address: string): string {
 }
 
 /**
- * The buyer's ship-to details. Prefers the one-time-entered Buyer record
- * (pincode/stateCode); falls back to guessing from the free-text address
- * snapshot for buyers that haven't been updated with that yet.
+ * The buyer's ship-to details. PIN/state, in priority order: the buyer's
+ * latest GST verification (only for a GSTIN buyer -- see
+ * latestGstVerification), then the buyer's own manually-entered
+ * pincode/stateCode (only meaningful when there's no GSTIN at all -- see
+ * the field comment in schema.prisma), then a guess from the free-text
+ * address snapshot as a last resort.
  */
 function buyerParty(inv: Invoice, buyer: Buyer | undefined): EwayParty {
   const gstin = (inv.buyerGstinSnapshot ?? "").trim().toUpperCase() || URP;
   const address = inv.buyerAddressSnapshot ?? "";
-  const pincode = buyer?.pincode ?? extractPincode(address);
+  const verified = buyer ? latestGstVerification(buyer) : undefined;
+  const manualPincode = buyer?.gstin ? null : (buyer?.pincode ?? null);
+  const manualStateCode = buyer?.gstin ? null : (buyer?.stateCode ?? null);
+  const pincode = verified?.pincode ?? manualPincode ?? extractPincode(address);
   const stateCode =
     stateCodeFromGstin(gstin) ??
-    buyer?.stateCode ??
+    verified?.stateCode ??
+    manualStateCode ??
     (pincode !== null ? inferStateFromPincode(pincode) : null);
   const [address1, address2] = splitAddress(address);
   return {

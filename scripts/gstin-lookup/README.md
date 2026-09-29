@@ -2,11 +2,13 @@
 
 Looks a buyer's GSTIN up on the GST portal's free, public **Search
 Taxpayer** tool (`services.gst.gov.in/services/searchtp` — no login, no OTP,
-just a GSTIN and a captcha), stores the resulting PIN code and state code on
-that buyer's row, and marks the buyer **verified** (`gstVerifiedAt`). Shown
-in the same drawer used to create/edit a buyer ("View GST Info" on the buyer
-detail page opens it); informational only, doesn't gate e-way bill
-generation — see [EWAY_BILL.md](../../EWAY_BILL.md).
+just a GSTIN and a captcha) and inserts one `GstVerification` row with
+everything it returns. It never writes to `Buyer` — "verified" is derived at
+read time by checking whether a `GstVerification` row's `gstin` still
+matches the buyer's current `gstin` (`isBuyerGstVerified` in
+`src/api/buyers.ts`). Shown in the same drawer used to create/edit a buyer
+("View GST Info" on the buyer detail page opens it); informational only,
+doesn't gate e-way bill generation — see [EWAY_BILL.md](../../EWAY_BILL.md).
 
 This is currently phase 1 of a planned two-phase rollout: right now,
 verification only happens by running this script by hand (`--buyer` or
@@ -64,40 +66,40 @@ node -r dotenv/config scripts/gstin-lookup/lookup-and-store.mjs --all-missing
 ```
 
 Prints a per-buyer summary table at the end (verified / skipped / failed,
-with the before → after PIN and state for anything it wrote).
+with the PIN and state it found for anything it wrote).
 
 ## What it writes
 
-Two places, in one transaction:
+Only `GstVerification` — one new row per successful lookup, never
+overwritten (a history table, not a cache): `pincode`, `stateCode`,
+`legalName`, `tradeName`, `registrationDate`, `constitutionOfBusiness`,
+`gstinStatus`, `taxpayerType`, `principalAddress`, and a `raw` JSON blob
+holding the rest of what the portal shows that isn't worth its own typed
+column — jurisdiction (administrative + state office), nature of core
+business activity, nature of business activities, the HSN/SAC goods &
+services table, and a full plain-text dump of the results panel as a
+catch-all. Not surfaced in full in the UI yet; query the table directly if
+you need it.
 
-- **`Buyer`** (the "current best known" summary, cheap to read without a
-  join): `pincode`, `stateCode`, `gstVerifiedAt` (set to the time of the
-  successful lookup — this is what "verified" means), `gstLegalName`,
-  `gstTradeName`, `gstAddress`.
-- **`GstVerification`** (one row per lookup, full detail, never overwritten
-  — a history table, not a cache): everything above again as its own row
-  (so it survives even if the buyer is later re-verified or its GSTIN
-  changes), plus `registrationDate`, `constitutionOfBusiness`,
-  `gstinStatus`, `taxpayerType`, and a `raw` JSON blob holding the rest of
-  what the portal shows that isn't worth its own typed column —
-  jurisdiction (administrative + state office), nature of core business
-  activity, nature of business activities, the HSN/SAC goods & services
-  table, and a full plain-text dump of the results panel as a catch-all.
-  Not surfaced in the UI yet; query the table directly if you need it.
+`Buyer` itself is never written to by this script. Buyer ship-to PIN/state
+for a GSTIN buyer always come from the latest matching `GstVerification`
+row via `latestGstVerification()` (`src/api/buyers.ts`), never cached back
+onto `Buyer` — see [EWAY_BILL.md](../../EWAY_BILL.md).
 
 **Never** `Buyer.name` or `Buyer.address`, even though the portal also
 returns a legal/trade name and a full address that could fill those.
 Deliberate: your working `name`/`address` might intentionally differ from
 GST's registered legal name (how you refer to a customer isn't necessarily
 their GST paperwork name), so this only surfaces the official values
-(console output, and `gstLegalName`/`gstAddress`/`GstVerification` rows) for
-you to compare, rather than silently overwriting what you're already using.
-Say so if you'd rather it did.
+(console output, and the `GstVerification` row) for you to compare, rather
+than silently overwriting what you're already using. Say so if you'd rather
+it did.
 
-A verification is only valid for the GSTIN it ran against —
-`netlify/functions/updateBuyer.ts` clears `gstVerifiedAt` automatically if
-you edit a buyer's GSTIN afterward, so a stale "verified" badge never lingers
-under a changed GSTIN. Re-run this script to re-verify.
+A verification is only valid for the GSTIN it ran against. There's no flag
+to clear when a buyer's GSTIN changes — the old `GstVerification` row's
+`gstin` simply stops matching the buyer's new one, so `isBuyerGstVerified`
+naturally goes false and no stale "verified" badge lingers under a changed
+GSTIN. Re-run this script to re-verify.
 
 ## Known gaps
 
