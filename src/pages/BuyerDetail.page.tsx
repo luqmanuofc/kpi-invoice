@@ -12,6 +12,20 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { useBuyer, useBuyerAnalytics, BUYERS_QUERY_KEY } from "@/hooks/useBuyers";
 import { useBuyerInvoices, buyerInvoicesQueryKey } from "@/hooks/useInvoices";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -126,6 +140,11 @@ export default function BuyerDetailPage() {
   const hasNextInvoicePage = invoicePage < totalInvoicePages;
   const hasPrevInvoicePage = invoicePage > 1;
 
+  // Full detail behind the latest scripts/gstin-lookup run, if any --
+  // getBuyer only ever returns the single most recent one.
+  const gstDetail = buyer.gstVerifications?.[0];
+  const gstRaw = gstDetail?.raw;
+
   return (
     <div className="w-full h-full p-4 md:p-8 space-y-6">
       <div className="flex items-center gap-3">
@@ -207,7 +226,121 @@ export default function BuyerDetailPage() {
                   {dayjs(buyer.gstVerifiedAt).format("DD/MM/YYYY")}
                 </p>
               </div>
-            ) : (
+            ) : null}
+
+            {gstDetail && (
+              <Accordion type="single" collapsible className="mt-2">
+                <AccordionItem value="gst-detail" className="border-none">
+                  <AccordionTrigger className="text-sm text-muted-foreground py-2 hover:no-underline">
+                    More GST details
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
+                      <p className="text-sm text-muted-foreground text-left">
+                        <strong>Registration Date:</strong>{" "}
+                        {gstDetail.registrationDate || "—"}
+                      </p>
+                      <p className="text-sm text-muted-foreground text-left">
+                        <strong>Constitution:</strong>{" "}
+                        {gstDetail.constitutionOfBusiness || "—"}
+                      </p>
+                      <p className="text-sm text-muted-foreground text-left">
+                        <strong>GSTIN Status:</strong>{" "}
+                        {gstDetail.gstinStatus || "—"}
+                      </p>
+                      <p className="text-sm text-muted-foreground text-left">
+                        <strong>Taxpayer Type:</strong>{" "}
+                        {gstDetail.taxpayerType || "—"}
+                      </p>
+                    </div>
+
+                    {(gstRaw?.adminOffice?.length || gstRaw?.otherOffice?.length) ? (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
+                        {gstRaw?.adminOffice && gstRaw.adminOffice.length > 0 && (
+                          <div>
+                            <p className="text-sm font-medium text-left">
+                              Administrative Office
+                            </p>
+                            {gstRaw.adminOffice.map((line, i) => (
+                              <p key={i} className="text-sm text-muted-foreground text-left">
+                                {line}
+                              </p>
+                            ))}
+                          </div>
+                        )}
+                        {gstRaw?.otherOffice && gstRaw.otherOffice.length > 0 && (
+                          <div>
+                            <p className="text-sm font-medium text-left">
+                              State Jurisdiction
+                            </p>
+                            {gstRaw.otherOffice.map((line, i) => (
+                              <p key={i} className="text-sm text-muted-foreground text-left">
+                                {line}
+                              </p>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ) : null}
+
+                    {(gstRaw?.natureOfCoreBusinessActivity || gstRaw?.natureOfBusinessActivities?.length) ? (
+                      <div>
+                        <p className="text-sm font-medium text-left">
+                          Nature of Business
+                        </p>
+                        {gstRaw?.natureOfCoreBusinessActivity && (
+                          <p className="text-sm text-muted-foreground text-left">
+                            {gstRaw.natureOfCoreBusinessActivity}
+                          </p>
+                        )}
+                        {gstRaw?.natureOfBusinessActivities && gstRaw.natureOfBusinessActivities.length > 0 && (
+                          <p className="text-sm text-muted-foreground text-left">
+                            {gstRaw.natureOfBusinessActivities.join(", ")}
+                          </p>
+                        )}
+                      </div>
+                    ) : null}
+
+                    {gstRaw?.goodsServices && gstRaw.goodsServices.length > 0 && (
+                      <div>
+                        <p className="text-sm font-medium text-left mb-1">
+                          Goods &amp; Services Dealt In
+                        </p>
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>HSN/SAC</TableHead>
+                              <TableHead>Description</TableHead>
+                              <TableHead>Type</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {gstRaw.goodsServices.map((item, i) => (
+                              <TableRow key={i}>
+                                <TableCell>{item.hsn}</TableCell>
+                                <TableCell className="whitespace-normal">
+                                  {item.description}
+                                </TableCell>
+                                <TableCell className="capitalize">
+                                  {item.type}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    )}
+
+                    <p className="text-xs text-muted-foreground text-left">
+                      From the {dayjs(gstDetail.verifiedAt).format("DD/MM/YYYY")}{" "}
+                      GST Search Taxpayer lookup.
+                    </p>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            )}
+
+            {!buyer.gstVerifiedAt && (
               <div className="space-y-2">
                 <p className="text-sm text-amber-700 dark:text-amber-500 text-left">
                   Not verified against the government's GST records yet.

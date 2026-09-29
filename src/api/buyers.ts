@@ -1,5 +1,40 @@
 import { apiClient } from "../utils/auth";
 
+export interface GstVerificationGoodsService {
+  hsn: string;
+  description: string;
+  type: "goods" | "service";
+}
+
+/** Everything scripts/gstin-lookup captured on its most recent run that isn't
+ * worth its own typed column -- see the `raw` column comment in schema.prisma. */
+export interface GstVerificationRaw {
+  adminOffice?: string[];
+  otherOffice?: string[];
+  natureOfCoreBusinessActivity?: string | null;
+  natureOfBusinessActivities?: string[];
+  goodsServices?: GstVerificationGoodsService[];
+  fullText?: string | null;
+}
+
+/** One row from the GstVerification table -- full detail behind a single
+ * scripts/gstin-lookup run. getBuyer only ever returns the latest one. */
+export interface GstVerificationDetail {
+  id: string;
+  gstin: string;
+  verifiedAt: string;
+  legalName: string | null;
+  tradeName: string | null;
+  registrationDate: string | null;
+  constitutionOfBusiness: string | null;
+  gstinStatus: string | null;
+  taxpayerType: string | null;
+  principalAddress: string | null;
+  pincode: number | null;
+  stateCode: number | null;
+  raw: GstVerificationRaw | null;
+}
+
 export interface Buyer {
   id: string;
   name: string;
@@ -17,6 +52,9 @@ export interface Buyer {
   gstLegalName: string | null;
   gstTradeName: string | null;
   gstAddress: string | null;
+  // Only populated by getBuyerById (a join); the buyer list doesn't fetch
+  // this. Latest verification only -- full history lives in the table.
+  gstVerifications?: GstVerificationDetail[];
   createdAt: string;
   updatedAt: string;
 }

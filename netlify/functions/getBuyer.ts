@@ -27,6 +27,14 @@ export default async function handler(request: Request) {
       where: {
         id: id,
       },
+      include: {
+        // Only the latest lookup for the buyer detail page's "More GST
+        // details" section -- full history lives in the table itself.
+        gstVerifications: {
+          orderBy: { verifiedAt: "desc" },
+          take: 1,
+        },
+      },
     });
 
     if (!buyer) {
