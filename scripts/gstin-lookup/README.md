@@ -22,25 +22,25 @@ Same captcha-solving approach as `eway-poc` (screenshot the `<img>`, ask
 Claude to read it, retry up to 3 times) — see
 [`../lib/solveCaptcha.mjs`](../lib/solveCaptcha.mjs), shared by both.
 
-## Before running
+## Status
 
-Selectors in `lookup-and-store.mjs` are placeholders — capture the real ones:
-
-```
-npx playwright codegen https://services.gst.gov.in/services/searchtp
-```
-
-Type in a real GSTIN, solve the captcha, submit, and copy the selectors for
-the GSTIN input, the captcha image, the captcha input, the submit button,
-and the result fields (legal/trade name, principal place of business
-address, and — if they're shown as their own fields rather than embedded in
-the address — state and PIN code separately). Paste them into `SELECTORS`.
+Selectors confirmed working against the real page (2026-09-29) — see the
+comment block at the top of `lookup-and-store.mjs` for the two non-obvious
+things found running it live (the captcha only appears on real keystrokes,
+not `.fill()`; a watermark occasionally obscures a character, handled by the
+retry+refresh loop already in place). First real run verified an actual
+buyer (`Raheek Multinational Sarai`, GSTIN `01CHMPB4308R1ZA`) against
+staging. If the portal changes its markup and this starts failing, redo the
+affected selector by hand (`headless: false` temporarily, or screenshot each
+step) rather than guessing.
 
 ## Setup
 
-Same dependencies as `eway-poc` (`playwright`, `@anthropic-ai/sdk` — install
-those first if you haven't already) plus `pg`, which the app already
-depends on. Set `ANTHROPIC_API_KEY` in `.env`.
+`playwright` is now a project devDependency (`npm install` picks it up) plus
+`@anthropic-ai/sdk` for captcha solving — install that one yourself if you
+haven't already — and `pg`, which the app already depends on. Set
+`ANTHROPIC_API_KEY` in `.env`. Also run `npx playwright install chromium`
+once, to fetch the browser binary.
 
 ## Run
 
@@ -87,5 +87,10 @@ under a changed GSTIN. Re-run this script to re-verify.
 - No session/rate-limit awareness — if the public tool starts throttling or
   captcha-walling after N lookups in a row, this doesn't detect or back off
   from that beyond the fixed 4s gap between buyers.
-- Same caveat as `eway-poc`: the "captcha was wrong" check assumes specific
-  error text that hasn't been confirmed against the real page.
+- The automated captcha-solving path (`solveCaptcha.mjs` calling Claude via
+  `@anthropic-ai/sdk`) hasn't been run end-to-end yet — the live verification
+  above was done by reading each captcha screenshot directly rather than
+  through that API call (no `ANTHROPIC_API_KEY` in that environment). The
+  selectors, form flow, and result parsing are all confirmed against the real
+  page; only the model-reads-the-image step itself is still unproven in
+  practice, though there's no reason to expect it to perform differently.

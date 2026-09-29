@@ -14,18 +14,20 @@
 // Do not point this at prod without deciding to.
 //
 // -----------------------------------------------------------------------
-// SELECTORS BELOW ARE PLACEHOLDERS, same caveat as scripts/eway-poc: this has
-// never been run against the real page, so there was nothing to test them
-// against. Capture the real ones yourself:
+// Selectors confirmed against the real page on 2026-09-29 (Angular SPA --
+// static HTML fetches won't show these; they only exist after the JS app
+// renders). If the portal changes its markup and this starts failing, redo
+// this by hand: `node scripts/gstin-lookup/lookup-and-store.mjs --buyer <id>`
+// with `headless: false` below temporarily, or screenshot each step.
 //
-//   npx playwright codegen https://services.gst.gov.in/services/searchtp
-//
-// Type a real GSTIN, solve the captcha, submit, and copy the selectors
-// Playwright records for: the GSTIN input, the captcha <img>, the captcha
-// input, the submit button, and the result fields (legal/trade name,
-// principal place of business address, state, and PIN code if it's a
-// separate field rather than embedded in the address). Paste them into
-// SELECTORS below.
+// Two non-obvious things learned running this live:
+// - The GSTIN field only reveals the captcha on real keystroke events
+//   (Angular's ng-keyup); Playwright's .fill() sets the value without firing
+//   those, so the captcha never appears. Must use keyboard.type().
+// - The captcha image has a decorative world-map watermark that sometimes
+//   sits directly over 1-2 characters, occasionally making an otherwise
+//   sharp captcha ambiguous. solveCaptcha's UNSURE path + the refresh below
+//   handles this by trying again rather than guessing through it.
 // -----------------------------------------------------------------------
 
 import "dotenv/config";
@@ -37,15 +39,15 @@ import { stateCodeFromName } from "./stateNames.mjs";
 const SEARCH_URL = "https://services.gst.gov.in/services/searchtp";
 
 const SELECTORS = {
-  gstinInput: "TODO", // e.g. '#for_gstin' or 'input[name="gstin"]'
-  captchaImage: "TODO",
-  captchaInput: "TODO",
-  submit: "TODO", // e.g. 'button:has-text("Search")'
-  resultLegalName: "TODO",
-  resultTradeName: "TODO",
-  resultAddress: "TODO", // "Principal Place of Business"
-  resultState: "TODO", // omit / leave "TODO" if state isn't a separate field -- falls back to parsing it out of resultAddress
-  resultPincode: "TODO", // omit / leave "TODO" if PIN isn't a separate field -- falls back to regex on resultAddress
+  gstinInput: "#for_gstin",
+  captchaImage: "#imgCaptcha",
+  captchaInput: "#fo-captcha",
+  refreshCaptcha: 'button[ng-click="refreshCaptcha()"]',
+  submit: "#lotsearch",
+  // Legal/trade name have no id -- located by their <strong> label, which is
+  // more stable across markup tweaks than a generated class name.
+  captchaError: "text=/enter valid letters shown/i",
+  resultAddress: '[data-ng-bind="searchTaxpre_Payload.pradr.adr"]', // "Principal Place of Business"
 };
 
 const MAX_CAPTCHA_ATTEMPTS = 3;
@@ -56,14 +58,32 @@ function extractPincodeFromText(text) {
   return matches ? Number(matches[matches.length - 1]) : null;
 }
 
-async function textOrNull(page, selector) {
-  if (selector === "TODO") return null;
-  return (await page.locator(selector).innerText().catch(() => null))?.trim() ?? null;
+/** GST addresses render as "..., <City>, <State>, <Pincode>" -- the last two
+ * comma-separated segments, reliably, so both come from this one field. */
+function parseAddress(address) {
+  const parts = (address ?? "").split(",").map((p) => p.trim());
+  const pincode = extractPincodeFromText(address ?? "");
+  const stateText = parts.length >= 2 ? parts[parts.length - 2] : null;
+  const stateCode = stateText ? stateCodeFromName(stateText) : null;
+  return { pincode, stateCode };
+}
+
+async function fieldByLabel(page, label) {
+  const value = await page
+    .locator(`.col-sm-4:has(strong:text-is("${label}")) p`)
+    .nth(1)
+    .innerText()
+    .catch(() => null);
+  return value?.trim() ?? null;
 }
 
 async function lookupOne(page, gstin) {
-  await page.goto(SEARCH_URL);
-  await page.fill(SELECTORS.gstinInput, gstin);
+  await page.goto(SEARCH_URL, { waitUntil: "networkidle" });
+  await page.waitForTimeout(1000);
+  await page.click(SELECTORS.gstinInput);
+  await page.keyboard.type(gstin, { delay: 80 }); // see note above: fill() won't reveal the captcha
+  await page.waitForSelector(SELECTORS.captchaImage, { timeout: 10000 });
+  await page.waitForTimeout(800);
 
   for (let attempt = 1; attempt <= MAX_CAPTCHA_ATTEMPTS; attempt++) {
     const captchaBuffer = await page.locator(SELECTORS.captchaImage).screenshot();
@@ -71,20 +91,18 @@ async function lookupOne(page, gstin) {
 
     if (guess === "UNSURE") {
       console.log(`  captcha attempt ${attempt}: model unsure, reloading...`);
-      // TODO: click the page's "refresh captcha" control, then continue
+      await page.click(SELECTORS.refreshCaptcha);
+      await page.waitForTimeout(1000);
       continue;
     }
 
     console.log(`  captcha attempt ${attempt}: trying "${guess}"`);
-    await page.fill(SELECTORS.captchaInput, guess);
+    await page.click(SELECTORS.captchaInput);
+    await page.keyboard.type(guess, { delay: 50 });
     await page.click(SELECTORS.submit);
+    await page.waitForTimeout(1500);
 
-    // TODO: replace with a real check for this page's actual error text/element
-    const captchaWasWrong = await page
-      .locator("text=/invalid captcha/i")
-      .isVisible()
-      .catch(() => false);
-
+    const captchaWasWrong = await page.locator(SELECTORS.captchaError).isVisible().catch(() => false);
     if (!captchaWasWrong) break;
     console.log("  captcha rejected, retrying...");
     if (attempt === MAX_CAPTCHA_ATTEMPTS) {
@@ -92,16 +110,12 @@ async function lookupOne(page, gstin) {
     }
   }
 
-  const legalName = await textOrNull(page, SELECTORS.resultLegalName);
-  const tradeName = await textOrNull(page, SELECTORS.resultTradeName);
-  const address = await textOrNull(page, SELECTORS.resultAddress);
-  const stateText = await textOrNull(page, SELECTORS.resultState);
-  const pincodeText = await textOrNull(page, SELECTORS.resultPincode);
+  const legalName = await fieldByLabel(page, "Legal Name of Business");
+  const tradeName = await fieldByLabel(page, "Trade Name");
+  const address = await page.locator(SELECTORS.resultAddress).innerText().catch(() => null);
+  const { pincode, stateCode } = parseAddress(address);
 
-  const pincode = pincodeText ? Number(pincodeText) : extractPincodeFromText(address ?? "");
-  const stateCode = stateText ? stateCodeFromName(stateText) : null;
-
-  return { legalName, tradeName, address, pincode, stateCode };
+  return { legalName, tradeName, address: address?.trim() ?? null, pincode, stateCode };
 }
 
 const BUYER_COLS = `id, name, gstin, pincode, "stateCode", "gstVerifiedAt"`;
@@ -159,7 +173,8 @@ async function main() {
   }
   console.log(`Looking up ${buyers.length} buyer(s) against ${SEARCH_URL}\n`);
 
-  const browser = await chromium.launch({ headless: false });
+  // Headless is fine here (unlike eway-poc) -- no OTP, no human step needed.
+  const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
   const results = [];
 

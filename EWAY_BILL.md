@@ -113,7 +113,8 @@ Split deliberately into two pieces, and only the first is the actual plan:
 not a filing action) and stores the resulting PIN/state on that buyer's row,
 one time, instead of typing it in by hand. It never touches the actual e-way
 bill portal or generates any compliance document — see the script's own
-README.
+README. Confirmed working end to end against the real page (2026-09-29,
+verified an actual buyer on staging).
 
 Phase 1.2 (not built): trigger that lookup automatically from the app the
 moment a GSTIN is entered on the buyer form, instead of running the script
