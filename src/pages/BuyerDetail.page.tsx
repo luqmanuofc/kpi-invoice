@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
+import dayjs from "dayjs";
 import { Loader2, ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Alert } from "@/components/ui/alert";
@@ -17,6 +18,7 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 import type { Invoice } from "@/api/invoices";
 import BuyerDrawer from "@/buyer/BuyerDrawer";
 import GstVerifiedBadge from "@/buyer/GstVerifiedBadge";
+import { STATE_CODES } from "@/eway/codes";
 import {
   BuyerAnalyticsSummaryCards,
   BuyerAnalyticsDetailCards,
@@ -137,15 +139,9 @@ export default function BuyerDetailPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="gap-2">
           <CardHeader>
-            <div className="flex items-center justify-between gap-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Buyer Info
-              </CardTitle>
-              <GstVerifiedBadge
-                gstin={buyer.gstin}
-                gstVerifiedAt={buyer.gstVerifiedAt}
-              />
-            </div>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Buyer Info
+            </CardTitle>
           </CardHeader>
           <CardContent className="grow space-y-2">
             <p className="text-sm text-muted-foreground text-left">
@@ -157,18 +153,6 @@ export default function BuyerDetailPage() {
             <p className="text-sm text-muted-foreground text-left">
               <strong>Phone:</strong> {buyer.phone || "—"}
             </p>
-            {buyer.gstin && !buyer.gstVerifiedAt && (
-              <p className="text-sm text-amber-700 dark:text-amber-500 text-left">
-                Not verified against GST records yet — e-way bills can't be
-                generated for this buyer until it is. Run{" "}
-                <code className="text-xs">scripts/gstin-lookup</code>.
-              </p>
-            )}
-            {buyer.gstVerifiedAt && buyer.gstLegalName && buyer.gstLegalName !== buyer.name && (
-              <p className="text-sm text-muted-foreground text-left">
-                <strong>GST legal name:</strong> {buyer.gstLegalName}
-              </p>
-            )}
           </CardContent>
           <CardFooter className="flex justify-end gap-2 pt-0">
             <Button size="sm" onClick={() => setEditOpen(true)}>
@@ -185,6 +169,65 @@ export default function BuyerDetailPage() {
           analytics && <BuyerAnalyticsSummaryCards data={analytics} />
         )}
       </div>
+
+      {buyer.gstin && (
+        <Card className="gap-2">
+          <CardHeader>
+            <div className="flex items-center justify-between gap-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                GST Information
+              </CardTitle>
+              <GstVerifiedBadge
+                gstin={buyer.gstin}
+                gstVerifiedAt={buyer.gstVerifiedAt}
+              />
+            </div>
+          </CardHeader>
+          <CardContent>
+            {buyer.gstVerifiedAt ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
+                <p className="text-sm text-muted-foreground text-left">
+                  <strong>Legal Name:</strong> {buyer.gstLegalName || "—"}
+                </p>
+                <p className="text-sm text-muted-foreground text-left">
+                  <strong>Trade Name:</strong> {buyer.gstTradeName || "—"}
+                </p>
+                <p className="text-sm text-muted-foreground text-left sm:col-span-2">
+                  <strong>Registered Address:</strong> {buyer.gstAddress || "—"}
+                </p>
+                <p className="text-sm text-muted-foreground text-left">
+                  <strong>Ship-to PIN code:</strong> {buyer.pincode ?? "—"}
+                </p>
+                <p className="text-sm text-muted-foreground text-left">
+                  <strong>Ship-to State:</strong>{" "}
+                  {buyer.stateCode ? STATE_CODES[buyer.stateCode] ?? buyer.stateCode : "—"}
+                </p>
+                <p className="text-sm text-muted-foreground text-left sm:col-span-2">
+                  <strong>Verified:</strong>{" "}
+                  {dayjs(buyer.gstVerifiedAt).format("DD/MM/YYYY")}
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <p className="text-sm text-amber-700 dark:text-amber-500 text-left">
+                  Not verified against the government's GST records yet.
+                </p>
+                <p className="text-sm text-muted-foreground text-left">
+                  <strong>Ship-to PIN code:</strong> {buyer.pincode ?? "Not set"}
+                </p>
+                <p className="text-sm text-muted-foreground text-left">
+                  <strong>Ship-to State:</strong>{" "}
+                  {buyer.stateCode ? STATE_CODES[buyer.stateCode] ?? buyer.stateCode : "Not set"}
+                </p>
+                <p className="text-xs text-muted-foreground text-left">
+                  Run <code>scripts/gstin-lookup</code> to verify this buyer
+                  against GST's own Search Taxpayer records.
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {analytics && <BuyerAnalyticsDetailCards data={analytics} />}
 

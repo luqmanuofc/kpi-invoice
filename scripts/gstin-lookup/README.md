@@ -3,8 +3,9 @@
 Looks a buyer's GSTIN up on the GST portal's free, public **Search
 Taxpayer** tool (`services.gst.gov.in/services/searchtp` — no login, no OTP,
 just a GSTIN and a captcha), stores the resulting PIN code and state code on
-that buyer's row, and marks the buyer **verified** (`gstVerifiedAt`). The
-E-way Bills page only offers bulk-JSON generation for verified buyers — see
+that buyer's row, and marks the buyer **verified** (`gstVerifiedAt`). Shown
+on the buyer's own detail page (a read-only "GST Information" card);
+informational only, doesn't gate e-way bill generation — see
 [EWAY_BILL.md](../../EWAY_BILL.md).
 
 This is currently phase 1 of a planned two-phase rollout: right now,
