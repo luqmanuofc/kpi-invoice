@@ -45,6 +45,14 @@ function App() {
             }
           />
           <Route
+            path="/buyer/create"
+            element={
+              <ProtectedRoute>
+                <BuyerPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/buyer/:id"
             element={
               <ProtectedRoute>
