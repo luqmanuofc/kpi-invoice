@@ -41,14 +41,11 @@ export interface Buyer {
   address: string;
   gstin: string | null;
   phone: string | null;
-  // Manual entry, meaningful only for a buyer with no GSTIN (URP) -- see
-  // the field comment in schema.prisma. For a GSTIN buyer, ignore these
-  // and use gstVerification's pincode/stateCode instead (via
-  // latestGstVerification below).
-  pincode: number | null;
-  stateCode: number | null;
   // Only populated by getBuyerById (a join); the buyer list doesn't fetch
   // this. Latest verification only -- full history lives in the table.
+  // This is the only source of e-way ship-to PIN/state (via
+  // latestGstVerification below); Buyer itself has no pincode/stateCode --
+  // a buyer with no GSTIN isn't currently supported for e-way generation.
   gstVerifications?: GstVerificationDetail[];
   createdAt: string;
   updatedAt: string;
@@ -81,8 +78,6 @@ export interface BuyerFormData {
   address: string;
   gstin?: string;
   phone?: string;
-  pincode?: number | null;
-  stateCode?: number | null;
 }
 
 export async function createBuyer(data: BuyerFormData) {

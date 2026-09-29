@@ -623,6 +623,14 @@ export type GstVerificationUncheckedUpdateManyWithoutBuyerNestedInput = {
   deleteMany?: Prisma.GstVerificationScalarWhereInput | Prisma.GstVerificationScalarWhereInput[]
 }
 
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type GstVerificationCreateWithoutBuyerInput = {
   id?: string
   gstin: string

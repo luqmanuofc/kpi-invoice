@@ -13,8 +13,6 @@ function makeBuyer(over: Partial<Buyer> = {}): Buyer {
     address: "Somewhere",
     gstin: "01ABCDE1234F1Z5",
     phone: null,
-    pincode: null,
-    stateCode: null,
     createdAt: "",
     updatedAt: "",
     ...over,

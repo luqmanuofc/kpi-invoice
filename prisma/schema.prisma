@@ -17,16 +17,11 @@ model Buyer {
   gstin   String?
   phone   String?
 
-  // Ship-to PIN/state for e-way bills -- manual entry, and *only* meaningful
-  // for a buyer with no GSTIN (URP). A buyer with a GSTIN has no use for
-  // these: their PIN/state always come from the latest matching row in
-  // GstVerification below instead (never cached here -- there is nowhere
-  // for a stale duplicate to hide). scripts/gstin-lookup never writes to
-  // these columns; only the buyer create/update form does, and only when
-  // the buyer has no GSTIN (see BuyerDrawer.tsx).
-  pincode   Int?
-  stateCode Int?
-
+  // No pincode/stateCode column: e-way bill ship-to PIN/state only ever
+  // come from the latest matching row in GstVerification below (a buyer
+  // with a GSTIN), and a buyer with no GSTIN (URP) isn't currently
+  // supported for e-way bill generation at all, so there's nothing to
+  // store manually.
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

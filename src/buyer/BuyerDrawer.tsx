@@ -39,15 +39,11 @@ import {
 import GstVerifiedBadge from "./GstVerifiedBadge";
 import { STATE_CODES } from "@/eway/codes";
 
-// react-hook-form needs controlled string inputs; pincode/stateCode are
-// converted to numbers (or null) only when submitting.
 interface BuyerFormValues {
   name: string;
   address: string;
   gstin?: string;
   phone?: string;
-  pincode: string;
-  stateCode: string;
 }
 
 type DrawerTab = "details" | "gst";
@@ -108,8 +104,6 @@ export default function BuyerDrawer({
       address: values.address,
       gstin: values.gstin,
       phone: values.phone,
-      pincode: values.pincode.trim() ? Number(values.pincode) : null,
-      stateCode: values.stateCode ? Number(values.stateCode) : null,
     };
 
     try {
@@ -161,8 +155,6 @@ export default function BuyerDrawer({
         address: buyer.address,
         gstin: buyer.gstin || "",
         phone: buyer.phone || "",
-        pincode: buyer.pincode ? String(buyer.pincode) : "",
-        stateCode: buyer.stateCode ? String(buyer.stateCode) : "",
       });
     } else if (mode === "create") {
       reset({
@@ -170,8 +162,6 @@ export default function BuyerDrawer({
         address: "",
         gstin: "",
         phone: "",
-        pincode: "",
-        stateCode: "",
       });
     }
   }, [buyer, mode, open, reset]);
@@ -276,61 +266,12 @@ export default function BuyerDrawer({
           )}
         </div>
 
-        {showGstTab ? (
+        {showGstTab && (
           <p className="text-sm text-muted-foreground">
             Ship-to PIN code and state are on the <strong>GST Info</strong> tab
             for this buyer — sourced from the government lookup, not typed
             here.
           </p>
-        ) : (
-          <>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="pincode">Ship-to PIN code</Label>
-                <Input
-                  id="pincode"
-                  inputMode="numeric"
-                  maxLength={6}
-                  {...register("pincode", {
-                    validate: (value) => {
-                      if (!value || value.trim() === "") return true;
-                      return /^[1-9]\d{5}$/.test(value.trim())
-                        ? true
-                        : "Enter a 6 digit PIN code or leave empty";
-                    },
-                  })}
-                  className={errors.pincode ? "border-destructive" : ""}
-                />
-                {errors.pincode && (
-                  <p className="text-sm text-destructive">
-                    {errors.pincode.message}
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="stateCode">Ship-to state</Label>
-                <select
-                  id="stateCode"
-                  {...register("stateCode")}
-                  className="h-9 w-full rounded-md border bg-transparent px-3 text-sm dark:bg-input/30"
-                >
-                  <option value="">Select state...</option>
-                  {Object.entries(STATE_CODES).map(([code, name]) => (
-                    <option key={code} value={code}>
-                      {name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <p className="text-xs text-muted-foreground -mt-4">
-              Used only for e-way bills: the PIN code and state goods are
-              shipped to. Fill this in once and every future invoice for
-              this buyer reuses it. Once this buyer has a GSTIN, this moves
-              to the GST Info tab and is set by verification instead.
-            </p>
-          </>
         )}
       </div>
 

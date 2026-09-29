@@ -34,22 +34,18 @@ function guessPlace(address: string): string {
 /**
  * The buyer's ship-to details. PIN/state, in priority order: the buyer's
  * latest GST verification (only for a GSTIN buyer -- see
- * latestGstVerification), then the buyer's own manually-entered
- * pincode/stateCode (only meaningful when there's no GSTIN at all -- see
- * the field comment in schema.prisma), then a guess from the free-text
- * address snapshot as a last resort.
+ * latestGstVerification), then a guess from the free-text address snapshot
+ * as a last resort. A buyer with no GSTIN (URP) isn't currently supported
+ * for e-way bill generation, so there's no manually-entered fallback.
  */
 function buyerParty(inv: Invoice, buyer: Buyer | undefined): EwayParty {
   const gstin = (inv.buyerGstinSnapshot ?? "").trim().toUpperCase() || URP;
   const address = inv.buyerAddressSnapshot ?? "";
   const verified = buyer ? latestGstVerification(buyer) : undefined;
-  const manualPincode = buyer?.gstin ? null : (buyer?.pincode ?? null);
-  const manualStateCode = buyer?.gstin ? null : (buyer?.stateCode ?? null);
-  const pincode = verified?.pincode ?? manualPincode ?? extractPincode(address);
+  const pincode = verified?.pincode ?? extractPincode(address);
   const stateCode =
     stateCodeFromGstin(gstin) ??
     verified?.stateCode ??
-    manualStateCode ??
     (pincode !== null ? inferStateFromPincode(pincode) : null);
   const [address1, address2] = splitAddress(address);
   return {

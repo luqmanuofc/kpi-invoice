@@ -19,8 +19,6 @@ export default async function handler(request: Request) {
         address: data.address,
         gstin: data.gstin || null,
         phone: data.phone || null,
-        pincode: data.pincode ?? null,
-        stateCode: data.stateCode ?? null,
       },
     });
 

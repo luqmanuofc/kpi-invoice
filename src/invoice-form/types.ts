@@ -4,8 +4,6 @@ export interface Buyer {
   address: string;
   gstin: string | null;
   phone: string | null;
-  pincode: number | null;
-  stateCode: number | null;
   createdAt: string;
   updatedAt: string;
 }

@@ -72,10 +72,10 @@ function makeGstVerification(over: Partial<GstVerificationDetail> = {}): GstVeri
   };
 }
 
-// GSTIN buyers now source PIN/state only from a matching GstVerification
-// row (see latestGstVerification in src/api/buyers.ts) -- buyer.pincode/
-// stateCode are for a URP buyer (no gstin) only, so this fixture defaults
-// to a verified GSTIN buyer, matching most of this suite's invoices.
+// GSTIN buyers source PIN/state only from a matching GstVerification row
+// (see latestGstVerification in src/api/buyers.ts) -- Buyer itself has no
+// pincode/stateCode, so this fixture defaults to a verified GSTIN buyer,
+// matching most of this suite's invoices.
 function makeBuyer(over: Partial<Buyer> = {}): Buyer {
   return {
     id: "b1",
@@ -83,8 +83,6 @@ function makeBuyer(over: Partial<Buyer> = {}): Buyer {
     address: "Lal Chowk, Srinagar 190001",
     gstin: "01ABCDE1234F1Z5",
     phone: null,
-    pincode: null,
-    stateCode: null,
     gstVerifications: [makeGstVerification()],
     createdAt: "",
     updatedAt: "",
@@ -230,14 +228,6 @@ describe("invoiceToEwayInput / buildEwayBill", () => {
     // Falls all the way through to guessing from the address, not the
     // mismatched verification's 190001/1.
     expect(withStale.to.pincode).toBe(400001);
-  });
-
-  it("uses the buyer's manually-entered PIN/state only for a URP buyer (no GSTIN)", () => {
-    const urp = invoiceToEwayInput(
-      makeInvoice({ buyerGstinSnapshot: null, buyerAddressSnapshot: "Some other address 400001" }),
-      makeBuyer({ gstin: null, gstVerifications: [], pincode: 190001, stateCode: 1 })
-    );
-    expect(urp.to).toMatchObject({ gstin: "URP", pincode: 190001, stateCode: 1 });
   });
 
   it("always sends distance 0, the documented instruction for the portal to calculate it", () => {

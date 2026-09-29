@@ -9,14 +9,13 @@ unlike the portal's single-bill "Generate New" form, which auto-fills them
 from the buyer's GSTIN as you type, bulk processing does no live lookup and
 just rejects a row with a missing/wrong one (confirmed against NIC's
 `generate-eway-bill` API docs, which describe the same underlying generation
-engine bulk upload uses). For a buyer with a GSTIN, PIN/state are **not**
-manually editable and are **not** stored on `Buyer` at all — they live only
-on the matching `GstVerification` row (see below), and `BuyerDrawer`'s
-Details tab hides those fields once a GSTIN is on file, pointing at the GST
-Info tab instead. A buyer with no GSTIN (URP) has no GST Info tab at all, so
-`Buyer.pincode`/`Buyer.stateCode` stay manually editable on Details — that's
-the one case those columns are still for, since there's no automated source
-for them.
+engine bulk upload uses). PIN/state are **not** manually editable and are
+**not** stored on `Buyer` at all — they live only on the matching
+`GstVerification` row (see below), and `BuyerDrawer`'s Details tab hides
+those fields once a GSTIN is on file, pointing at the GST Info tab instead.
+A buyer with no GSTIN (URP) isn't currently supported for e-way bill
+generation at all — there's no automated source for their PIN/state and no
+manual-entry path either, deliberately, until that workflow is asked for.
 
 UI: on the invoice's own page (`/invoice/:id`), next to Download/Print — an
 **E-way Bill** button appears for any invoice whose value puts it over the
@@ -44,14 +43,12 @@ API later.
 | `config.ts` | seller PIN code (190017, confirmed against a real accepted bill) |
 
 Buyer ship-to PIN/state come from `latestGstVerification()` (`src/api/buyers.ts`)
-for a GSTIN buyer — the newest `GstVerification` row whose `gstin` still
-matches the buyer's current `gstin` — or from `Buyer.pincode`/`stateCode`
-directly for a URP buyer (see above). `fromInvoice.ts`'s `buyerParty()`
-resolves them in that order and falls back to guessing a PIN from the
-free-text address snapshot when neither is available — good enough to flag
-"needs an e-way bill" but not reliable enough to export without a warning
-(surfaced as a normal validation error in the generation dialog on the
-invoice page).
+— the newest `GstVerification` row whose `gstin` still matches the buyer's
+current `gstin` (see above). `fromInvoice.ts`'s `buyerParty()` falls back to
+guessing a PIN from the free-text address snapshot when that's unavailable
+— good enough to flag "needs an e-way bill" but not reliable enough to
+export without a warning (surfaced as a normal validation error in the
+generation dialog on the invoice page).
 
 Tests: `npm test`.
 
@@ -87,10 +84,10 @@ above -- worth repeating against step 1's proper diff before the first bulk
 upload, since this was informal and only checked two intra-state, single-HSN
 bills.
 
-**Not yet deployed:** the `pincode`/`stateCode` columns this feature depends on
-(see below) exist on this branch's migration but haven't been applied to prod
-yet -- confirmed by querying prod's `Buyer` table directly. Deploy + migrate
-before relying on buyer ship-to data in production.
+**Not yet deployed:** the `GstVerification` table and its migrations this
+feature depends on (see below) exist on this branch but haven't been applied
+to prod yet -- confirmed by querying prod directly. Deploy + migrate before
+relying on buyer ship-to data in production.
 
 ## Limits
 
