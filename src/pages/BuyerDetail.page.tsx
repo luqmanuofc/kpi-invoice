@@ -54,6 +54,7 @@ export default function BuyerDetailPage() {
   const { data: analytics, isLoading: analyticsLoading } = useBuyerAnalytics(id);
 
   const [editOpen, setEditOpen] = useState(false);
+  const [drawerTab, setDrawerTab] = useState<"details" | "gst">("details");
   const [invoicePage, setInvoicePage] = useState(1);
 
   const {
@@ -163,7 +164,10 @@ export default function BuyerDetailPage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setEditOpen(true)}
+                onClick={() => {
+                  setDrawerTab("gst");
+                  setEditOpen(true);
+                }}
               >
                 {buyer.gstVerifiedAt ? (
                   <BadgeCheck className="h-4 w-4 text-green-600 dark:text-green-500" />
@@ -173,7 +177,13 @@ export default function BuyerDetailPage() {
                 View GST Info
               </Button>
             )}
-            <Button size="sm" onClick={() => setEditOpen(true)}>
+            <Button
+              size="sm"
+              onClick={() => {
+                setDrawerTab("details");
+                setEditOpen(true);
+              }}
+            >
               Edit
             </Button>
           </CardFooter>
@@ -261,6 +271,7 @@ export default function BuyerDetailPage() {
         mode="edit"
         buyerId={buyer.id}
         onSuccess={handleEditSuccess}
+        initialTab={drawerTab}
       />
     </div>
   );
