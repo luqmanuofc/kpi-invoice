@@ -4,13 +4,18 @@ Flags invoices that need a GST e-way bill and exports them as the portal's
 bulk-upload JSON (e-Waybill → Generate Bulk). No paid API involved.
 
 **Buyer setup (one time per buyer, ideally):** run `scripts/gstin-lookup`
-(preferred) or open the buyer's Edit form and fill in "Ship-to PIN code" and
-"Ship-to state" by hand. Bulk upload needs these already correct in the file
-— unlike the portal's single-bill "Generate New" form, which auto-fills them
+(preferred). Bulk upload needs PIN/state already correct in the file —
+unlike the portal's single-bill "Generate New" form, which auto-fills them
 from the buyer's GSTIN as you type, bulk processing does no live lookup and
 just rejects a row with a missing/wrong one (confirmed against NIC's
 `generate-eway-bill` API docs, which describe the same underlying generation
-engine bulk upload uses). So this is entered once here instead.
+engine bulk upload uses). For a buyer with a GSTIN, PIN/state are **not**
+manually editable — `BuyerDrawer`'s Details tab hides those fields once a
+GSTIN is on file and points at the GST Info tab instead, since the whole
+point is that the value came from the government, not from someone typing
+it in; only `scripts/gstin-lookup` sets them. A buyer with no GSTIN (URP)
+has no GST Info tab at all, so their PIN/state stay manually editable on
+Details — there's no automated source for them.
 
 UI: on the invoice's own page (`/invoice/:id`), next to Download/Print — an
 **E-way Bill** button appears for any invoice whose value puts it over the
@@ -37,12 +42,13 @@ API later.
 | `fromInvoice.ts` | app `Invoice` (+ `Buyer`) → `EwayInput` (discount spread over items, unit mapping) |
 | `config.ts` | seller PIN code (190017, confirmed against a real accepted bill) |
 
-Buyer ship-to PIN/state live on the `Buyer` model (`pincode`, `stateCode`),
-entered via `BuyerDrawer` or `scripts/gstin-lookup`. For a buyer without them
-set yet, `fromInvoice.ts` falls back to guessing a PIN from the free-text
-address snapshot — good enough to flag "needs an e-way bill" but not
-reliable enough to export without a warning (surfaced as a normal validation
-error in the generation dialog on the invoice page).
+Buyer ship-to PIN/state live on the `Buyer` model (`pincode`, `stateCode`) —
+set by `scripts/gstin-lookup` for a GSTIN buyer, or manually via
+`BuyerDrawer`'s Details tab for a URP buyer (see above). For a buyer without
+them set yet, `fromInvoice.ts` falls back to guessing a PIN from the
+free-text address snapshot — good enough to flag "needs an e-way bill" but
+not reliable enough to export without a warning (surfaced as a normal
+validation error in the generation dialog on the invoice page).
 
 Tests: `npm test`.
 
@@ -133,27 +139,34 @@ by hand. For now, verification is a manual, deliberate step.
 A buyer only counts as **verified** once `scripts/gstin-lookup` has
 successfully confirmed their GSTIN against the government's own Search
 Taxpayer data — tracked by `Buyer.gstVerifiedAt` (non-null = verified;
-`isBuyerGstVerified` in `src/api/buyers.ts`). Manually typing a PIN/state on
-the buyer form does **not** count as verified, even though the same fields
-get set either way — verified specifically means the values came from the
-government lookup, not from someone typing them in.
+`isBuyerGstVerified` in `src/api/buyers.ts`). Since PIN/state are no longer
+manually editable once a buyer has a GSTIN (see above), verified now means
+exactly what it says: the value came from the government lookup, full stop.
 
 Verification status isn't shown as a standalone card — a niche, read-only
 thing didn't deserve a full page row. It lives inside `BuyerDrawer` (the same
-drawer used to create/edit a buyer): a "View GST Info" button on the buyer
-detail page's Buyer Info card opens it, same as "Edit" does, landing on a
-"GST Verification" section below the form fields (legal/trade name,
-registered address, verified date, and a "More GST details" accordion for
-jurisdiction/business activity/HSN — see `GstVerification` below). Reusing
-the edit drawer is deliberate, not just economical: phase 1.2 (auto-running
-the lookup the moment a GSTIN is typed in) lands in this same surface later,
-so building the display here now means that automation has somewhere to show
-its result without a new UI. Doesn't appear on the buyer list, and doesn't
-block anything: **e-way bill generation is available on any eligible invoice
-regardless of verification status** — the only real gate is the invoice's
-own data being valid (a missing PIN/state still shows up as a normal
-validation error in the generation dialog, same as a bad HSN code would;
-it's just not treated as a special "go verify this buyer" case anymore).
+drawer used to create/edit a buyer), behind a **Details / GST Info** tab pair
+that only appears once the buyer has a GSTIN. A "View GST Info" button on the
+buyer detail page's Buyer Info card opens the drawer straight onto that tab;
+"Edit" opens the same drawer onto Details instead — both the same component
+and mode, just a different landing tab. Reusing the edit drawer is
+deliberate, not just economical: phase 1.2 (auto-running the lookup the
+moment a GSTIN is typed in) lands in this same surface later, so building the
+display here now means that automation has somewhere to show its result
+without a new UI.
+
+The GST Info tab shows legal/trade name (each its own line), registered
+address, ship-to PIN/state, and the verified date, followed by several
+independently-expandable accordion sections (Registration Details,
+Jurisdiction, Business Activity, Goods & Services) rather than one big
+"more details" panel — deliberately split so opening it doesn't dump
+everything on screen at once (see `GstVerification` below for the full field
+list). Doesn't appear on the buyer list, and doesn't block anything: **e-way
+bill generation is available on any eligible invoice regardless of
+verification status** — the only real gate is the invoice's own data being
+valid (a missing PIN/state still shows up as a normal validation error in
+the generation dialog, same as a bad HSN code would; it's just not treated
+as a special "go verify this buyer" case anymore).
 
 Editing a buyer's GSTIN still clears `gstVerifiedAt` (`updateBuyer.ts`) — a
 verification is only valid for the GSTIN it was run against, so changing it

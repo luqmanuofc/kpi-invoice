@@ -273,51 +273,62 @@ export default function BuyerDrawer({
           )}
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="pincode">Ship-to PIN code</Label>
-            <Input
-              id="pincode"
-              inputMode="numeric"
-              maxLength={6}
-              {...register("pincode", {
-                validate: (value) => {
-                  if (!value || value.trim() === "") return true;
-                  return /^[1-9]\d{5}$/.test(value.trim())
-                    ? true
-                    : "Enter a 6 digit PIN code or leave empty";
-                },
-              })}
-              className={errors.pincode ? "border-destructive" : ""}
-            />
-            {errors.pincode && (
-              <p className="text-sm text-destructive">
-                {errors.pincode.message}
-              </p>
-            )}
-          </div>
+        {showGstTab ? (
+          <p className="text-sm text-muted-foreground">
+            Ship-to PIN code and state are on the <strong>GST Info</strong> tab
+            for this buyer — sourced from the government lookup, not typed
+            here.
+          </p>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="pincode">Ship-to PIN code</Label>
+                <Input
+                  id="pincode"
+                  inputMode="numeric"
+                  maxLength={6}
+                  {...register("pincode", {
+                    validate: (value) => {
+                      if (!value || value.trim() === "") return true;
+                      return /^[1-9]\d{5}$/.test(value.trim())
+                        ? true
+                        : "Enter a 6 digit PIN code or leave empty";
+                    },
+                  })}
+                  className={errors.pincode ? "border-destructive" : ""}
+                />
+                {errors.pincode && (
+                  <p className="text-sm text-destructive">
+                    {errors.pincode.message}
+                  </p>
+                )}
+              </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="stateCode">Ship-to state</Label>
-            <select
-              id="stateCode"
-              {...register("stateCode")}
-              className="h-9 w-full rounded-md border bg-transparent px-3 text-sm dark:bg-input/30"
-            >
-              <option value="">Select state...</option>
-              {Object.entries(STATE_CODES).map(([code, name]) => (
-                <option key={code} value={code}>
-                  {name}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-        <p className="text-xs text-muted-foreground -mt-4">
-          Used only for e-way bills: the PIN code and state goods are
-          shipped to. Fill this in once and every future invoice for
-          this buyer reuses it.
-        </p>
+              <div className="space-y-2">
+                <Label htmlFor="stateCode">Ship-to state</Label>
+                <select
+                  id="stateCode"
+                  {...register("stateCode")}
+                  className="h-9 w-full rounded-md border bg-transparent px-3 text-sm dark:bg-input/30"
+                >
+                  <option value="">Select state...</option>
+                  {Object.entries(STATE_CODES).map(([code, name]) => (
+                    <option key={code} value={code}>
+                      {name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground -mt-4">
+              Used only for e-way bills: the PIN code and state goods are
+              shipped to. Fill this in once and every future invoice for
+              this buyer reuses it. Once this buyer has a GSTIN, this moves
+              to the GST Info tab and is set by verification instead.
+            </p>
+          </>
+        )}
       </div>
 
       <div className="flex justify-end w-full">
@@ -329,8 +340,23 @@ export default function BuyerDrawer({
     </form>
   );
 
+  const stateName = (code: number | null) =>
+    code ? STATE_CODES[code] ?? String(code) : "Not set";
+
+  const hasJurisdiction = !!(gstRaw?.adminOffice?.length || gstRaw?.otherOffice?.length);
+  const hasBusinessActivity = !!(
+    gstRaw?.natureOfCoreBusinessActivity || gstRaw?.natureOfBusinessActivities?.length
+  );
+  const hasGoodsServices = !!gstRaw?.goodsServices?.length;
+  const hasRegistrationDetails = !!(
+    gstDetail?.registrationDate ||
+    gstDetail?.constitutionOfBusiness ||
+    gstDetail?.gstinStatus ||
+    gstDetail?.taxpayerType
+  );
+
   const gstContent = buyer && (
-    <div className="space-y-3">
+    <div className="space-y-4">
       <div className="flex items-center justify-end">
         <GstVerifiedBadge
           gstin={buyer.gstin}
@@ -338,23 +364,31 @@ export default function BuyerDrawer({
         />
       </div>
 
-      {buyer.gstVerifiedAt ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
+      <div className="space-y-1.5">
+        <p className="text-sm text-muted-foreground text-left">
+          <strong>Legal Name:</strong> {buyer.gstLegalName || "—"}
+        </p>
+        <p className="text-sm text-muted-foreground text-left">
+          <strong>Trade Name:</strong> {buyer.gstTradeName || "—"}
+        </p>
+        <p className="text-sm text-muted-foreground text-left">
+          <strong>Registered Address:</strong> {buyer.gstAddress || "—"}
+        </p>
+        <p className="text-sm text-muted-foreground text-left">
+          <strong>Ship-to PIN code:</strong> {buyer.pincode ?? "Not set"}
+        </p>
+        <p className="text-sm text-muted-foreground text-left">
+          <strong>Ship-to State:</strong> {stateName(buyer.stateCode)}
+        </p>
+        {buyer.gstVerifiedAt && (
           <p className="text-sm text-muted-foreground text-left">
-            <strong>Legal Name:</strong> {buyer.gstLegalName || "—"}
-          </p>
-          <p className="text-sm text-muted-foreground text-left">
-            <strong>Trade Name:</strong> {buyer.gstTradeName || "—"}
-          </p>
-          <p className="text-sm text-muted-foreground text-left sm:col-span-2">
-            <strong>Registered Address:</strong> {buyer.gstAddress || "—"}
-          </p>
-          <p className="text-sm text-muted-foreground text-left sm:col-span-2">
             <strong>Verified:</strong>{" "}
             {dayjs(buyer.gstVerifiedAt).format("DD/MM/YYYY")}
           </p>
-        </div>
-      ) : (
+        )}
+      </div>
+
+      {!buyer.gstVerifiedAt && (
         <p className="text-sm text-amber-700 dark:text-amber-500 text-left">
           Not verified against the government's GST records yet. Run{" "}
           <code>scripts/gstin-lookup</code> to verify this buyer against
@@ -362,36 +396,42 @@ export default function BuyerDrawer({
         </p>
       )}
 
-      {gstDetail && (
-        <Accordion type="single" collapsible>
-          <AccordionItem value="gst-detail" className="border-none">
-            <AccordionTrigger className="text-sm text-muted-foreground py-2 hover:no-underline">
-              More GST details
-            </AccordionTrigger>
-            <AccordionContent className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
-                <p className="text-sm text-muted-foreground text-left">
-                  <strong>Registration Date:</strong>{" "}
-                  {gstDetail.registrationDate || "—"}
-                </p>
-                <p className="text-sm text-muted-foreground text-left">
-                  <strong>Constitution:</strong>{" "}
-                  {gstDetail.constitutionOfBusiness || "—"}
-                </p>
-                <p className="text-sm text-muted-foreground text-left">
-                  <strong>GSTIN Status:</strong> {gstDetail.gstinStatus || "—"}
-                </p>
-                <p className="text-sm text-muted-foreground text-left">
-                  <strong>Taxpayer Type:</strong>{" "}
-                  {gstDetail.taxpayerType || "—"}
-                </p>
-              </div>
-
-              {gstRaw?.adminOffice?.length || gstRaw?.otherOffice?.length ? (
+      {(hasRegistrationDetails || hasJurisdiction || hasBusinessActivity || hasGoodsServices) && (
+        <Accordion type="multiple">
+          {hasRegistrationDetails && (
+            <AccordionItem value="registration">
+              <AccordionTrigger>Registration Details</AccordionTrigger>
+              <AccordionContent>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
+                  <p className="text-sm text-muted-foreground text-left">
+                    <strong>Registration Date:</strong>{" "}
+                    {gstDetail?.registrationDate || "—"}
+                  </p>
+                  <p className="text-sm text-muted-foreground text-left">
+                    <strong>Constitution:</strong>{" "}
+                    {gstDetail?.constitutionOfBusiness || "—"}
+                  </p>
+                  <p className="text-sm text-muted-foreground text-left">
+                    <strong>GSTIN Status:</strong>{" "}
+                    {gstDetail?.gstinStatus || "—"}
+                  </p>
+                  <p className="text-sm text-muted-foreground text-left">
+                    <strong>Taxpayer Type:</strong>{" "}
+                    {gstDetail?.taxpayerType || "—"}
+                  </p>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          )}
+
+          {hasJurisdiction && (
+            <AccordionItem value="jurisdiction">
+              <AccordionTrigger>Jurisdiction</AccordionTrigger>
+              <AccordionContent>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
                   {gstRaw?.adminOffice && gstRaw.adminOffice.length > 0 && (
                     <div>
-                      <p className="text-sm font-medium text-left">
+                      <p className="text-xs font-medium uppercase tracking-wide text-left mb-1">
                         Administrative Office
                       </p>
                       {gstRaw.adminOffice.map((line, i) => (
@@ -406,7 +446,7 @@ export default function BuyerDrawer({
                   )}
                   {gstRaw?.otherOffice && gstRaw.otherOffice.length > 0 && (
                     <div>
-                      <p className="text-sm font-medium text-left">
+                      <p className="text-xs font-medium uppercase tracking-wide text-left mb-1">
                         State Jurisdiction
                       </p>
                       {gstRaw.otherOffice.map((line, i) => (
@@ -420,65 +460,68 @@ export default function BuyerDrawer({
                     </div>
                   )}
                 </div>
-              ) : null}
+              </AccordionContent>
+            </AccordionItem>
+          )}
 
-              {gstRaw?.natureOfCoreBusinessActivity ||
-              gstRaw?.natureOfBusinessActivities?.length ? (
-                <div>
-                  <p className="text-sm font-medium text-left">
-                    Nature of Business
+          {hasBusinessActivity && (
+            <AccordionItem value="business">
+              <AccordionTrigger>Business Activity</AccordionTrigger>
+              <AccordionContent className="space-y-1">
+                {gstRaw?.natureOfCoreBusinessActivity && (
+                  <p className="text-sm text-muted-foreground text-left">
+                    {gstRaw.natureOfCoreBusinessActivity}
                   </p>
-                  {gstRaw?.natureOfCoreBusinessActivity && (
+                )}
+                {gstRaw?.natureOfBusinessActivities &&
+                  gstRaw.natureOfBusinessActivities.length > 0 && (
                     <p className="text-sm text-muted-foreground text-left">
-                      {gstRaw.natureOfCoreBusinessActivity}
+                      {gstRaw.natureOfBusinessActivities.join(", ")}
                     </p>
                   )}
-                  {gstRaw?.natureOfBusinessActivities &&
-                    gstRaw.natureOfBusinessActivities.length > 0 && (
-                      <p className="text-sm text-muted-foreground text-left">
-                        {gstRaw.natureOfBusinessActivities.join(", ")}
-                      </p>
-                    )}
-                </div>
-              ) : null}
+              </AccordionContent>
+            </AccordionItem>
+          )}
 
-              {gstRaw?.goodsServices && gstRaw.goodsServices.length > 0 && (
-                <div>
-                  <p className="text-sm font-medium text-left mb-1">
-                    Goods &amp; Services Dealt In
-                  </p>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>HSN/SAC</TableHead>
-                        <TableHead>Description</TableHead>
-                        <TableHead>Type</TableHead>
+          {hasGoodsServices && (
+            <AccordionItem value="goods">
+              <AccordionTrigger>
+                Goods &amp; Services ({gstRaw?.goodsServices?.length})
+              </AccordionTrigger>
+              <AccordionContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>HSN/SAC</TableHead>
+                      <TableHead>Description</TableHead>
+                      <TableHead>Type</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {gstRaw?.goodsServices?.map((item, i) => (
+                      <TableRow key={i}>
+                        <TableCell>{item.hsn}</TableCell>
+                        <TableCell className="whitespace-normal">
+                          {item.description}
+                        </TableCell>
+                        <TableCell className="capitalize">
+                          {item.type}
+                        </TableCell>
                       </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {gstRaw.goodsServices.map((item, i) => (
-                        <TableRow key={i}>
-                          <TableCell>{item.hsn}</TableCell>
-                          <TableCell className="whitespace-normal">
-                            {item.description}
-                          </TableCell>
-                          <TableCell className="capitalize">
-                            {item.type}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              )}
-
-              <p className="text-xs text-muted-foreground text-left">
-                From the {dayjs(gstDetail.verifiedAt).format("DD/MM/YYYY")}{" "}
-                GST Search Taxpayer lookup.
-              </p>
-            </AccordionContent>
-          </AccordionItem>
+                    ))}
+                  </TableBody>
+                </Table>
+              </AccordionContent>
+            </AccordionItem>
+          )}
         </Accordion>
+      )}
+
+      {gstDetail && (
+        <p className="text-xs text-muted-foreground text-left">
+          From the {dayjs(gstDetail.verifiedAt).format("DD/MM/YYYY")} GST
+          Search Taxpayer lookup.
+        </p>
       )}
     </div>
   );
