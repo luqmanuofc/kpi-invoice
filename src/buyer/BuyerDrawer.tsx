@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
-import { Loader2, BadgeCheck, ShieldAlert, Copy, Check } from "lucide-react";
+import { Loader2, BadgeCheck, ShieldAlert } from "lucide-react";
 import {
   createBuyer,
   updateBuyer,
@@ -9,7 +10,8 @@ import {
   type Buyer,
   type BuyerFormData,
 } from "../api/buyers";
-import { useBuyer } from "../hooks/useBuyers";
+import { startGstLookup, submitGstCaptcha } from "../api/gstLookup";
+import { useBuyer, BUYERS_QUERY_KEY } from "../hooks/useBuyers";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -48,6 +50,16 @@ interface BuyerFormValues {
 
 type DrawerTab = "details" | "gst";
 
+// The inline "Fetch GST Info" flow's state machine (see the GST tab's
+// unverified branch below). A session lives on gst-worker (a separate
+// always-on process -- see gst-worker/README.md for why a Netlify Function
+// can't hold this open itself) between "captcha" and the next submit.
+type GstLookupPhase =
+  | { kind: "idle" }
+  | { kind: "starting" }
+  | { kind: "captcha"; sessionId: string; captchaImage: string; submitting: boolean; notice?: string }
+  | { kind: "error"; message: string };
+
 interface BuyerDrawerProps {
   open: boolean;
   onClose: () => void;
@@ -71,7 +83,9 @@ export default function BuyerDrawer({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<DrawerTab>(initialTab);
-  const [commandCopied, setCommandCopied] = useState(false);
+  const [gstLookup, setGstLookup] = useState<GstLookupPhase>({ kind: "idle" });
+  const [captchaAnswer, setCaptchaAnswer] = useState("");
+  const queryClient = useQueryClient();
 
   const {
     data: buyer,
@@ -93,6 +107,11 @@ export default function BuyerDrawer({
     // here) without re-running on every initialTab change -- that would
     // snap the tab back if included, fighting a manual click mid-session.
     setActiveTab(initialTab);
+    // A lookup session belongs to whichever buyer was open when it started;
+    // don't carry a half-finished captcha over to a different buyer or a
+    // fresh open of the same one.
+    setGstLookup({ kind: "idle" });
+    setCaptchaAnswer("");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, buyerId, open]);
 
@@ -179,21 +198,69 @@ export default function BuyerDrawer({
   const gstRaw = gstDetail?.raw;
   const showGstTab = mode === "edit" && !!buyer?.gstin;
 
-  // No in-app automation yet -- scripts/gstin-lookup --all-missing already
-  // finds every unverified GSTIN buyer on its own, so this just saves
-  // retyping the buyer id by hand.
-  const lookupCommand = buyer
-    ? `node -r dotenv/config scripts/gstin-lookup/lookup-and-store.mjs --buyer ${buyer.id}`
-    : "";
-
-  const handleCopyCommand = async () => {
+  const handleFetchGstInfo = async () => {
+    if (!buyer?.gstin) return;
+    setGstLookup({ kind: "starting" });
     try {
-      await navigator.clipboard.writeText(lookupCommand);
-      setCommandCopied(true);
-      setTimeout(() => setCommandCopied(false), 2000);
-    } catch {
-      // Clipboard access can fail (permissions, insecure context) -- the
-      // command is still visible to copy by hand, so this is silent.
+      const { sessionId, captchaImage } = await startGstLookup(buyer.gstin);
+      setCaptchaAnswer("");
+      setGstLookup({ kind: "captcha", sessionId, captchaImage, submitting: false });
+    } catch (err: any) {
+      setGstLookup({ kind: "error", message: err.message || "Failed to start GST lookup" });
+    }
+  };
+
+  const handleSubmitCaptcha = async () => {
+    if (gstLookup.kind !== "captcha" || !buyer?.gstin) return;
+    const { sessionId } = gstLookup;
+    setGstLookup({ ...gstLookup, submitting: true, notice: undefined });
+
+    try {
+      const result = await submitGstCaptcha({
+        sessionId,
+        answer: captchaAnswer,
+        buyerId: buyer.id,
+        gstin: buyer.gstin,
+      });
+
+      if (result.status === "success") {
+        // Refetches this buyer (and the list) so gstVerifications picks up
+        // the new row and the tab flips to the verified view on its own.
+        queryClient.invalidateQueries({ queryKey: BUYERS_QUERY_KEY });
+        setGstLookup({ kind: "idle" });
+        setCaptchaAnswer("");
+        return;
+      }
+
+      if (result.status === "wrong_captcha") {
+        setCaptchaAnswer("");
+        setGstLookup({
+          kind: "captcha",
+          sessionId,
+          captchaImage: result.captchaImage,
+          submitting: false,
+          notice: "That wasn't right -- try the new captcha below.",
+        });
+        return;
+      }
+
+      if (result.status === "incomplete") {
+        setGstLookup({ kind: "error", message: result.error });
+        return;
+      }
+
+      if (result.status === "failed") {
+        setGstLookup({
+          kind: "error",
+          message: "Too many incorrect captcha attempts. Try again.",
+        });
+        return;
+      }
+
+      // not_found -- the session expired (idle timeout) or the worker restarted.
+      setGstLookup({ kind: "error", message: "This lookup session expired. Try again." });
+    } catch (err: any) {
+      setGstLookup({ kind: "error", message: err.message || "GST lookup failed" });
     }
   };
 
@@ -347,27 +414,76 @@ export default function BuyerDrawer({
           <p className="text-sm text-amber-700 dark:text-amber-500 text-left">
             GST info isn't verified for this buyer yet. Please complete
             verification to start generating e-way bills for {buyer.name}.
-            <br />
-            Run this from the project root to verify it against GST's own
-            Search Taxpayer records:
           </p>
-          <div className="flex items-center gap-2">
-            <code className="flex-1 min-w-0 text-xs bg-muted rounded px-2 py-1.5 overflow-x-auto whitespace-nowrap">
-              {lookupCommand}
-            </code>
+
+          {gstLookup.kind === "idle" && (
             <Button
               type="button"
               variant="outline"
               size="sm"
-              onClick={handleCopyCommand}
+              onClick={handleFetchGstInfo}
             >
-              {commandCopied ? (
-                <Check className="h-3.5 w-3.5" />
-              ) : (
-                <Copy className="h-3.5 w-3.5" />
-              )}
+              Fetch GST Info
             </Button>
-          </div>
+          )}
+
+          {gstLookup.kind === "starting" && (
+            <Button type="button" variant="outline" size="sm" disabled>
+              <Loader2 className="h-3.5 w-3.5 animate-spin" /> Starting...
+            </Button>
+          )}
+
+          {gstLookup.kind === "captcha" && (
+            <div className="space-y-2">
+              <img
+                src={`data:image/png;base64,${gstLookup.captchaImage}`}
+                alt="GST portal captcha"
+                className="rounded border bg-white"
+              />
+              {gstLookup.notice && (
+                <p className="text-xs text-amber-700 dark:text-amber-500 text-left">
+                  {gstLookup.notice}
+                </p>
+              )}
+              <div className="flex items-center gap-2">
+                <Input
+                  value={captchaAnswer}
+                  onChange={(e) => setCaptchaAnswer(e.target.value)}
+                  placeholder="Type what you see above"
+                  disabled={gstLookup.submitting}
+                  className="flex-1"
+                />
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={handleSubmitCaptcha}
+                  disabled={!captchaAnswer.trim() || gstLookup.submitting}
+                >
+                  {gstLookup.submitting ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    "Submit"
+                  )}
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {gstLookup.kind === "error" && (
+            <div className="space-y-2">
+              <p className="text-xs text-destructive text-left">
+                {gstLookup.message}
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setGstLookup({ kind: "idle" })}
+              >
+                Try Again
+              </Button>
+            </div>
+          )}
         </div>
       )}
 

@@ -10,10 +10,12 @@ matches the buyer's current `gstin` (`isBuyerGstVerified` in
 ("View GST Info" on the buyer detail page opens it); informational only,
 doesn't gate e-way bill generation — see [EWAY_BILL.md](../../EWAY_BILL.md).
 
-This is currently phase 1 of a planned two-phase rollout: right now,
-verification only happens by running this script by hand (`--buyer` or
-`--all-missing`). Phase 1.2 (not built) would trigger it automatically from
-the app the moment a GSTIN is entered on the buyer form.
+There's now also an in-app path -- the buyer edit drawer's GST Info tab has
+a **Fetch GST Info** button, which runs the same underlying browser
+automation against `gst-worker/` (a separate always-on process; see its own
+README) with a human solving the captcha inline instead of Claude. That's
+the preferred way to verify a single buyer now. This script is still useful
+for bulk sweeps (`--all-missing`) and as a fallback if `gst-worker` is down.
 
 This is deliberately narrower than `scripts/eway-poc/`: it only reads public
 registry data and only writes to our own database. It never touches the

@@ -3,8 +3,10 @@
 Flags invoices that need a GST e-way bill and exports them as the portal's
 bulk-upload JSON (e-Waybill → Generate Bulk). No paid API involved.
 
-**Buyer setup (one time per buyer, ideally):** run `scripts/gstin-lookup`
-(preferred). Bulk upload needs PIN/state already correct in the file —
+**Buyer setup (one time per buyer, ideally):** click **Fetch GST Info** in
+the buyer's edit drawer's GST Info tab (preferred -- see "Two phases" below
+for how this is wired up), or run `scripts/gstin-lookup` by hand. Bulk
+upload needs PIN/state already correct in the file —
 unlike the portal's single-bill "Generate New" form, which auto-fills them
 from the buyer's GSTIN as you type, bulk processing does no live lookup and
 just rejects a row with a missing/wrong one (confirmed against NIC's
@@ -87,7 +89,11 @@ bills.
 **Not yet deployed:** the `GstVerification` table and its migrations this
 feature depends on (see below) exist on this branch but haven't been applied
 to prod yet -- confirmed by querying prod directly. Deploy + migrate before
-relying on buyer ship-to data in production.
+relying on buyer ship-to data in production. The in-app "Fetch GST Info"
+button also needs `gst-worker` actually running on the VPS and `GST_WORKER_URL`
+/ `GST_WORKER_SECRET` set in Netlify's environment variables (see
+`gst-worker/README.md`) -- without those, the button fails with a clear
+"GST lookup isn't configured yet" error rather than silently doing nothing.
 
 ## Limits
 
@@ -122,17 +128,31 @@ Split deliberately into two pieces, and only the first is the actual plan:
    doesn't carry, since everything else here uses the portal as designed.
 
 **One piece of automation is adopted, and it's neither of the above:**
-`scripts/gstin-lookup/` looks a buyer's GSTIN up on the GST portal's free
-*public* Search Taxpayer tool (no login, no OTP — a public registry lookup,
-not a filing action) and inserts one `GstVerification` row with everything it
-returns, one time, instead of typing it in by hand. It never writes to
-`Buyer` and never touches the actual e-way bill portal or generates any
-compliance document — see the script's own README. Confirmed working end to
-end against the real page (2026-09-29, verified an actual buyer on staging).
+looking a buyer's GSTIN up on the GST portal's free *public* Search Taxpayer
+tool (no login, no OTP — a public registry lookup, not a filing action) and
+inserting one `GstVerification` row with everything it returns, one time,
+instead of typing it in by hand. It never writes to `Buyer` and never
+touches the actual e-way bill portal or generates any compliance document.
+Confirmed working end to end against the real page (2026-09-29, verified an
+actual buyer on staging).
 
-Phase 1.2 (not built): trigger that lookup automatically from the app the
-moment a GSTIN is entered on the buyer form, instead of running the script
-by hand. For now, verification is a manual, deliberate step.
+Two ways to run it, same underlying browser automation and captcha step:
+
+- **In-app (phase 1.2, built):** the buyer edit drawer's GST Info tab has a
+  **Fetch GST Info** button. Clicking it starts a session on `gst-worker/` —
+  a small always-on process on a separate VPS, *not* a Netlify Function (a
+  captcha needs a human to look at it and answer, which means the browser
+  session has to stay open across two separate requests; Netlify Functions
+  are stateless and can't do that — see `gst-worker/README.md`). The captcha
+  image shows up right there in the drawer; you type what you see and submit.
+  Deliberately a **human solves the captcha**, not an ML model — more
+  reliable than the vision-based solving `scripts/gstin-lookup` used, which
+  had a poor real-world hit rate against this portal's watermark-obscured
+  images.
+- **By hand:** `scripts/gstin-lookup/lookup-and-store.mjs` — the original
+  script, still around for bulk sweeps (`--all-missing`) or as a fallback if
+  `gst-worker` is down. Uses Claude's vision to solve the captcha instead of
+  a human, via `--buyer <id>`. See the script's own README.
 
 ## GST verification is informational, not a gate
 
@@ -154,11 +174,10 @@ drawer used to create/edit a buyer), behind a **Details / GST Info** tab pair
 that only appears once the buyer has a GSTIN. A "View GST Info" button on the
 buyer detail page's Buyer Info card opens the drawer straight onto that tab;
 "Edit" opens the same drawer onto Details instead — both the same component
-and mode, just a different landing tab. Reusing the edit drawer is
-deliberate, not just economical: phase 1.2 (auto-running the lookup the
-moment a GSTIN is typed in) lands in this same surface later, so building the
-display here now means that automation has somewhere to show its result
-without a new UI.
+and mode, just a different landing tab. Reusing the edit drawer was
+deliberate, not just economical: the Fetch GST Info flow (see "Two phases"
+above) lives in this exact surface, so that automation had somewhere to show
+its result without needing a new UI built for it.
 
 The GST Info tab shows legal/trade name (each its own line), registered
 address, ship-to PIN/state, and the verified date, followed by several

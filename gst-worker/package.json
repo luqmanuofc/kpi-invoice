@@ -1,0 +1,14 @@
+{
+  "name": "gst-worker",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Standalone service, deployed to a VPS -- see README.md. Not part of the Netlify app build.",
+  "scripts": {
+    "start": "node server.mjs"
+  },
+  "dependencies": {
+    "dotenv": "^16.6.1",
+    "playwright": "^1.63.0"
+  }
+}
