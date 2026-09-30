@@ -158,10 +158,10 @@ describe("invoiceToEwayInput / buildEwayBill", () => {
       docDate: "22/09/2026",
       fromGstin: "01BSGPB0427H1ZJ",
       fromTrdName: "Khaldun Plastic Industries",
-      fromAddr1: "28A-SIDCO INDL. COMPLEX SHALLATENG SRINAGAR J&K 190010",
+      fromAddr1: "28, SIDCO Complex, Shallateng, Srinagar, Jammu and Kashmir",
       fromAddr2: "",
       fromPlace: "SRINAGAR",
-      fromPincode: 190010,
+      fromPincode: 190017,
       fromStateCode: 1,
       actualFromStateCode: 1,
       toGstin: "01ABCDE1234F1Z5",
@@ -264,9 +264,17 @@ describe("validation", () => {
     expect(errors(i).map((e) => e.field)).toContain("to.pincode");
   });
 
-  it("falls back to the configured seller PIN when the address text has none", () => {
-    const i = invoiceToEwayInput(makeInvoice({ sellerAddressSnapshot: "28A-SIDCO SRINAGAR" }), makeBuyer());
+  it("always uses the configured seller address/PIN, regardless of the invoice's own address text", () => {
+    // The invoice's sellerAddressSnapshot is a printed-invoice value the user
+    // edits freely; it's deliberately never used for the seller side of the
+    // e-way bill (see EWAY_SELLER in config.ts) so a messy or portal-unsafe
+    // printed address can't leak into the bill.
+    const i = invoiceToEwayInput(
+      makeInvoice({ sellerAddressSnapshot: "some totally different (unsafe) text" }),
+      makeBuyer()
+    );
     expect(i.from.pincode).toBe(190017); // EWAY_SELLER.pincode, confirmed against a real accepted bill
+    expect(i.from.address1).toBe("28, SIDCO Complex, Shallateng, Srinagar, Jammu and Kashmir");
     expect(errors(i).map((e) => e.field)).not.toContain("from.pincode");
   });
 

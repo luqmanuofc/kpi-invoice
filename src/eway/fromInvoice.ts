@@ -63,14 +63,14 @@ function buyerParty(inv: Invoice, buyer: Buyer | undefined): EwayParty {
 function sellerParty(inv: Invoice): EwayParty {
   const gstin = inv.sellerGstinSnapshot.trim().toUpperCase();
   const stateCode = stateCodeFromGstin(gstin);
-  const [address1, address2] = splitAddress(inv.sellerAddressSnapshot);
+  const [address1, address2] = splitAddress(EWAY_SELLER.address);
   return {
     gstin,
     name: inv.sellerNameSnapshot,
     address1,
     address2,
     place: EWAY_SELLER.place,
-    pincode: extractPincode(inv.sellerAddressSnapshot) ?? EWAY_SELLER.pincode,
+    pincode: EWAY_SELLER.pincode,
     stateCode,
     actualStateCode: stateCode,
   };

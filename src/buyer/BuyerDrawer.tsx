@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import dayjs from "dayjs";
-import { Loader2, BadgeCheck, ShieldAlert } from "lucide-react";
+import { Loader2, BadgeCheck, ShieldAlert, Copy, Check } from "lucide-react";
 import {
   createBuyer,
   updateBuyer,
@@ -71,6 +71,7 @@ export default function BuyerDrawer({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<DrawerTab>(initialTab);
+  const [commandCopied, setCommandCopied] = useState(false);
 
   const {
     data: buyer,
@@ -178,6 +179,24 @@ export default function BuyerDrawer({
   const gstRaw = gstDetail?.raw;
   const showGstTab = mode === "edit" && !!buyer?.gstin;
 
+  // No in-app automation yet -- scripts/gstin-lookup --all-missing already
+  // finds every unverified GSTIN buyer on its own, so this just saves
+  // retyping the buyer id by hand.
+  const lookupCommand = buyer
+    ? `node -r dotenv/config scripts/gstin-lookup/lookup-and-store.mjs --buyer ${buyer.id}`
+    : "";
+
+  const handleCopyCommand = async () => {
+    try {
+      await navigator.clipboard.writeText(lookupCommand);
+      setCommandCopied(true);
+      setTimeout(() => setCommandCopied(false), 2000);
+    } catch {
+      // Clipboard access can fail (permissions, insecure context) -- the
+      // command is still visible to copy by hand, so this is silent.
+    }
+  };
+
   if (isFetching) {
     return (
       <Sheet open={open} onOpenChange={handleClose}>
@@ -265,14 +284,6 @@ export default function BuyerDrawer({
             <p className="text-sm text-destructive">{errors.gstin.message}</p>
           )}
         </div>
-
-        {showGstTab && (
-          <p className="text-sm text-muted-foreground">
-            Ship-to PIN code and state are on the <strong>GST Info</strong> tab
-            for this buyer — sourced from the government lookup, not typed
-            here.
-          </p>
-        )}
       </div>
 
       <div className="flex justify-end w-full">
@@ -332,12 +343,31 @@ export default function BuyerDrawer({
           </p>
         </div>
       ) : (
-        <p className="text-sm text-amber-700 dark:text-amber-500 text-left">
-          Not verified against the government's GST records yet — no
-          ship-to PIN/state available for this buyer until it is. Run{" "}
-          <code>scripts/gstin-lookup</code> to verify this buyer against
-          GST's own Search Taxpayer records.
-        </p>
+        <div className="space-y-2">
+          <p className="text-sm text-amber-700 dark:text-amber-500 text-left">
+            Not verified against the government's GST records yet — no
+            ship-to PIN/state available for this buyer until it is. Run this
+            from the project root to verify it against GST's own Search
+            Taxpayer records:
+          </p>
+          <div className="flex items-center gap-2">
+            <code className="flex-1 min-w-0 text-xs bg-muted rounded px-2 py-1.5 overflow-x-auto whitespace-nowrap">
+              {lookupCommand}
+            </code>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleCopyCommand}
+            >
+              {commandCopied ? (
+                <Check className="h-3.5 w-3.5" />
+              ) : (
+                <Copy className="h-3.5 w-3.5" />
+              )}
+            </Button>
+          </div>
+        </div>
       )}
 
       {(hasRegistrationDetails || hasJurisdiction || hasBusinessActivity || hasGoodsServices) && (

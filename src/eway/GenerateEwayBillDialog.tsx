@@ -41,12 +41,11 @@ export default function GenerateEwayBillDialog({
 }: GenerateEwayBillDialogProps) {
   const today = dayjs().format("YYYY-MM-DD");
   const [vehicleNo, setVehicleNo] = useState(invoice.vehicleNumber ?? "");
-  const [transporterId, setTransporterId] = useState("");
 
   const prepared = useMemo(() => {
-    const transport: TransportOverrides = { vehicleNo, transporterId };
+    const transport: TransportOverrides = { vehicleNo };
     return prepareBill(invoiceToEwayInput(invoice, buyer, transport), { today });
-  }, [invoice, buyer, vehicleNo, transporterId, today]);
+  }, [invoice, buyer, vehicleNo, today]);
 
   const problems = prepared.issues.filter((i) => i.severity !== "info");
 
@@ -67,12 +66,8 @@ export default function GenerateEwayBillDialog({
         <DialogHeader>
           <DialogTitle>Generate E-way Bill</DialogTitle>
         </DialogHeader>
-        <p className="text-sm text-muted-foreground">
-          Downloads a bulk-upload JSON for invoice {invoice.invoiceNumber} that
-          you upload yourself at e-Waybill → Generate Bulk on the portal.
-        </p>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="mt-4 space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="ewb-vehicle">Vehicle no.</Label>
             <Input
@@ -81,29 +76,19 @@ export default function GenerateEwayBillDialog({
               onChange={(e) => setVehicleNo(normalizeVehicleNo(e.target.value))}
             />
           </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="ewb-transporter">Transporter GSTIN</Label>
-            <Input
-              id="ewb-transporter"
-              placeholder="If not self-transporting"
-              maxLength={15}
-              value={transporterId}
-              onChange={(e) => setTransporterId(e.target.value.toUpperCase())}
-            />
-          </div>
+
+          {problems.length > 0 && (
+            <ul className="text-sm space-y-1.5">
+              {problems.map((i, k) => (
+                <li key={k} className={i.severity === "error" ? "text-destructive" : "text-amber-600"}>
+                  <span className="font-mono text-xs">{i.field}</span> — {i.message}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
-        {problems.length > 0 && (
-          <ul className="text-sm space-y-1">
-            {problems.map((i, k) => (
-              <li key={k} className={i.severity === "error" ? "text-destructive" : "text-amber-600"}>
-                <span className="font-mono text-xs">{i.field}</span> — {i.message}
-              </li>
-            ))}
-          </ul>
-        )}
-
-        <DialogFooter>
+        <DialogFooter className="mt-4">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Close
           </Button>
