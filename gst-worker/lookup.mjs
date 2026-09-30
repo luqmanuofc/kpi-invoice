@@ -124,21 +124,33 @@ export async function openLookup(gstin) {
   // error in a few seconds instead of a hard timeout with no clean response.
   page.setDefaultTimeout(8000);
   page.setDefaultNavigationTimeout(15000);
-  await page.goto(SEARCH_URL, { waitUntil: "networkidle" });
-  await page.waitForTimeout(1000);
-  // Explicit, longer timeout here specifically -- this is the one action in
-  // the whole session guaranteed to run exactly once (not compounded across
-  // retries the way submitAnswer()'s actions are), and on a slower network
-  // path to the portal (e.g. a VPS further from India than a local dev
-  // machine), Angular's bootstrap after "networkidle" can legitimately take
-  // longer than the page's tighter 8s default. Bumping this one call doesn't
-  // reintroduce the compounding-timeout bug that default exists to prevent.
-  await page.click(SELECTORS.gstinInput, { timeout: 20000 });
-  await page.keyboard.type(gstin, { delay: 80 }); // fill() won't reveal the captcha -- see lookup-and-store.mjs
-  await page.waitForSelector(SELECTORS.captchaImage, { timeout: 10000 });
-  await page.waitForTimeout(800);
-  const captchaImage = await page.locator(SELECTORS.captchaImage).screenshot();
-  return { browser, page, captchaImage };
+
+  try {
+    await page.goto(SEARCH_URL, { waitUntil: "networkidle" });
+    await page.waitForTimeout(1000);
+    // Explicit, longer timeout here specifically -- this is the one action
+    // in the whole session guaranteed to run exactly once (not compounded
+    // across retries the way submitAnswer()'s actions are), and on a slower
+    // network path to the portal (e.g. a VPS further from India than a
+    // local dev machine), Angular's bootstrap after "networkidle" can
+    // legitimately take longer than the page's tighter 8s default. Bumping
+    // this one call doesn't reintroduce the compounding-timeout bug that
+    // default exists to prevent.
+    await page.click(SELECTORS.gstinInput, { timeout: 20000 });
+    await page.keyboard.type(gstin, { delay: 80 }); // fill() won't reveal the captcha -- see lookup-and-store.mjs
+    await page.waitForSelector(SELECTORS.captchaImage, { timeout: 10000 });
+    await page.waitForTimeout(800);
+    const captchaImage = await page.locator(SELECTORS.captchaImage).screenshot();
+    return { browser, page, captchaImage };
+  } catch (err) {
+    // Whatever went wrong (portal down, unreachable, markup changed, plain
+    // slowness) -- the caller shouldn't see a raw Playwright stack trace
+    // like "page.click: Timeout 8000ms exceeded ... waiting for
+    // locator('#for_gstin')". One clear, generic message instead.
+    console.error("openLookup failed:", err);
+    await browser.close().catch(() => {});
+    throw new Error("Couldn't reach the GST portal right now. Please try again in a few minutes.");
+  }
 }
 
 /** Submits a captcha answer on an already-open page. On a wrong answer,
