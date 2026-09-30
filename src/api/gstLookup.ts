@@ -10,7 +10,8 @@ export type GstCaptchaResult =
   | { status: "wrong_captcha"; captchaImage: string }
   | { status: "failed" }
   | { status: "not_found" }
-  | { status: "incomplete"; error: string };
+  | { status: "incomplete"; error: string }
+  | { status: "error"; message: string };
 
 export async function startGstLookup(
   gstin: string

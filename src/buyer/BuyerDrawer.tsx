@@ -224,9 +224,13 @@ export default function BuyerDrawer({
       });
 
       if (result.status === "success") {
-        // Refetches this buyer (and the list) so gstVerifications picks up
-        // the new row and the tab flips to the verified view on its own.
-        queryClient.invalidateQueries({ queryKey: BUYERS_QUERY_KEY });
+        // Awaited, not fire-and-forget: invalidateQueries() only *starts*
+        // the refetch. Setting gstLookup to idle before it resolves would
+        // render with the still-stale (unverified) buyer for a moment --
+        // "Fetch GST Info" flashing back before the verified view takes
+        // over. Staying in the submitting state until the refetch actually
+        // lands keeps the spinner up through that gap instead.
+        await queryClient.invalidateQueries({ queryKey: BUYERS_QUERY_KEY });
         setGstLookup({ kind: "idle" });
         setCaptchaAnswer("");
         return;
@@ -239,7 +243,7 @@ export default function BuyerDrawer({
           sessionId,
           captchaImage: result.captchaImage,
           submitting: false,
-          notice: "That wasn't right -- try the new captcha below.",
+          notice: "Captcha couldn't be verified. Please try the new captcha.",
         });
         return;
       }
@@ -254,6 +258,11 @@ export default function BuyerDrawer({
           kind: "error",
           message: "Too many incorrect captcha attempts. Try again.",
         });
+        return;
+      }
+
+      if (result.status === "error") {
+        setGstLookup({ kind: "error", message: result.message });
         return;
       }
 
@@ -434,14 +443,20 @@ export default function BuyerDrawer({
           )}
 
           {gstLookup.kind === "captcha" && (
-            <div className="space-y-2">
+            <form
+              className="space-y-2"
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSubmitCaptcha();
+              }}
+            >
               <img
                 src={`data:image/png;base64,${gstLookup.captchaImage}`}
                 alt="GST portal captcha"
                 className="rounded border bg-white"
               />
               {gstLookup.notice && (
-                <p className="text-xs text-amber-700 dark:text-amber-500 text-left">
+                <p className="text-xs text-destructive text-left">
                   {gstLookup.notice}
                 </p>
               )}
@@ -452,11 +467,11 @@ export default function BuyerDrawer({
                   placeholder="Type what you see above"
                   disabled={gstLookup.submitting}
                   className="flex-1"
+                  autoFocus
                 />
                 <Button
-                  type="button"
+                  type="submit"
                   size="sm"
-                  onClick={handleSubmitCaptcha}
                   disabled={!captchaAnswer.trim() || gstLookup.submitting}
                 >
                   {gstLookup.submitting ? (
@@ -466,7 +481,7 @@ export default function BuyerDrawer({
                   )}
                 </Button>
               </div>
-            </div>
+            </form>
           )}
 
           {gstLookup.kind === "error" && (

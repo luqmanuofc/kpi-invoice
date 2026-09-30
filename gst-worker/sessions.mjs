@@ -49,7 +49,18 @@ export async function answerSession(sessionId, answer) {
   if (!session) return { status: "not_found" };
 
   session.attempts += 1;
-  const result = await submitAnswer(session.page, answer);
+
+  let result;
+  try {
+    result = await submitAnswer(session.page, answer);
+  } catch (err) {
+    // A page/selector hiccup (e.g. the refreshed captcha image not settling
+    // in time) shouldn't leave the browser session orphaned or surface a
+    // bare 500 -- clean up and give the caller something it can show.
+    console.error(`answerSession(${sessionId}) failed:`, err);
+    await endSession(sessionId);
+    return { status: "error", message: err.message || "Something went wrong talking to the GST portal" };
+  }
 
   if (result.ok) {
     await endSession(sessionId);

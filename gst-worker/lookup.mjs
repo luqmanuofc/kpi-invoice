@@ -116,6 +116,14 @@ async function scrapeResult(page) {
 export async function openLookup(gstin) {
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
+  // Playwright's own default action/navigation timeout is 30s -- the same
+  // ceiling Netlify Functions die at. A slow/stuck click or screenshot could
+  // silently eat the whole function budget and get killed by the platform
+  // before answerSession()'s try/catch ever got a chance to handle it
+  // cleanly. Failing fast here means a real hiccup surfaces as a handled
+  // error in a few seconds instead of a hard timeout with no clean response.
+  page.setDefaultTimeout(8000);
+  page.setDefaultNavigationTimeout(15000);
   await page.goto(SEARCH_URL, { waitUntil: "networkidle" });
   await page.waitForTimeout(1000);
   await page.click(SELECTORS.gstinInput);
@@ -136,16 +144,39 @@ export async function submitAnswer(page, answer) {
   await page.click(SELECTORS.captchaInput);
   await page.keyboard.type(answer, { delay: 50 });
   await page.click(SELECTORS.submit);
-  await page.waitForTimeout(1500);
 
-  const wrong = await page.locator(SELECTORS.captchaError).isVisible().catch(() => false);
+  // Actively wait for whichever of these actually happens, instead of a
+  // fixed delay then a one-off visibility check. That fixed-delay version
+  // was a real race: if the portal took even a bit longer than the delay to
+  // render the error, the check fired too early, wrongly concluded the
+  // captcha was accepted, and fell through to scrapeResult() against a page
+  // that never actually loaded results -- each field lookup there then
+  // waited out its own timeout in sequence, compounding well past Netlify's
+  // 30s function budget. Racing both outcomes with a real wait fixes the
+  // false negative and bounds the worst case to this one timeout.
+  const outcome = await Promise.race([
+    page.locator(SELECTORS.captchaError).waitFor({ state: "visible", timeout: 10000 }).then(() => "error").catch(() => null),
+    page.locator(SELECTORS.resultsPanel).waitFor({ state: "visible", timeout: 10000 }).then(() => "result").catch(() => null),
+  ]);
+  // Neither appeared (outcome === null) is treated as wrong too -- refreshing
+  // and trying again is the safe default when we can't confirm success.
+  const wrong = outcome !== "result";
+
   if (wrong) {
     await page.click(SELECTORS.refreshCaptcha);
-    await page.waitForTimeout(1000);
+    // Refresh swaps the <img> src -- wait for it to actually be visible
+    // again rather than trust a fixed delay, which could screenshot mid-swap.
+    await page.waitForSelector(SELECTORS.captchaImage, { state: "visible", timeout: 5000 });
+    await page.waitForTimeout(500);
     const captchaImage = await page.locator(SELECTORS.captchaImage).screenshot();
     return { ok: false, captchaImage };
   }
 
+  // The results panel is already confirmed visible at this point, so the
+  // individual field lookups inside scrapeResult() should resolve near-
+  // instantly -- a short timeout here bounds the worst case tightly instead
+  // of inheriting the page's more patient 8s default per field.
+  page.setDefaultTimeout(3000);
   const data = await scrapeResult(page);
   return { ok: true, data };
 }

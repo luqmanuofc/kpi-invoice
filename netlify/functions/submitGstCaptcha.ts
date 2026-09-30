@@ -97,6 +97,7 @@ export default async function handler(request: Request) {
       headers: { "Content-Type": "application/json" },
     });
   } catch (err: any) {
+    console.error("submitGstCaptcha error:", err);
     return new Response(JSON.stringify({ error: err.message }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
