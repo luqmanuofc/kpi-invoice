@@ -345,10 +345,11 @@ export default function BuyerDrawer({
       ) : (
         <div className="space-y-2">
           <p className="text-sm text-amber-700 dark:text-amber-500 text-left">
-            Not verified against the government's GST records yet — no
-            ship-to PIN/state available for this buyer until it is. Run this
-            from the project root to verify it against GST's own Search
-            Taxpayer records:
+            GST info isn't verified for this buyer yet. Please complete
+            verification to start generating e-way bills for {buyer.name}.
+            <br />
+            Run this from the project root to verify it against GST's own
+            Search Taxpayer records:
           </p>
           <div className="flex items-center gap-2">
             <code className="flex-1 min-w-0 text-xs bg-muted rounded px-2 py-1.5 overflow-x-auto whitespace-nowrap">

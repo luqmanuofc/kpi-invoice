@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -57,6 +57,19 @@ export default function BuyerDetailPage() {
   const [editOpen, setEditOpen] = useState(false);
   const [drawerTab, setDrawerTab] = useState<"details" | "gst">("details");
   const [invoicePage, setInvoicePage] = useState(1);
+
+  // Arriving here from the "Verify GST Info" prompt in GenerateEwayBillDialog
+  // (an unverified buyer on an invoice) should land straight on the GST tab,
+  // not require an extra click once you're already here for that reason.
+  useEffect(() => {
+    const state = location.state as { openGstTab?: boolean } | null;
+    if (state?.openGstTab) {
+      setDrawerTab("gst");
+      setEditOpen(true);
+      navigate(location.pathname, { replace: true, state: null });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const {
     data: invoicesData,
