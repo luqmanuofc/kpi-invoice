@@ -8,7 +8,7 @@ import "dotenv/config";
 import http from "node:http";
 import { startSession, answerSession, closeAllSessions } from "./sessions.mjs";
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8420;
 const SHARED_SECRET = process.env.WORKER_SHARED_SECRET;
 
 if (!SHARED_SECRET) {

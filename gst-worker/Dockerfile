@@ -16,6 +16,6 @@ COPY --chown=pwuser:pwuser *.mjs ./
 COPY --from=gstin-lookup stateNames.mjs /scripts/gstin-lookup/
 
 USER pwuser
-ENV PORT=3000
-EXPOSE 3000
+ENV PORT=8420
+EXPOSE 8420
 CMD ["node", "server.mjs"]
