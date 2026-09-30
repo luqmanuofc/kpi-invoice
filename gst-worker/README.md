@@ -99,6 +99,58 @@ their progress and needs to click "Fetch GST Info" again) -- acceptable
 given how rarely this runs; no attempt is made to preserve sessions across a
 restart.
 
+## Updating from this dev machine via SSH
+
+The commands above have to run *on* the machine hosting the Docker
+container -- gst-worker isn't deployed from CI/CD, so every code change
+needs someone to actually log into that box and re-run the build/run
+sequence. Relaying copy-paste instructions for a human to run there each
+time is slow and error-prone (wrong path, stale `.env`, forgotten `funnel`
+step), so instead this dev machine has direct SSH access to run the update
+itself.
+
+**How that's set up:** a dedicated SSH keypair, generated on this dev
+machine specifically for this purpose (not reused from any other key),
+with its public half appended to the target machine's
+`~/.ssh/authorized_keys`. Key-based auth was chosen over Tailscale SSH
+because Tailscale SSH needs an ACL policy change in the tailnet's admin
+console beyond just enabling it locally, which turned out to be more setup
+than generating and registering a key -- and over a plain password because
+that would mean a credential passing through chat/session history, which
+we specifically avoided.
+
+**Where the actual connection details live:** `gst-worker/.deploy-target.local`
+in this directory -- gitignored, not in this doc, because this repo is
+public and that file has the real hostname/IP/username for someone's
+personal machine. If you're picking this up on a fresh checkout of this
+exact dev machine and that file is missing, the keypair and
+`authorized_keys` entry may still be intact on the target machine (check
+before regenerating) -- otherwise, re-establish access the same way
+described there: generate a new keypair, have a human add the public half
+to the target's `authorized_keys`, then recreate the file.
+
+**The actual update, once connected**, is just the build/run sequence
+from "Updating" above, run over SSH instead of an interactive shell:
+
+```bash
+ssh -i <key from .deploy-target.local> <user>@<host> \
+  "cd <repo path> && git pull && cd gst-worker && \
+   docker build --build-context gstin-lookup=../scripts/gstin-lookup -t gst-worker . && \
+   docker rm -f gst-worker && \
+   docker run -d --name gst-worker --restart unless-stopped --init --ipc=host \
+     -p 127.0.0.1:8420:8420 --env-file .env gst-worker && \
+   curl -s localhost:8420/health"
+```
+
+If the port ever changes, Funnel needs re-pointing too (`sudo tailscale
+funnel <old-port> off` on newer Tailscale CLI versions may error with a CLI
+syntax message -- ignore it, the important one is `sudo tailscale funnel
+--bg <new-port>`; check `tailscale funnel status` afterward to confirm only
+the new port's rule is active). Both `tailscale` commands need `sudo`,
+which needs an interactive password this SSH flow can't supply
+non-interactively -- ask a human to run those two specific commands
+directly on the machine when a port change is involved.
+
 ## API
 
 Both endpoints require `Authorization: Bearer <WORKER_SHARED_SECRET>`.
