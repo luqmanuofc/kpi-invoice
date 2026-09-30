@@ -126,7 +126,14 @@ export async function openLookup(gstin) {
   page.setDefaultNavigationTimeout(15000);
   await page.goto(SEARCH_URL, { waitUntil: "networkidle" });
   await page.waitForTimeout(1000);
-  await page.click(SELECTORS.gstinInput);
+  // Explicit, longer timeout here specifically -- this is the one action in
+  // the whole session guaranteed to run exactly once (not compounded across
+  // retries the way submitAnswer()'s actions are), and on a slower network
+  // path to the portal (e.g. a VPS further from India than a local dev
+  // machine), Angular's bootstrap after "networkidle" can legitimately take
+  // longer than the page's tighter 8s default. Bumping this one call doesn't
+  // reintroduce the compounding-timeout bug that default exists to prevent.
+  await page.click(SELECTORS.gstinInput, { timeout: 20000 });
   await page.keyboard.type(gstin, { delay: 80 }); // fill() won't reveal the captcha -- see lookup-and-store.mjs
   await page.waitForSelector(SELECTORS.captchaImage, { timeout: 10000 });
   await page.waitForTimeout(800);
