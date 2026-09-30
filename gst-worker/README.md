@@ -113,3 +113,50 @@ Both endpoints require `Authorization: Bearer <WORKER_SHARED_SECRET>`.
   - `{ status: "failed" }` -- 4 wrong attempts, session closed
   - `{ status: "not_found" }` -- unknown or expired `sessionId` (sessions
     idle-timeout after 5 minutes)
+
+## Deployment update (2026-09-30): Docker instead of systemd
+
+The steps above are the original plan. When this was actually deployed, the
+"VPS" turned out to be a personal laptop, so we switched to running the
+worker in Docker rather than installing Node + Playwright's system libraries
+directly on the host and adding a systemd unit. Everything above still
+describes how the worker itself behaves; only the install/run mechanics
+changed.
+
+Why: keeps Node, Chromium and its ~30 apt dependencies off the host, makes
+removal a single `docker rm -f`, and sandboxes the headless browser away from
+the user's home directory. Docker's `--restart unless-stopped` gives the same
+crash/reboot resilience the systemd unit was for.
+
+What's different:
+
+- `Dockerfile` + `.dockerignore` in this directory, based on
+  `mcr.microsoft.com/playwright:v1.63.0-noble` (ships Node + Chromium libs).
+- `lookup.mjs` imports `../scripts/gstin-lookup/stateNames.mjs`, which is
+  outside this directory, so it's passed in as a named build context rather
+  than widening the build context to the whole repo.
+- Port is published on `127.0.0.1` only; Tailscale Funnel on the host is the
+  sole way in from outside. Funnel setup is unchanged.
+- `.env` is passed with `--env-file`; it is not baked into the image.
+
+```bash
+cd kpi-invoice/gst-worker
+docker build --build-context gstin-lookup=../scripts/gstin-lookup -t gst-worker .
+docker run -d --name gst-worker --restart unless-stopped --init --ipc=host \
+  -p 127.0.0.1:3000:3000 --env-file .env gst-worker
+curl localhost:3000/health          # -> {"ok":true}
+sudo tailscale funnel --bg 3000
+```
+
+Updating (replaces the systemd "Updating" steps above):
+
+```bash
+cd kpi-invoice && git pull
+cd gst-worker
+docker build --build-context gstin-lookup=../scripts/gstin-lookup -t gst-worker .
+docker rm -f gst-worker
+docker run -d --name gst-worker --restart unless-stopped --init --ipc=host \
+  -p 127.0.0.1:3000:3000 --env-file .env gst-worker
+```
+
+Logs: `docker logs -f gst-worker`.
