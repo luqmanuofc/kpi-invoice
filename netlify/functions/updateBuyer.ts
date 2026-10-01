@@ -22,6 +22,11 @@ export default async function handler(request: Request) {
       });
     }
 
+    // No GST-verification bookkeeping needed here: GstVerification rows are
+    // never touched by this endpoint, and "verified" is derived at read time
+    // by comparing a buyer's current gstin against its latest
+    // GstVerification.gstin (see isBuyerGstVerified in src/api/buyers.ts) --
+    // so an edited GSTIN can't leave a stale "verified" status behind.
     const buyer = await prisma.buyer.update({
       where: {
         id: data.id,

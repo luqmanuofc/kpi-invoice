@@ -11,3 +11,12 @@ dist
 
 # Live Epson OAuth tokens written by scripts/epson/1-auth-setup.mjs
 scripts/epson/tokens.json
+
+# Screenshots written by the e-way bill portal automation POC
+poc-ready-to-submit.png
+poc-error.png
+
+# Actual SSH connection details for the machine gst-worker runs on --
+# machine-specific, and this repo is public, so this stays local-only. See
+# gst-worker/README.md's "Updating from this dev machine via SSH" section.
+gst-worker/.deploy-target.local

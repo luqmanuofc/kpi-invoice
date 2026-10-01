@@ -17,10 +17,61 @@ model Buyer {
   gstin   String?
   phone   String?
 
+  // No pincode/stateCode column: e-way bill ship-to PIN/state only ever
+  // come from the latest matching row in GstVerification below (a buyer
+  // with a GSTIN), and a buyer with no GSTIN (URP) isn't currently
+  // supported for e-way bill generation at all, so there's nothing to
+  // store manually.
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  invoices Invoice[]
+  invoices         Invoice[]
+  gstVerifications GstVerification[]
+}
+
+//
+// GST VERIFICATION (one row per scripts/gstin-lookup run -- the only place
+// a GSTIN buyer's legal name/trade name/address/pincode/stateCode live;
+// nothing here is cached back onto Buyer)
+//
+model GstVerification {
+  id String @id @default(cuid())
+
+  buyerId String
+  buyer   Buyer  @relation(fields: [buyerId], references: [id], onDelete: Cascade)
+
+  // Snapshot of the GSTIN this row was verified against -- Buyer.gstin can
+  // change later. "Verified" is derived at read time by checking this
+  // still equals the buyer's current gstin (see isBuyerGstVerified in
+  // src/api/buyers.ts) rather than tracked with its own flag/column, so a
+  // changed GSTIN can't leave a stale "verified" status lying around.
+  gstin String
+
+  verifiedAt DateTime @default(now())
+
+  // Headline fields, typed for easy display/querying.
+  legalName              String?
+  tradeName              String?
+  registrationDate       String? // as shown by the portal, dd/mm/yyyy text -- not parsed, to avoid a scrape bug silently corrupting a DateTime
+  constitutionOfBusiness String?
+  gstinStatus            String? // e.g. "Active"
+  taxpayerType           String? // e.g. "Regular"
+  principalAddress       String?
+  pincode                Int?
+  stateCode              Int?
+
+  // Everything else the portal returns -- jurisdiction (administrative +
+  // state office lines), Aadhaar/e-KYC verification status, nature of core
+  // business activity, nature of business activities, and the HSN/SAC goods
+  // & services table -- kept as JSON rather than modelled field-by-field so
+  // a portal layout change doesn't silently drop data or need a migration
+  // just to keep capturing it. See scripts/gstin-lookup for the shape.
+  raw Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([buyerId])
+  @@index([gstin])
 }
 
 //

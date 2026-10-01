@@ -1,7 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-import { Loader2, ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Loader2,
+  ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
+  BadgeCheck,
+  ShieldAlert,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Alert } from "@/components/ui/alert";
 import {
@@ -15,6 +22,7 @@ import { useBuyer, useBuyerAnalytics, BUYERS_QUERY_KEY } from "@/hooks/useBuyers
 import { useBuyerInvoices, buyerInvoicesQueryKey } from "@/hooks/useInvoices";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import type { Invoice } from "@/api/invoices";
+import { isBuyerGstVerified } from "@/api/buyers";
 import BuyerDrawer from "@/buyer/BuyerDrawer";
 import {
   BuyerAnalyticsSummaryCards,
@@ -47,7 +55,21 @@ export default function BuyerDetailPage() {
   const { data: analytics, isLoading: analyticsLoading } = useBuyerAnalytics(id);
 
   const [editOpen, setEditOpen] = useState(false);
+  const [drawerTab, setDrawerTab] = useState<"details" | "gst">("details");
   const [invoicePage, setInvoicePage] = useState(1);
+
+  // Arriving here from the "Verify GST Info" prompt in GenerateEwayBillDialog
+  // (an unverified buyer on an invoice) should land straight on the GST tab,
+  // not require an extra click once you're already here for that reason.
+  useEffect(() => {
+    const state = location.state as { openGstTab?: boolean } | null;
+    if (state?.openGstTab) {
+      setDrawerTab("gst");
+      setEditOpen(true);
+      navigate(location.pathname, { replace: true, state: null });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const {
     data: invoicesData,
@@ -152,7 +174,30 @@ export default function BuyerDetailPage() {
             </p>
           </CardContent>
           <CardFooter className="flex justify-end gap-2 pt-0">
-            <Button size="sm" onClick={() => setEditOpen(true)}>
+            {buyer.gstin && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setDrawerTab("gst");
+                  setEditOpen(true);
+                }}
+              >
+                {isBuyerGstVerified(buyer) ? (
+                  <BadgeCheck className="h-4 w-4 text-green-600 dark:text-green-500" />
+                ) : (
+                  <ShieldAlert className="h-4 w-4 text-amber-600 dark:text-amber-500" />
+                )}
+                View GST Info
+              </Button>
+            )}
+            <Button
+              size="sm"
+              onClick={() => {
+                setDrawerTab("details");
+                setEditOpen(true);
+              }}
+            >
               Edit
             </Button>
           </CardFooter>
@@ -240,6 +285,7 @@ export default function BuyerDetailPage() {
         mode="edit"
         buyerId={buyer.id}
         onSuccess={handleEditSuccess}
+        initialTab={drawerTab}
       />
     </div>
   );

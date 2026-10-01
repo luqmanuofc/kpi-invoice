@@ -5,7 +5,7 @@ import {
   useSearchParams,
   useLocation,
 } from "react-router-dom";
-import { Loader2, ArrowLeft, Download, Printer } from "lucide-react";
+import { Loader2, ArrowLeft, Download, Printer, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
@@ -19,6 +19,9 @@ import html2canvas from "html2canvas";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useInvoice } from "@/hooks/useInvoices";
 import { usePrintJob, usePrintInvoiceEpson, isPrintJobInFlight } from "@/hooks/usePrintJob";
+import { useBuyer } from "@/hooks/useBuyers";
+import { assessInvoice } from "@/eway/fromInvoice";
+import GenerateEwayBillDialog from "@/eway/GenerateEwayBillDialog";
 
 // Translates Epson's raw job status into something a non-technical user can
 // act on -- "media_empty" means nothing to someone printing an invoice.
@@ -84,6 +87,10 @@ export default function InvoiceViewPage() {
   const isMobile = useMediaQuery("(max-width: 768px)");
   const { data: printJob } = usePrintJob(id);
   const printMutation = usePrintInvoiceEpson(id);
+
+  const { data: buyer } = useBuyer(invoice?.buyerId);
+  const [ewayDialogOpen, setEwayDialogOpen] = useState(false);
+  const ewayRequired = invoice ? assessInvoice(invoice, buyer).required : false;
 
   // Transform Invoice to InvoiceForm format
   const invoiceData = useMemo<InvoiceForm | null>(() => {
@@ -391,6 +398,16 @@ export default function InvoiceViewPage() {
               )}
               {!isMobile && "Print to Epson"}
             </Button>
+            {ewayRequired && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setEwayDialogOpen(true)}
+              >
+                <Truck className={isMobile ? "h-4 w-4" : "mr-2 h-4 w-4"} />
+                {!isMobile && "E-way Bill"}
+              </Button>
+            )}
             {isMobile && (
               <Button
                 variant="outline"
@@ -443,6 +460,15 @@ export default function InvoiceViewPage() {
         transformOrigin="top center"
         ref={invoiceRef}
       />
+
+      {invoice && (
+        <GenerateEwayBillDialog
+          open={ewayDialogOpen}
+          onOpenChange={setEwayDialogOpen}
+          invoice={invoice}
+          buyer={buyer}
+        />
+      )}
     </div>
   );
 }
