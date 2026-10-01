@@ -43,7 +43,13 @@ export function buildEwayBill(input: EwayInput): EwayBill {
     cessRate: 0,
     cessNonAdvol: 0,
   }));
-  const mainItem = items.reduce((a, b) => (b.taxableAmount > a.taxableAmount ? b : a), items[0]);
+  // items can be empty (an invoice with no line items) -- validateEwayInput's
+  // own "No items" check runs after this, not before, so this has to survive
+  // that case rather than crash on it.
+  const mainItem =
+    items.length > 0
+      ? items.reduce((a, b) => (b.taxableAmount > a.taxableAmount ? b : a), items[0])
+      : null;
 
   const totalValue = round2(items.reduce((s, i) => s + i.taxableAmount, 0));
   const cgstValue = round2(input.cgstValue);
@@ -96,7 +102,7 @@ export function buildEwayBill(input: EwayInput): EwayBill {
     transDocDate: toPortalDate(t.transDocDate),
     vehicleNo: normalizeVehicleNo(t.vehicleNo),
     vehicleType: t.vehicleType,
-    mainHsnCode: mainItem.hsnCode,
+    mainHsnCode: mainItem?.hsnCode ?? "",
     itemList: items,
   };
 }

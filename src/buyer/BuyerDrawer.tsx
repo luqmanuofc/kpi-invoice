@@ -12,6 +12,7 @@ import {
 } from "../api/buyers";
 import { startGstLookup, submitGstCaptcha } from "../api/gstLookup";
 import { useBuyer, BUYERS_QUERY_KEY } from "../hooks/useBuyers";
+import { isValidGstin } from "@/eway/gst";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -347,7 +348,7 @@ export default function BuyerDrawer({
             {...register("gstin", {
               validate: (value) => {
                 if (!value || value.trim() === "") return true;
-                if (value.length === 15) return true;
+                if (isValidGstin(value)) return true;
                 return "Please enter a valid 15 character GSTIN or leave empty";
               },
             })}

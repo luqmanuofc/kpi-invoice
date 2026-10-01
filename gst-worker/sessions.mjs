@@ -48,6 +48,14 @@ export async function answerSession(sessionId, answer) {
   const session = sessions.get(sessionId);
   if (!session) return { status: "not_found" };
 
+  // Stop the idle timer before doing any async work with this session --
+  // otherwise the timer scheduled by the *previous* scheduleExpiry() call
+  // keeps counting down through the whole submitAnswer() await below, and
+  // can fire mid-operation (e.g. someone takes close to the full TTL to
+  // type a captcha), closing the browser out from under the in-flight
+  // Playwright call. scheduleExpiry() below sets a fresh one once this
+  // attempt actually finishes.
+  clearTimeout(session.timer);
   session.attempts += 1;
 
   let result;

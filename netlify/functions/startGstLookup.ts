@@ -1,4 +1,5 @@
 import { validateAuth, unauthorizedResponse } from "../lib/auth";
+import { isValidGstin } from "../../src/eway/gst";
 
 // gst-worker/ -- a separate always-on process (not a Netlify Function; see
 // gst-worker/README.md for why) that holds a live browser session open
@@ -27,7 +28,7 @@ export default async function handler(request: Request) {
     const body = await request.json();
     const gstin = String(body.gstin || "").trim().toUpperCase();
 
-    if (gstin.length !== 15) {
+    if (!isValidGstin(gstin)) {
       return new Response(
         JSON.stringify({ error: "Please enter a valid 15 character GSTIN" }),
         { status: 400, headers: { "Content-Type": "application/json" } }

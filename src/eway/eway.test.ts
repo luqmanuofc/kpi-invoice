@@ -247,6 +247,16 @@ describe("invoiceToEwayInput / buildEwayBill", () => {
     expect(b.OthValue).toBe(-1);
     expect(b.totalValue + b.cgstValue + b.sgstValue + b.igstValue + b.OthValue).toBe(b.totInvValue);
   });
+
+  // buildEwayBill() runs before validateEwayInput()'s own "No items" check
+  // (see export.ts's prepareBill), so it has to survive an empty items
+  // array rather than crash on it -- mainItem used to be items.reduce(...,
+  // items[0]), which is undefined for an empty array.
+  it("doesn't crash on an invoice with no items, leaving validation to flag it", () => {
+    const empty = invoiceToEwayInput(makeInvoice({ items: [] }), makeBuyer());
+    expect(() => buildEwayBill(empty)).not.toThrow();
+    expect(buildEwayBill(empty).mainHsnCode).toBe("");
+  });
 });
 
 describe("validation", () => {
