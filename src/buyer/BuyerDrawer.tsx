@@ -398,6 +398,9 @@ export default function BuyerDrawer({
       {gstDetail ? (
         <div className="space-y-1.5">
           <p className="text-sm text-muted-foreground text-left">
+            <strong>GSTIN:</strong> {buyer.gstin || "—"}
+          </p>
+          <p className="text-sm text-muted-foreground text-left">
             <strong>Legal Name:</strong> {gstDetail.legalName || "—"}
           </p>
           <p className="text-sm text-muted-foreground text-left">
